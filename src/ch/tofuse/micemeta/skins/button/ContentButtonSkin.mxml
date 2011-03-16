@@ -1,0 +1,55 @@
+<s:SparkSkin
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	xmlns:mx="library://ns.adobe.com/flex/mx"
+	useHandCursor="true"
+	buttonMode="true">
+	
+	<fx:Metadata>
+		[HostComponent("ch.tofuse.micemeta.views.buttons.ContentButton")]
+	</fx:Metadata>
+	
+	<s:states>
+		<s:State name="up"/>
+		<s:State name="over"/>
+		<s:State name="down"/>
+		<s:State name="disabled"/>
+	</s:states> 
+	
+	<s:Rect id="highlight" left="0" right="0" top="0" bottom="0" radiusX="6" radiusY="6"
+			includeIn="over,down">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0xFFFFFF"
+								 ratio="0.1"
+								 alpha=".66"/>
+				<s:GradientEntry color="0xFFFFFF"
+								 ratio="0.9"
+								 alpha="0.33"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Group top="5" right="0" bottom="5" left="0"
+		horizontalCenter="0"
+		verticalCenter="0">
+		
+		<s:layout>
+			<s:VerticalLayout gap="3" 
+							  horizontalAlign="center"/>
+		</s:layout>
+				
+		<mx:Image
+			id="icon"
+			source="{hostComponent.modulesIcon}" />
+		
+		<s:Label id="buttonLabel"
+			text="{hostComponent.label}"
+			color="0x222222"
+			color.over="0x000000"
+			includeInLayout="{( hostComponent.label != '' )}"
+			visible="{( hostComponent.label != '' )}"/>
+	</s:Group>
+	
+</s:SparkSkin>

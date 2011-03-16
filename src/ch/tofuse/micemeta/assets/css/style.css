@@ -1,0 +1,168 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace button "ch.tofuse.micemeta.views.buttons.*";
+@namespace input "ch.tofuse.micemeta.views.inputs.*";
+@namespace components "ch.tofuse.micemeta.views.components.*";
+
+@font-face { 
+	src: url("../fonts/MyriadWebPro.ttf"); 
+	fontFamily: Myriad; 
+	fontWeight: normal; 
+	embedAsCFF: true;
+	advancedAntiAliasing: true; 
+}
+
+@font-face { 
+	src: url("../fonts/MyriadWebProBold.ttf"); 
+	fontFamily: Myriad; 
+	fontWeight: bold; 
+	embedAsCFF: true; 
+	advancedAntiAliasing: true; 
+}
+
+@font-face { 
+	src: url("../fonts/MyriadWebPro.ttf"); 
+	fontFamily: MyriadMX; 
+	fontWeight: normal; 
+	embedAsCFF: false; 
+}
+
+@font-face { 
+	src: url("../fonts/MyriadWebProBold.ttf"); 
+	fontFamily: MyriadMX; 
+	fontWeight: bold; 
+	embedAsCFF: false;  
+}
+
+s|global {
+	font-family: Myriad;
+	font-size: 12px;
+	font-grid-fit-type: pixel;
+	font-weight: normal;
+	font-anti-alias-type: advanced;
+}
+
+
+s|Label, input|AutoCompleteTextInput, input|AutoCompleteList, s|RichEditableText, s|MXDataGridItemRenderer, s|VGroup, s|HGroup
+{
+	font-family: Myriad;
+	font-weight: normal;
+	direction: ltr;
+}
+
+mx|DateField, mx|Button, mx|DataGrid, mx|FormItem, mx|FormItemLabel, mx|Label, mx|ToolTip, mx|Alert 
+{
+	font-family: MyriadMX;
+}
+
+#contentStack {
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+}
+
+/* LABELS */
+
+.menuLabel {
+	color: #707070;	
+	font-weight: bold;
+	font-size: 12px;
+	direction: ltr;
+	justification-rule:auto;
+	justification-style:auto;
+}
+
+.headerLabel {
+	color: #707070;
+	font-size: 20px;
+	font-weight: bold;
+	direction: ltr;
+}
+
+.sectionLabel {
+	color: #707070;
+	font-size: 16px;
+	font-weight: bold;
+	direction: ltr;
+}
+
+.formPartHeaderLabel {
+	font-size: 13px;
+	color: #707070;
+	font-weight: normal;
+}
+
+.inputInfoLabel {
+	color: #707070;
+}
+
+.debug {
+	border-style: solid;
+	border-color: #00FFFF;
+}
+
+/* PSEUDO FORM */
+.formItem {
+	padding-left: 10;
+}
+
+.formItemlabel {
+	color: #666666;
+	font-size: 13px;
+	font-weight: bold;
+	direction: ltr;
+}
+
+/* INPUTS */
+
+mx|DateField {
+	
+}
+
+/* BUTTONS */
+
+button|ModuleButton {
+	padding-top: 5px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-left: 10px;
+}
+
+button|IconButton {
+	padding-top: 5px;
+	padding-right: 5px;
+	padding-bottom: 5px;
+	padding-left: 5px;
+}
+
+/* FORMS */
+
+.addForm {
+	padding-top: 0px;
+}
+
+mx|FormItem {
+	padding-left: 0px;
+	
+}
+
+.subForm {
+	
+}
+
+/* TOOL TIPS */
+
+mx|ToolTip {
+	backgroundColor: #000000;
+	backgroundAlpha: 1.0;
+	cornerRadius: 0;
+	color: #FFFFFF;
+	font-size: 12px;
+}
+
+components|ComponentBase {
+	background-color: #FFFFFF;
+	border-visible: false;
+}

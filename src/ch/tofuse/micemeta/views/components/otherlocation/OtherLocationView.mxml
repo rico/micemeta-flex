@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ComponentBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  xmlns:components="ch.tofuse.micemeta.views.components.*"
+						  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*"
+						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+						  xmlns:text="ch.tofuse.micemeta.views.text.*"
+						  xmlns:views="ch.tofuse.micemeta.views.*"
+				 		  creationComplete="build()" xmlns:grids="ch.tofuse.micemeta.views.grids.*">
+	
+	<fx:Declarations>
+		<mx:StringValidator id="codeValidator" source="{code}" property="text"
+							minLength="2" maxLength="4"
+							valid="{_code_valid = true}" invalid="{_code_valid = false}" />
+		<mx:StringValidator id="descriptionValidator" source="{description}" property="text"
+							minLength="4"
+							valid="{_desc_valid = true}" invalid="{_desc_valid = false}" />
+	</fx:Declarations>
+	
+	<components:states>
+		<s:State name="view" enterState="{addEntityButton.enabled = true}" exitState="{addEntityButton.enabled = false}"/>
+		<s:State name="edit" />
+		<s:State name="add" />
+	</components:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.entities.OtherLocation;
+			import ch.tofuse.micemeta.helpers.DataHelpers;
+			import ch.tofuse.micemeta.vo.Segments;
+			
+			import org.davekeen.flextrine.orm.IEntityRepository;
+			
+			[Bindable] private var _formItemLabelLeft:Number = 15;
+			[Bindable] private var _formItemValueLeft:Number = 75;
+			[Bindable] private var _editMode:Boolean = false;
+			[Bindable] private var _formItem:OtherLocation;
+			[Bindable] private var _segments:Segments;
+			
+			private var _code_valid:Boolean = false;
+			private var _desc_valid:Boolean = true;
+			
+			private function build():void
+			{
+				_formItem = new OtherLocation();
+				_segments = new Segments();
+				
+				repository = em.getRepository( OtherLocation );
+				repository.loadAll();
+				entitiesGrid.dataSource = repository.entities;
+				
+			}
+			
+			private function validateForm():void
+			{
+				if( codeValid() && segmentValid() && _desc_valid ) {
+					doneButton.enabled = true;
+				} else {
+					doneButton.enabled = false;
+				}				
+			}
+			
+			private function codeValid():Boolean
+			{
+				if( currentState == 'edit' ) {
+					return true;
+				} else {
+					
+					codeValidator.validate();
+					
+					if( repository.findOneBy( {code: code.text} ) ) {
+						return false;
+					} else {
+						if( _code_valid ) {
+							return true;	
+						} else {
+							return false;
+						}
+					}
+				}
+			}
+			
+			private function segmentValid():Boolean
+			{
+				if( segment.selectedLabel != '-') {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			
+			override protected function deleteItem( event:Event ):void
+			{
+				em.remove( OtherLocation( event.target.data ) );
+				em.flush();
+				entitiesGrid.selectedIndex = 0;
+			}
+			
+			override protected function editItem( event:Event ):void
+			{
+				currentState = 'edit';
+				_formItem = event.target.data as OtherLocation;
+				
+				code.text = _formItem.code;
+				description.text = _formItem.description;
+				segment.selectedIndex = DataHelpers.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments );
+				
+				doneButton.enabled = true;
+			}
+			
+			private function editSave():void
+			{
+				_formItem.code = code.text;
+				_formItem.description = description.text;
+				_formItem.segment = segment.selectedLabel;
+				
+				em.flush();
+				
+				entitiesGrid.selectedItem = _formItem;
+				resetForm();
+				currentState = 'view';
+			}
+			
+			override protected function addItem( event:Event ):void
+			{
+				currentState = 'add';
+				resetForm();
+				
+			}
+			
+			private function addSave():void
+			{
+				var ol:OtherLocation = new OtherLocation();
+				ol.code = code.text;
+				ol.segment = segment.selectedLabel;
+				ol.description = description.text;
+				
+				em.persist( ol );
+				em.flush();
+				
+				//entitiesGrid.selectedItem = ol;
+				
+				currentState = 'view';
+				
+				resetForm();
+			}
+			
+			private function resetForm():void
+			{
+				// reset form
+				code.text = '';
+				description.text = '';
+				
+				validateForm();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<components:layout>
+		<s:VerticalLayout gap="2"
+						  paddingTop="10"
+						  paddingBottom="10"
+						  paddingRight="10"/>
+	</components:layout>
+	
+	<s:Label id="header" text="Other Locations" styleName="headerLabel" />
+	
+	<mx:Spacer height="15" />
+	
+	<s:Group id="main" left="20" layoutDirection="ltr">
+		<s:layout>
+			<s:HorizontalLayout paddingLeft="{_formItemLabelLeft}"
+								gap="50"/>
+		</s:layout>
+		
+		<s:VGroup gap="10">
+			<s:Label text="Current Other Locations" styleName="sectionLabel" />
+			<grids:AutoResizeDataGrid id="entitiesGrid">
+				<grids:columns>
+					<mx:DataGridColumn headerText="code" dataField="code" width="80"/>
+					<mx:DataGridColumn headerText="description" dataField="description" width="150" wordWrap="true"/>
+					<mx:DataGridColumn headerText="segment" dataField="segment" width="80"/>
+					<mx:DataGridColumn width="30" itemRenderer="ch.tofuse.micemeta.views.renderers.EditItemRenderer"/>
+					<mx:DataGridColumn width="30" itemRenderer="ch.tofuse.micemeta.views.renderers.DeleteItemRenderer"/>
+				</grids:columns>
+			</grids:AutoResizeDataGrid>	
+			
+			<s:Group width="100%">
+				<buttons:IconButton id="addEntityButton"
+								   right="0"
+								   click="addItem( event )"
+								   label="Add Other Location"
+								   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/add.png')"/>	
+			</s:Group>
+			
+			
+		</s:VGroup>
+		
+		<s:VGroup gap="10" includeIn="add, edit">
+			<s:Label text="{currentState == 'add' ? 'Add Location' : 'Edit Location' }" styleName="sectionLabel" />
+			
+			<mx:Form id="addEditForm" styleName="addEditForm" defaultButton="{doneButton}">
+				
+				<mx:FormItem label="code" required="true">
+					<mx:TextInput id="code" maxChars="4"
+								  enabled="{currentState == 'add'}"
+								  change="validateForm()"
+								  />	
+				</mx:FormItem>
+				
+				<mx:FormItem label="segment" required="true">
+					<mx:ComboBox id="segment" 
+								 dataProvider="{_segments}"
+								 change="validateForm()" />
+						
+				</mx:FormItem>
+				
+				<mx:FormItem label="description">
+					<inputs:AutoResizeableTextArea id="description"
+													   autoResize="true"
+													   creationComplete="descriptionValidator.validate()"
+													   change="{descriptionValidator.validate();validateForm()}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem>
+					<buttons:IconButton id="doneButton" label="save" click="{currentState == 'add' ? addSave() : editSave()}"
+									   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
+				</mx:FormItem>
+			</mx:Form>	
+			<text:InfoText includeIn="add" text="Please make sure to choose a unique value for the code!" />
+		</s:VGroup>
+		
+	</s:Group>
+	
+</components:ComponentBase>

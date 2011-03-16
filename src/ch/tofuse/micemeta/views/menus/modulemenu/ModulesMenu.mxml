@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableComponent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+		  skinClass="ch.tofuse.micemeta.skins.menu.ModulesMenuSkin"
+		  width="100%"
+		  creationComplete="build()">
+	
+	<fx:Declarations>
+		<fx:String id="headerLabel">micemeta</fx:String>
+		
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.views.buttons.ComponentButton;
+			import ch.tofuse.micemeta.views.buttons.ContentButton;
+			import ch.tofuse.micemeta.views.buttons.ModuleButton;
+			import ch.tofuse.micemeta.interfaces.IContent;
+			import ch.tofuse.micemeta.managers.ComponentManager;
+			import ch.tofuse.micemeta.managers.ModuleManager;
+			import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+			
+			import spark.components.HGroup;
+			
+			[SkinPart(required="false", type="ch.tofuse.micemeta.views.components.buttons.ModuleButton")]
+			public var moduleButton:IFactory;
+			
+			[SkinPart(required="false", type="ch.tofuse.micemeta.views.components.buttons.ComponentButton")]
+			public var componentButton:IFactory;
+			
+			[SkinPart(required="true")]
+			public var modulesGroup:HGroup;
+			
+			[SkinPart(required="true")]
+			public var componentsGroup:HGroup;
+			
+			[SkinPart(required="false")]
+			public var settingsGroup:HGroup;	
+			
+			private var _moduleManager:ModuleManager;
+			private var _componentManager:ComponentManager;
+			
+			private function build():void
+			{
+				addStartupContent();
+			}
+			
+			private function addStartupContent():void
+			{
+				for each( var module:IContent in _moduleManager.modules ) {
+					if( module.addInstanceOnStart ) {
+						_moduleManager.addModuleInstanceToNavigator( module );
+					}
+				}
+				
+				for each ( var component:IContent in _componentManager.components) {
+					if( component.addInstanceOnStart ) {
+						_componentManager.addComponentInstanceToNavigator( component );
+					}
+				}
+				
+			}
+			
+			override protected function partAdded( partName:String, instance:Object ):void
+			{
+				
+				super.partAdded( partName, instance );
+				
+				if ( partName == "moduleButton" ) {
+					ModuleButton( instance ).addEventListener( MouseEvent.CLICK, addContent );
+				}
+				
+				if( partName == "componentButton" ) {
+					ComponentButton( instance ).addEventListener( MouseEvent.CLICK, addContent );
+				}
+			}
+			
+			override protected function partRemoved(partName:String, instance:Object) : void
+			{
+				super.partRemoved(partName, instance);
+				
+				if (partName == "moduleButton") {
+					ModuleButton(instance).removeEventListener(MouseEvent.CLICK, addContent);
+				}
+				
+				if( partName == "componentButton" ) {
+					ComponentButton( instance ).removeEventListener( MouseEvent.CLICK, addContent );
+				}
+			}
+				
+			
+			public function set moduleManager( mm:ModuleManager ):void
+			{
+				if( !_moduleManager ) {
+					_moduleManager = mm;
+					
+					var mb:ModuleButton;
+					for each( var module:IContent in _moduleManager.modules ) {
+						mb = createDynamicPartInstance( "moduleButton" ) as ModuleButton;   
+						mb.component = module;
+						modulesGroup.addElement( mb );
+					}
+				}
+			}
+			
+			public function set componentManager( cm:ComponentManager ):void
+			{
+				if( !_componentManager ) {
+					_componentManager = cm;
+					
+					var cb:ComponentButton;
+					for each( var component:IContent in _componentManager.components ) {
+						cb = createDynamicPartInstance( "componentButton" ) as ComponentButton;   
+						cb.component = component;
+						modulesGroup.addElement( cb );
+					}
+				}
+			}
+			
+			protected function addContent( event:MouseEvent ):void
+			{
+				var m:IContent = ( event.target as ContentButton ).component;
+				_moduleManager.addModuleInstanceToNavigator( m );
+			}
+		]]>
+	</fx:Script>
+	
+</s:SkinnableComponent>

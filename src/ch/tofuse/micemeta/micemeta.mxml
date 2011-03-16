@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:menus="ch.tofuse.micemeta.views.menus.*" 
+			   xmlns:navigation="ch.tofuse.micemeta.views.navigation.*" 
+			   xmlns:content="ch.tofuse.micemeta.content.*" 
+			   xmlns:components="ch.tofuse.micemeta.components.*"
+			   xmlns:maps="ch.tofuse.micemeta.maps.*"
+			   xmlns:main="ch.tofuse.micemeta.views.main.*" 
+			   xmlns:nestcheck="ch.tofuse.micemeta.views.modules.nestcheck.*"
+			   xmlns:location="ch.tofuse.micemeta.views.modules.location.*" 
+			   xmlns:mouse="ch.tofuse.micemeta.views.components.mouse.*" 
+			   xmlns:genetic="ch.tofuse.micemeta.views.modules.genetic.*" 
+			   xmlns:views="ch.tofuse.micemeta.views.*" 
+			   xmlns:modulemenu="ch.tofuse.micemeta.views.menus.modulemenu.*"
+			   initialize="init()">
+	
+	<s:layout>
+		<s:VerticalLayout gap="0"/>
+	</s:layout>
+	
+	<fx:Style source="assets/css/style.css"/>
+	<fx:Declarations>
+		<!-- modules -->
+		<fx:Vector id="modules" type="ch.tofuse.micemeta.interfaces.IContent">
+			<nestcheck:NestcheckMainContainer addInstanceOnStart="true" />
+			<genetic:GeneticsMainContainer />
+			
+		</fx:Vector>
+		
+		<!-- modules -->
+		<fx:Vector id="components" type="ch.tofuse.micemeta.interfaces.IContent">
+			<mouse:MiceMainContainer />
+			<location:LocationMainContainer/>
+		</fx:Vector>
+		
+		<!-- maps -->
+		<maps:MainEventMap />
+		
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.config.FlextrineConfig;
+			import ch.tofuse.micemeta.events.ComponentManagerEvent;
+			import ch.tofuse.micemeta.events.ModuleManagerEvent;
+			
+			import org.davekeen.flextrine.orm.EntityManager;
+			
+			private function init():void
+			{
+				var mme:ModuleManagerEvent = new ModuleManagerEvent( ModuleManagerEvent.INIT_MODULES );
+				mme.modules = modules;
+				mme.moduleNavigator = contentNavigator;
+				dispatchEvent( mme );
+				
+				var cme:ComponentManagerEvent = new ComponentManagerEvent( ComponentManagerEvent.INIT_COMPONENTS );
+				cme.components = components;
+				cme.componentNavigator = contentNavigator;
+				dispatchEvent( cme );
+				
+				EntityManager.getInstance().setConfiguration( new FlextrineConfig() );
+			}
+		]]>
+	</fx:Script>
+	
+	<!-- modules menu -->
+	<modulemenu:ModulesMenu id="moduleMenu" height="55" />
+	
+	<!-- module Navigation -->
+	<views:ContentNavigator id="contentNavigator"
+								width="100%" height="100%"/>
+</s:Application>

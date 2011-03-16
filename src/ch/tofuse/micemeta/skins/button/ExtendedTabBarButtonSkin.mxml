@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin
+	xmlns:fx="http://ns.adobe.com/mxml/2009"
+	xmlns:s="library://ns.adobe.com/flex/spark"
+	alpha.disabled="0.5">
+	
+	<fx:Metadata>
+		[HostComponent("ch.tofuse.micemeta.views.navigation.ExtendedTabBarButton")]
+	</fx:Metadata>
+	
+	<!-- states -->
+	<s:states>
+		<s:State name="up" />
+		<s:State name="over" stateGroups="overStates" />
+		<s:State name="down" stateGroups="downStates" />
+		<s:State name="disabled" stateGroups="disabledStates" />
+		<s:State name="upAndSelected" stateGroups="selectedStates, selectedUpStates" />
+		<s:State name="overAndSelected" stateGroups="overStates, selectedStates" />
+		<s:State name="downAndSelected" stateGroups="downStates, selectedStates" />
+		<s:State name="disabledAndSelected" stateGroups="selectedUpStates, disabledStates, selectedStates" />
+	</s:states>
+	
+	<!-- tab -->
+	<!-- border -->
+	<s:Group id="borderGroup" top="0" bottom="0" width="100" height="{this.height}">
+		
+		<s:Line height="{borderGroup.height}">
+			<s:stroke>
+				<s:SolidColorStroke color="0x696969" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+		
+		<s:Line x="{borderGroup.width}" height="{borderGroup.height}">
+			<s:stroke>
+				<s:SolidColorStroke color="0x696969" weight="1"/>
+			</s:stroke>
+		</s:Line>	
+	</s:Group>
+	
+	<!-- background -->
+	<s:Rect left="1" right="0" top="0" bottom="0">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="0xd7d7d7d" color.selectedStates="0xd6d6d6" ratio=".1" alpha="1"/>
+					<s:GradientEntry color="0xd6d6d6" color.selectedStates="0xa5a5a5" ratio=".9" alpha="1"/>
+				</s:entries>
+			</s:LinearGradient>  
+		</s:fill>
+	</s:Rect>
+	
+	<!-- close button -->
+	<s:Button id="closeButton" skinClass="ch.tofuse.micemeta.skins.button.ExtendedTabBarButtonCloseButtonSkin" 
+			  toolTip=""
+			  right="5"
+			  verticalCenter="0"/>
+	
+	<!-- label -->
+	<s:Label id="labelDisplay"
+			 maxDisplayedLines="1"
+			 color="0x000000"
+			 color.up="0x666666"
+			 verticalCenter="4"
+			 left="10" right="10" top="2" bottom="2" />
+	
+</s:SparkSkin>

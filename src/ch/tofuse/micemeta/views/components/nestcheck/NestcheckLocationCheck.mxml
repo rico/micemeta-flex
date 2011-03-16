@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ComponentBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*"
+						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+						  xmlns:components="ch.tofuse.micemeta.views.components.*"
+						  creationComplete="build()" xmlns:litter="ch.tofuse.micemeta.views.components.litter.*">
+	
+	<components:states>
+		<s:State name="boxAdd" activate="boxCheckStateEntered()"/>
+		<s:State name="boxEdit" activate="boxCheckStateEntered()" />
+		<s:State name="boxView" activate="boxCheckStateEntered()" />
+		<s:State name="OtherLocationAdd" activate="otherLocationCheckEntered()" />
+		<s:State name="OtherLocationEdit" activate="otherLocationCheckEntered()" />
+		<s:State name="OtherLocationView" activate="otherLocationCheckEntered()" />
+	</components:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.entities.Box;
+			import ch.tofuse.micemeta.entities.BoxCheck;
+			import ch.tofuse.micemeta.entities.Litter;
+			import ch.tofuse.micemeta.entities.LocationCheck;
+			import ch.tofuse.micemeta.entities.NestCheck;
+			import ch.tofuse.micemeta.entities.OtherLocation;
+			import ch.tofuse.micemeta.entities.OtherLocationCheck;
+			import ch.tofuse.micemeta.events.AutoCompleteTextInputEvent;
+			
+			import org.davekeen.flextrine.orm.EntityProxy;
+			import org.davekeen.flextrine.orm.IEntityRepository;
+			
+			[Bindable] private var _boxRepository:IEntityRepository;
+			[Bindable] private var _otherLocationRepository:IEntityRepository;
+			
+			private var _boxCheck:BoxCheck;
+			private var _otherLocationCheck:OtherLocationCheck;
+			private var _locationCheck:LocationCheck;
+			private var _nestcheck:NestCheck;
+			
+			
+			private function build():void
+			{
+				
+				_boxRepository = em.getRepository( Box );
+				_otherLocationRepository = em.getRepository( OtherLocation );
+			}
+			
+			public function get nestcheck():NestCheck
+			{
+				return _nestcheck;
+			}
+			
+			public function set nestcheck(value:NestCheck):void
+			{
+				_nestcheck = value;
+			}
+			
+			[Inspectable(category="General",type="String", defaultValue="boxView",enumeration=",boxView,boxEdit,boxAdd,otherLocationView,otherLocationEdit,otherLocationAdd")]
+			public function set state( s:String ):void
+			{
+				currentState = s;
+			}
+			
+			private function boxCheckStateEntered():void
+			{
+				itemFormLabel.text = "Box Check Details";
+			}
+			
+			private function otherLocationCheckEntered():void
+			{
+				itemFormLabel.text = "Other Location Check Details";
+			}
+			
+			public function get boxCheck():BoxCheck
+			{
+				return _boxCheck;
+			}
+
+			public function set boxCheck(value:BoxCheck):void
+			{
+				
+				_boxCheck = value;
+				
+				currentState = "boxCheckView";
+			}
+
+			public function get otherLocationCheck():OtherLocationCheck
+			{
+				return _otherLocationCheck;
+			}
+
+			public function set otherLocationCheck(value:OtherLocationCheck):void
+			{
+				_otherLocationCheck = value;
+				currentState = "otherLocationCheckView";
+			}
+			
+			private function saveCheck( ):void
+			{
+				_locationCheck.rank = _nestcheckData.length + 1;
+				_locationCheck.non_transpondered = non_transpondered.numericValue;
+				_locationCheck.sub_adults = sub_adults.numericValue;
+				_locationCheck.pups = pups.numericValue;
+				_locationCheck.pups_age = pups_age.numericValue;
+				_locationCheck.pups_male_alive = pups_male_alive.numericValue;
+				_locationCheck.pups_male_dead = pups_male_dead.numericValue;
+				_locationCheck.pups_female_alive = pups_female_alive.numericValue;
+				_locationCheck.pups_female_dead = pups_female_dead.numericValue;
+				_locationCheck.pups_unknown_alive = pups_unknown_alive.numericValue;
+				_locationCheck.pups_unknown_dead = pups_unknown_dead.numericValue;
+				_locationCheck.new_litter = litters.dataProvider.length > 0;
+				_locationCheck.communal = communal.selected;
+				_locationCheck.remark = remark.text;
+				
+				/* mice */
+				for each( var mouse:ch.tofuse.micemeta.entities.Mouse in transponders_list.data ) {
+					_locationCheck.mice.addItem( mouse );
+				}
+				
+				/* litters */
+				for each( var litter:Litter in litters.dataProvider ) {
+					_locationCheck.litters.addItem( litter );
+				}
+				
+			}
+			
+			private function addLocation( event:AutoCompleteTextInputEvent = null ):void
+			{
+				locations.acceptCompletion();
+				var si:EntityProxy = EntityProxy( locations.selectedItem );
+				
+				if( si._item is Box ) {
+					currentState = "boxCheck";
+					_boxCheck = new BoxCheck();
+					_boxCheck.nestcheck = _nestcheck;
+					_boxCheck.box = Box(si._item);
+					
+					_nestcheckManager.boxCheckManager.addEntity( _boxCheck );
+					_nestcheck.box_checks.addItem( _boxCheck );
+					
+				} else if( si._item is OtherLocation ) {
+					currentState = "otherLocationCheck";
+					_otherLocationCheck = new OtherLocationCheck();
+					_otherLocationCheck.nestcheck = _nestcheck;
+					_otherLocationCheck.otherLocation = OtherLocation(si._item);
+					
+					_nestcheckManager.otherLocationCheckManager.addEntity( _otherLocationCheck );
+					_nestcheck.other_location_checks.addItem( _otherLocationCheck );
+				}
+				
+				_currentLocation = si._item;
+				location.text = locations.labelFunction.call( null, si );
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+						  
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<components:layout>
+		<s:VerticalLayout gap="10" />
+	</components:layout>
+	
+	<s:Label id="itemFormLabel" text="Check Details" styleName="sectionLabel" />
+	<mx:Form id="addEditForm" styleName="addEditForm" defaultButton="{doneButton}">
+		
+		<mx:FormItem label="location" >
+			<mx:Label id="location"/>	
+		</mx:FormItem>
+		
+		<mx:FormItem label="transponders" >
+			<inputs:AutoCompleteList id="transponders_list" 
+									 textInputWidthInChars="10"
+									 inputsEnabled="{!_nestcheckManager.loading}"
+									 listData="{_nestcheckManager.mouseManager.rfidData}" 
+									 field="id"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="non transpondered" >
+			<inputs:NumericTextInput id="non_transpondered"/>	
+		</mx:FormItem>
+		
+		<mx:FormItem label="Subadults" >
+			<inputs:NumericTextInput id="sub_adults"/>	
+		</mx:FormItem>
+		
+		<mx:FormItem label="Nest open"
+					 includeIn="boxCheck">
+			<s:CheckBox id="nest_open" />	
+		</mx:FormItem>
+		
+		<mx:FormItem label="pups age">
+			<s:HGroup verticalAlign="middle" gap="10">
+				<inputs:NumericTextInput id="pups_age" maxChars="3" widthInChars="3" />
+				<s:Label text="(in days)" styleName="inputInfoLabel" />
+			</s:HGroup>
+			
+		</mx:FormItem>
+		
+		<mx:FormItem label="number of pups">
+			<inputs:NumericTextInput id="pups" enabled="false" 
+									 numericValue="{ pups_male_alive.numericValue + pups_male_dead.numericValue + pups_female_alive.numericValue + pups_female_dead.numericValue + pups_unknown_alive.numericValue + pups_unknown_dead.numericValue }"/>
+		</mx:FormItem>
+		
+		<mx:FormItem label="pups male alive">
+			<inputs:NumericTextInput id="pups_male_alive" />
+		</mx:FormItem>
+		
+		<mx:FormItem label="pups male dead">
+			<inputs:NumericTextInput id="pups_male_dead" />
+		</mx:FormItem>
+		
+		<mx:FormItem label="pups female alive">
+			<inputs:NumericTextInput id="pups_female_alive" />
+		</mx:FormItem>
+		
+		<mx:FormItem label="pups female dead">
+			<inputs:NumericTextInput id="pups_female_dead" />
+		</mx:FormItem>
+		
+		<mx:FormItem label="pups unknown gender alive">
+			<inputs:NumericTextInput id="pups_unknown_alive" />
+		</mx:FormItem>
+		
+		<mx:FormItem label="pups unknown gender dead">
+			<inputs:NumericTextInput id="pups_unknown_dead" />
+		</mx:FormItem>
+		
+		<!-- litters -->
+		<mx:FormItem label="litters">
+			<mx:Spacer height="15" />
+			<litter:LitterView id="litters" />
+		</mx:FormItem>
+		
+		<mx:FormItem label="communal">
+			<s:CheckBox id="communal" />
+		</mx:FormItem>
+		
+		<mx:FormItem label="remark">
+			<s:TextArea id="remark" widthInChars="30" heightInLines="5" top="10"/>	
+		</mx:FormItem>
+		
+		
+		<mx:FormItem>
+			<buttons:IconButton id="doneButton" label="save" click="{currentState == 'add' ? saveAddLocationCheck() : saveEditLocationCheck()}"
+								iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
+		</mx:FormItem>
+	</mx:Form>	
+	
+	
+</components:ComponentBase>

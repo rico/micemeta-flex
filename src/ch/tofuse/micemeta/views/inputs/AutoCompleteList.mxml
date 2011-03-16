@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:buttons="ch.tofuse.micemeta.views.buttons.*" 
+		  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*"
+		  creationComplete="build()"
+		  paddingTop="0" paddingRight="0" paddingBottom="0" paddingLeft="0"
+		  >
+	
+	<s:states>
+		<s:State name="add" />
+		<s:State name="select" />
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.views.renderers.DeleteItemRenderer;
+			import ch.tofuse.micemeta.views.renderers.DeleteItemWithoutConfirmRenderer;
+			import ch.tofuse.micemeta.events.AutoCompleteTextInputEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.controls.listClasses.ListData;
+			
+			[Bindable] public var listData:ArrayCollection;
+			[Bindable] public var textInputWidthInChars:Number;
+			
+			[Bindable] private var _field:String;
+			[Bindable] private var _data:ArrayCollection = new ArrayCollection();
+			[Bindable] private var _inputsEnabled:Boolean = true;
+			[Bindable] private var _showGrid:Boolean = true;
+			
+			private function build():void
+			{
+				itemsGrid.addEventListener( "deleteItem", deleteItem );
+				addInput.addEventListener( AutoCompleteTextInputEvent.CONFIRM_SELECTION, addItem );
+				addInput.addEventListener( "selectedItemChange", function(event:Event):void{ dispatchEvent( new Event("selectedItemChange") )} );
+			}
+			
+			public function set field( f:String ):void
+			{
+				_field = f;
+				fieldColumn.dataField = _field;
+			}
+			
+			public function set selectedItem( item:Object ):void
+			{
+				addInput.selectedItem = item;
+				dispatchEvent( new Event("selectedItemChange") );
+			}
+			
+			[Bindable(Event="selectedItemChange")]
+			public function get selectedItem():Object
+			{
+				return addInput.selectedItem;
+			}
+			
+			public function set labelFunction( f:Function ):void
+			{
+				addInput.labelFunction = f;
+			}
+			
+			[Inspectable(category="General",type="String", defaultValue="add",enumeration="add,select")]
+			public function set mode(m:String):void
+			{
+				switch (m) {
+					case 'add':
+						currentState = 'add'
+					break;
+					case 'select':
+						currentState = 'select';
+					break;
+				}
+			}
+			
+			public function set showGrid( sg:Boolean ):void
+			{
+				_showGrid = sg;
+			}
+			
+			public function get showGrid():Boolean
+			{
+				return _showGrid;				
+			}
+			
+			public function set requireSelection( rs:Boolean ):void
+			{
+				addInput.requireSelection = rs;
+			}
+			
+			private function addItem( event:AutoCompleteTextInputEvent = null ):void
+			{
+				if ( _data.getItemIndex( addInput.selectedItem ) == -1 ) {
+					
+					_data.addItemAt( addInput.selectedItem, 0 );
+					addInput.text = '';
+					
+					if( _showGrid ) {
+						itemsGrid.selectedItem = addInput.selectedItem;
+						updateGridRowCount( true );
+					} else {
+						dispatchEvent( new Event("dataChange") );			
+					}
+					
+					dispatchEvent( new Event("itemAdded") );
+										
+				}
+			}
+			
+			[Bindable(Event="dataChange")]
+			public function get data():ArrayCollection
+			{
+				return _data;
+			}
+			
+			private function deleteItem( event:Event ):void
+			{
+				event.stopImmediatePropagation();
+				_data.removeItemAt( _data.getItemIndex( event.target.data ) );
+				dispatchEvent( new Event("dataChange") );
+				updateGridRowCount( false );
+			}
+			
+			public function set inputsEnabled( e:Boolean ):void
+			{
+				if( e != _inputsEnabled ) {
+					_inputsEnabled = e;
+				}
+			}
+			
+			public function set title( t:String ):void
+			{
+				if( t != '') {
+					title_label.text = t;
+					title_label.includeInLayout = true;
+					title_label.visible = true;
+				} else {
+					title_label.includeInLayout = false;
+					title_label.visible = false;
+				}
+			}
+			
+			public function get title():String
+			{
+				return title_label.text;
+			}
+			
+			private function updateGridRowCount( add:Boolean ):void
+			{
+				if( add ) {
+					if( _data.length != 1) {
+						itemsGrid.rowCount++;
+					}	
+				} else {
+					if( _data.length != 0) {
+						itemsGrid.rowCount--;
+					} else {
+						itemsGrid.rowCount = 1;
+					}
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Label id="title_label" styleName="formItemlabel"
+			 includeInLayout="false" visible="false"/>
+	
+	<s:HGroup gap="10" verticalAlign="middle"
+			  paddingTop="0" paddingRight="0" paddingBottom="0" paddingLeft="0">
+		<inputs:AutoCompleteTextInput id="addInput" 
+									 requireSelection="true"
+									 widthInChars="{textInputWidthInChars}"
+									 enabled="{_inputsEnabled}"
+									 dataProvider="{listData}"
+									 labelField="{_field}"
+									 prefixOnly="false"
+									 height="22" />
+		<buttons:IconButton label="Add" 
+						   includeIn="add"
+						   click="addItem()"
+						   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/add.png')" 
+						   height="22"
+						   enabled="{(addInput.selectedItem != null) &amp;&amp; (_inputsEnabled)}"/>
+		
+		<buttons:IconButton label="Select"
+						   includeIn="select"
+						   click="addItem()"
+						   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/accept.png')" 
+						   height="22"
+						   enabled="{(addInput.selectedItem != null) &amp;&amp; (_inputsEnabled)}"/>
+		
+	</s:HGroup>
+	
+	<mx:DataGrid id="itemsGrid" 
+				 width="130"
+				 dataProvider="{_data}"
+				 visible="{ (_data.length > 0) &amp;&amp; (_showGrid) }"
+				 includeInLayout="{ (_data.length > 0) &amp;&amp; (_showGrid) }"
+				 showHeaders="false"
+				 rowCount="1"
+				 sortableColumns="false"
+				 useRollOver="false">
+		<mx:columns>
+			<mx:DataGridColumn id="fieldColumn" width="100" />
+			<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.DeleteItemWithoutConfirmRenderer" width="30" />
+		</mx:columns>
+	</mx:DataGrid>
+	
+</s:VGroup>

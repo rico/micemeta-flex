@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mate:EventMap xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:mate="http://mate.asfusion.com/">
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.events.ComponentManagerEvent;
+			import ch.tofuse.micemeta.events.ModuleManagerEvent;
+			import ch.tofuse.micemeta.managers.ComponentManager;
+			import ch.tofuse.micemeta.managers.ModuleManager;
+			import ch.tofuse.micemeta.views.menus.modulemenu.ModulesMenu;
+			import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		
+		<mate:Debugger level="{Debugger.ALL}" />
+		
+		<!-- Modules / Components -->
+		<mate:EventHandlers type="{ModuleManagerEvent.INIT_MODULES}">
+			<mate:ObjectBuilder generator="{ModuleManager}">
+				<mate:Properties dispatcher="{scope.dispatcher}" />
+				<mate:Properties modules="{event.modules}" />
+				<mate:Properties moduleNavigator="{event.moduleNavigator}" />
+			</mate:ObjectBuilder>
+		</mate:EventHandlers>
+		
+		<mate:EventHandlers type="{ComponentManagerEvent.INIT_COMPONENTS}">
+			<mate:ObjectBuilder generator="{ComponentManager}">
+				<mate:Properties dispatcher="{scope.dispatcher}" />
+				<mate:Properties components="{event.components}" />
+				<mate:Properties componentNavigator="{event.componentNavigator}" />
+			</mate:ObjectBuilder>
+		</mate:EventHandlers>
+		
+		<mate:Injectors target="{ModulesMenu}">
+			<mate:PropertyInjector targetKey="moduleManager" source="{ModuleManager}" />
+			<mate:PropertyInjector targetKey="componentManager" source="{ComponentManager}" />
+		</mate:Injectors>
+		
+		<mate:Injectors target="{ModuleContainerBase}">
+			<mate:PropertyInjector targetKey="moduleManager" source="{ModuleManager}" />
+		</mate:Injectors>
+		
+	</fx:Declarations>
+	
+</mate:EventMap>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx"
+				   minHeight="14">
+	<fx:Script>
+		<![CDATA[
+			import spark.filters.DropShadowFilter;
+			
+			[Bindable] public var text:String;
+			
+		]]>
+	</fx:Script>
+	
+	<s:layout>
+		<s:BasicLayout />
+	</s:layout>
+	
+	<s:BorderContainer borderColor="#EE735C"
+					   borderStyle="solid"
+					   borderWeight="1"
+					   backgroundColor="#EE735C"
+					   backgroundAlpha=".75"
+					   color="#FFFFFF"
+					   x="8" y="7"
+					   minHeight="14">
+		<s:layout>
+			<s:BasicLayout />
+		</s:layout>
+		
+		<mx:Image source="@Embed(source='ch/tofuse/micemeta/assets/img/attention.png')" 
+				  x="-8" y="-7"/>
+		<mx:Text id="infoText" text="{text}" color="#FFFFFF" minHeight="14"
+				 left="5" top="7" right="5" bottom="5"/>
+		
+	</s:BorderContainer>
+	
+			
+</s:Group>

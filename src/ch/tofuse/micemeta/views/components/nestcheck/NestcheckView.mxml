@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ComponentBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:view="ch.tofuse.micemeta.views.main.view.*" 
+		 xmlns:nestcheck="ch.tofuse.micemeta.views.components.nestcheck.*"
+		 xmlns:components="ch.tofuse.micemeta.views.components.*" 
+		 xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+		 creationComplete="build()" 
+		 height="100%">
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.config.LayoutConfig;
+		]]>
+	</fx:Script>
+	
+	<components:states>
+		<s:State name="add" enterState="addStateEntered()"/>
+		<s:State name="edit" enterState="editStateEntered()"/>
+		<s:State name="view" enterState="viewStateEntered()"/>
+		<s:State name="locationCheck" enterState="locationCheckEntered()"/>
+	</components:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.entities.Box;
+			import ch.tofuse.micemeta.entities.Litter;
+			import ch.tofuse.micemeta.entities.NestCheck;
+			import ch.tofuse.micemeta.entities.OtherLocation;
+			import ch.tofuse.micemeta.events.ModuleMenuEvent;
+			
+			[Bindable] private var _addMode:Boolean;
+			[Bindable] private var _nestcheck:NestCheck;
+			
+			
+			private function build():void
+			{
+					//repository = em.getRepository( NestCheck );
+			}
+			
+			public function set nestcheck( nc:NestCheck ):void
+			{
+				_nestcheck = nc;
+			}
+			
+			public function get nestcheck():NestCheck
+			{
+				return _nestcheck;
+			}
+			
+			private function viewStateEntered():void
+			{
+				header.text = "Add Nestcheck";
+				_addMode = false;
+				
+				overview.currentState = "view";
+				
+			}
+			
+			private function editStateEntered():void
+			{
+				header.text = "Edit Nestcheck";
+				_addMode = false;	
+				
+				overview.currentState = "edit";
+			}
+			
+			private function addStateEntered():void
+			{
+				_nestcheck = new NestCheck();
+				header.text = "Add Nestcheck";
+				_addMode = true;
+				
+				overview.currentState = "add";
+			}
+			
+			private function locationCheckEntered():void
+			{
+				header.text = "Location";
+			}
+			
+			/* LITTERS */
+			
+			/* SAVE */
+			private function addLocationCheck():void
+			{
+				//_nestcheckData.addItem( );
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<components:layout>
+		<s:VerticalLayout gap="15"
+						  paddingLeft="10"
+						  paddingTop="10"
+						  paddingBottom="10"
+						  paddingRight="10"/>
+	</components:layout>
+	
+	<s:Label id="header" styleName="headerLabel"/>
+	
+	<s:VGroup paddingLeft="{LayoutConfig.FORM_ITEM_VALUE_LEFT}">
+		
+		<!-- overview -->
+		<nestcheck:NestcheckOverview id="overview" 
+									 width="100%"
+									 nestcheck="{_nestcheck}"
+									 includeIn="add,view,edit" />
+			
+		<!-- location check -->
+		<!-- <s:Scroller height="100%" width="100%">
+			<nestcheck:NestcheckLocationCheck id="locationCheck" includeIn="locationCheck"/>
+		</s:Scroller> -->
+			
+	</s:VGroup>
+	
+	<mx:Spacer height="20" />
+	<buttons:IconButton id="doneButton" label="done" click="done()"
+						includeIn="add,edit"
+						iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
+	
+</components:ComponentBase>

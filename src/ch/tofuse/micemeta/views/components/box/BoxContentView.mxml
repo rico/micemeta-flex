@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:ComponentBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  xmlns:components="ch.tofuse.micemeta.views.components.*"
+						  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*"
+						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+						  xmlns:text="ch.tofuse.micemeta.views.text.*"
+						  creationComplete="build()" xmlns:grids="ch.tofuse.micemeta.views.grids.*">
+	
+	<fx:Declarations>
+		<mx:NumberValidator id="xcoordValidator" source="{xcoord}" property="text"
+							valid="{_xcoord_valid = true}" invalid="{_xcoord_valid = false}"
+							allowNegative="false" minValue="0" precision="0" precisionError="decimal number not allowed"/>
+		<mx:NumberValidator id="ycoordValidator" source="{ycoord}" property="text"
+							valid="{_ycoord_valid = true}" invalid="{_ycoord_valid = false}"
+							allowNegative="false" minValue="0" precision="0" precisionError="decimal number not allowed"/>
+	</fx:Declarations>
+	
+	<components:states>
+		<s:State name="view" />
+		<s:State name="edit" />
+	</components:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.entities.Box;
+			import ch.tofuse.micemeta.helpers.DataHelpers;
+			import ch.tofuse.micemeta.vo.Segments;
+			
+			import org.davekeen.flextrine.orm.FetchMode;
+			import org.davekeen.flextrine.orm.IEntityRepository;
+			
+			[Bindable] private var _formItemLabelLeft:Number = 15;
+			[Bindable] private var _formItemValueLeft:Number = 75;
+			[Bindable] private var _editMode:Boolean = false;
+			[Bindable] private var _formItem:Box;
+			[Bindable] private var _segments:Segments;
+			
+			private var _number_valid:Boolean = false;
+			private var _xcoord_valid:Boolean = true;
+			private var _ycoord_valid:Boolean = true;
+			
+			private function build():void
+			{
+				_formItem = new Box();
+				_segments = new Segments();
+				
+				repository = em.getRepository( Box );
+				repository.loadAll();
+				entitiesGrid.dataSource = repository.entities;
+			}
+			
+			
+			private function validateForm():void
+			{
+				if( segmentValid() && _xcoord_valid && _ycoord_valid ) {
+					doneButton.enabled = true;
+				} else {
+					doneButton.enabled = false;
+				}				
+			}
+			
+			private function segmentValid():Boolean
+			{
+				if( segment.selectedLabel != '-') {
+					return true;
+				} else {
+					return false;
+				}
+			}
+			
+			override protected function editItem( event:Event ):void
+			{
+				super.editItem( event )
+				
+				currentState = 'edit';
+				_formItem = event.target.data as Box;
+				
+				box_id.text = _formItem.id;
+				segment.selectedIndex = DataHelpers.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments )
+				xcoord.numericValue = _formItem.xcoord;
+				ycoord.numericValue = _formItem.ycoord;
+				
+				doneButton.enabled = true;
+			}
+			
+			private function editSave():void
+			{
+				_formItem.segment = segment.selectedLabel;
+				_formItem.xcoord = xcoord.numericValue;
+				_formItem.ycoord = ycoord.numericValue;
+				
+				em.flush();
+				
+				entitiesGrid.selectedItem = _formItem;
+				resetForm();
+				currentState = 'view';
+			}
+			
+			private function resetForm():void
+			{
+				// reset form
+				box_id.text = '';
+				segment.selectedIndex = 0;
+				xcoord.numericValue = 0;
+				ycoord.numericValue = 0;
+				
+				_xcoord_valid = true;
+				_ycoord_valid = true;
+				
+				validateForm();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<components:layout>
+		<s:VerticalLayout gap="2"
+						  paddingTop="10"
+						  paddingBottom="10"
+						  paddingRight="10"/>
+	</components:layout>
+	
+	<s:Label id="header" text="Boxes" styleName="headerLabel" />
+	
+	<mx:Spacer height="15" />
+	
+	<s:HGroup id="main" left="20" layoutDirection="ltr"
+			  paddingLeft="{_formItemLabelLeft}"
+			  gap="50">
+			<components:VScrollerBase gap="10">
+				<s:Label text="Current Boxes" styleName="sectionLabel" />
+				<grids:AutoResizeDataGrid id="entitiesGrid">
+					<grids:columns>
+						<mx:DataGridColumn headerText="id" dataField="id" width="80"/>
+						<mx:DataGridColumn headerText="segment" dataField="segment" width="80"/>
+						<mx:DataGridColumn headerText="x-coordinate" dataField="xcoord" width="100"/>
+						<mx:DataGridColumn headerText="y-coordinate" dataField="ycoord" width="100"/>
+						<mx:DataGridColumn headerText="data count" dataField="data_count" width="100"/>
+						<mx:DataGridColumn headerText="dir count" dataField="dir_count" width="100"/>
+						<mx:DataGridColumn headerText="res count" dataField="res_count" width="100"/>
+						<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.EditItemRenderer" width="30"/>
+					</grids:columns>
+				</grids:AutoResizeDataGrid>	
+			</components:VScrollerBase>
+		
+		<s:VGroup gap="10" includeIn="edit">
+			<s:Label text="Edit Box" styleName="sectionLabel" />
+			
+			<mx:Form id="editForm" styleName="addEditForm" defaultButton="{doneButton}">
+				
+				<mx:FormItem label="number" required="true">
+					<inputs:NumericTextInput id="box_id"
+								 enabled="false"
+								 change="validateForm()"
+								 />	
+				</mx:FormItem>
+				
+				<mx:FormItem label="segment" required="true">
+					<mx:ComboBox id="segment" 
+								 dataProvider="{_segments}"
+								 change="validateForm()"/>
+						
+				</mx:FormItem>
+				
+				<mx:FormItem label="x-coordinate">
+					<inputs:NumericTextInput id="xcoord" maxChars="5"
+								  creationComplete="xcoordValidator.validate()"
+								  change="{xcoordValidator.validate();validateForm()}"/>
+				</mx:FormItem>
+				
+				<mx:FormItem label="y-coordinate">
+					<inputs:NumericTextInput id="ycoord" maxChars="5"
+								  creationComplete="ycoordValidator.validate()"
+								  change="{ycoordValidator.validate();validateForm()}"/>
+				</mx:FormItem>
+				<mx:FormItem>
+					<buttons:IconButton id="doneButton" label="save" click="editSave()"
+									   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
+				</mx:FormItem>
+			</mx:Form>	
+		</s:VGroup>
+	</s:HGroup>
+	
+</components:ComponentBase>

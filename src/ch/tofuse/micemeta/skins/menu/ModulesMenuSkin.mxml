@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:buttons="ch.tofuse.micemeta.views.buttons.*">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("ch.tofuse.micemeta.views.menus.modulemenu.ModulesMenu")]
+	</fx:Metadata>
+	<fx:Declarations>
+		<fx:Component id="moduleButton">
+			<buttons:ModuleButton width="60" height="100%"/>
+ 		</fx:Component>
+		<fx:Component id="componentButton">
+			<buttons:ComponentButton width="60" height="100%"/>
+		</fx:Component>
+					  
+	</fx:Declarations>
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" /> 
+	</s:states>
+	
+	
+	<!-- background -->
+	<s:Rect id="background" left="0" top="0" right="0" bottom="0">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:entries>
+					<s:GradientEntry color="0xececec" ratio=".1" alpha="1"/>
+					<s:GradientEntry color="0xb2b2b2" ratio=".9" alpha="1"/>
+				</s:entries>
+			</s:LinearGradient>  
+		</s:fill>
+	</s:Rect>
+	
+	<s:Group id="contentGroup" top="0" right="0" bottom="0" left="10">
+		<s:layout>
+			<s:HorizontalLayout verticalAlign="middle"/>
+		</s:layout>
+		<s:Label text="{hostComponent.headerLabel}" 
+				 fontWeight="bold" color="0x333333" fontSize="16"
+				 verticalCenter="0"/>
+		
+		<mx:Spacer width="50" />
+		
+		<s:HGroup id="modulesGroup" top="10" bottom="10" gap="10" verticalCenter="0" />
+		<mx:Spacer width="20" />
+		<s:HGroup id="componentsGroup" top="10" bottom="10" gap="10" verticalCenter="0" />
+		<mx:Spacer width="20" />
+		<s:HGroup id="settingsGroup" top="10" bottom="10" gap="10" verticalCenter="0" />
+	</s:Group>
+</s:Skin>

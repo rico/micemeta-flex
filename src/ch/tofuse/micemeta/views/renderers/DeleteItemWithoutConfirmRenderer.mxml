@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:MXDataGridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  focusEnabled="true"
+						  verticalCenter="0"
+						  horizontalCenter="0" 
+						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+						  useHandCursor="true"
+						  buttonMode="true"
+						  width="100%"
+						  height="100%"
+						  toolTip="delete item"
+						  click="{dispatchEvent( new Event('deleteItem',true) )}">
+	
+	<fx:Script>
+		<![CDATA[
+			
+			[Embed(source="ch/tofuse/micemeta/assets/img/attention.png")]
+			[Bindable]
+			public var attentionIcon:Class;
+			
+		]]>
+	</fx:Script>
+	
+	<s:HGroup verticalAlign="middle" horizontalAlign="center"
+			  width="100%" height="100%">
+		<mx:Image source="@Embed(source='ch/tofuse/micemeta/assets/img/delete.png')" />	
+	</s:HGroup>
+	
+	
+	
+</s:MXDataGridItemRenderer>

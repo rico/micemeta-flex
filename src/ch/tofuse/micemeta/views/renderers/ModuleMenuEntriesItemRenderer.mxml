@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" 
+				autoDrawBackground="false"
+				useHandCursor="true"
+				buttonMode="true"
+				includeInLayout="{_show}"
+				visible="{_show}"
+				click="clickHandler(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.ItemClickEvent;
+			
+			[Bindable] private var _show:Boolean;
+			
+			private function clickHandler( event:MouseEvent ):void
+			{
+				var e:ItemClickEvent = new ItemClickEvent(ItemClickEvent.ITEM_CLICK, true);
+				e.item = data;
+				e.index = itemIndex;
+				dispatchEvent(e);
+
+			}	
+			
+			override public function set label(value:String):void {
+				if( value && value != '' ) {
+					super.label = value;
+					labelDisplay.text = label;
+					_show = true;
+				} else {
+					_show = false;
+				}
+				 
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="hovered" />
+		<s:State name="selected" />
+	</s:states>
+	
+	<s:Rect id="background" top="0" right="0"  bottom="0" left="0"
+			includeIn="selected">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="#64A3E0" />
+				<s:GradientEntry color="#0065BD" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Line top="0" left="0" right="0"
+			includeIn="selected">
+		<s:stroke>
+			<s:SolidColorStroke color="#4790D4" weight="1" />
+		</s:stroke>
+	</s:Line>
+	
+	<s:Group>
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"
+								paddingLeft="15" paddingRight="5"
+								paddingTop="5" paddingBottom="5" />
+		</s:layout>
+		
+		<s:BitmapImage source="@Embed(source='ch/tofuse/micemeta/assets/img/menu_list_item.png')" 
+					   verticalCenter="1"/>
+		
+		<s:Label id="labelDisplay"
+				 fontWeight="bold"
+				 color.hovered="#0065BD"
+				 color.selected="#FFFFFF"/>
+	</s:Group>
+	
+</s:ItemRenderer>

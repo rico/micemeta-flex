@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:MXDataGridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  focusEnabled="true"
+						  verticalCenter="0"
+						  horizontalCenter="0" 
+						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+						  useHandCursor="true"
+						  buttonMode="true"
+						  width="100%"
+						  height="100%"
+						  toolTip="delete item"
+						  click="showConfirm(event)">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			
+			[Embed(source="ch/tofuse/micemeta/assets/img/attention.png")]
+			[Bindable]
+			public var attentionIcon:Class;
+			
+			private function showConfirm(event:Event):void
+			{
+				Alert.show( "Are you sure you want to delete this item?", 
+					"Delete Item", 
+					Alert.CANCEL | Alert.OK, 
+					null, 
+					closeConfirmHandler, 
+					attentionIcon, 
+					Alert.CANCEL); 
+			}
+			
+			
+			private function closeConfirmHandler( event:CloseEvent ):void
+			{
+				if ( event.detail == Alert.OK) {
+					dispatchEvent( new Event('deleteItem',true) );		 
+				}
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:HGroup verticalAlign="middle" horizontalAlign="center"
+			  width="100%" height="100%">
+		<mx:Image source="@Embed(source='ch/tofuse/micemeta/assets/img/delete.png')" />	
+	</s:HGroup>
+	
+	
+	
+</s:MXDataGridItemRenderer>

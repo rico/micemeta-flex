@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx"
+			 includeInLayout="{_dataSource.length > 0}"
+			 visible="{_dataSource.length > 0}"
+			 rowCount="{_dataSource.length}">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.events.CollectionEvent;
+			
+			[Bindable] private var _dataSource:ArrayCollection;
+			[Bindable] public var scrollHeight:Number = 500;
+			
+			public function get dataSource():ArrayCollection
+			{
+				return _dataSource as ArrayCollection;
+			}
+			
+			public function set dataSource(value:ArrayCollection):void
+			{
+				_dataSource = value;
+				dataProvider = _dataSource;
+				_dataSource.addEventListener(CollectionEvent.COLLECTION_CHANGE, update );
+			}
+			
+			private function update( event:Event = null ):void
+			{
+				measure();
+				
+				if( measuredHeight > scrollHeight ) {
+					rowCount = 0;
+					height = scrollHeight;
+				} else {
+					rowCount = _dataSource.length;
+				}
+				
+				invalidateProperties();
+			}
+
+		]]>
+	</fx:Script>
+</mx:DataGrid>

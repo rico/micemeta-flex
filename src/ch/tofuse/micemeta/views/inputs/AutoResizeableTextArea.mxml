@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+////////////////////////////////////////////////////////////////////////////////
+//
+//  AutoResizableTextArea
+//  *********************
+//
+//  Copyright (C) 2009 Andrei Ionescu
+//  http://www.flexer.info/
+//  
+//  Permission is hereby granted, free of charge, to any person
+//  obtaining a copy of this software and associated documentation
+//  files (the "Software"), to deal in the Software without
+//  restriction, including without limitation the rights to use, misuse,
+//  copy, modify, merge, publish, distribute, love, hate, sublicense, 
+//  and/or sell copies of the Software, and to permit persons to whom the
+//  Software is furnished to do so, subject to no conditions whatsoever.
+// 
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+//  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+//  OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+//  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+//  HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+//  WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+//  OTHER DEALINGS IN THE SOFTWARE. DON'T SUE ME FOR SOMETHING DUMB
+//  YOU DO. 
+//
+//  PLEASE DO NOT DELETE THIS NOTICE.
+//
+////////////////////////////////////////////////////////////////////////////////
+-->
+<mx:TextArea xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+		
+			// auto resize setting
+			private var _autoResizable:Boolean = false;
+			
+			// getter
+			[Bindable(event="changeAutoResize")]
+			public function get autoResize():Boolean
+			{
+				return _autoResizable;
+			}
+			
+			// setter
+			public function set autoResize(b:Boolean):void
+			{
+				_autoResizable = b;
+				// if the text field component is created
+				// and is auto resizable
+				// we call the resize method
+				if (this.mx_internal::getTextField() != null && 
+					_autoResizable == true)
+					resizeTextArea();
+				// dispatch event to make the autoResize 
+				// property bindable
+				dispatchEvent(new Event("changeAutoResize"));
+			}
+			
+			// setter override
+			/*override public function set text(value:String):void
+			{
+				// calling super method 
+				super.text = value;
+				// if is auto resizable we call 
+				// the resize method
+				if (_autoResizable)
+					resizeTextArea();
+			}*/
+			
+			override protected function updateDisplayList(unscaledWidth:Number,unscaledHeight:Number):void
+			{					
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+				// if is auto resizable we call 
+				// the resize method
+				if (_autoResizable)
+					resizeTextArea();
+			}
+			
+			// resize function for the text area
+			private function resizeTextArea():void
+			{
+				// initial height value
+				// if set to 0 scroll bars will 
+				// appear to the resized text area 
+				var totalHeight:uint = 10;
+				// validating the object
+				this.validateNow();
+				// find the total number of text lines 
+				// in the text area
+				var noOfLines:int = this.mx_internal::getTextField().numLines;
+				// iterating through all lines of 
+				// text in the text area
+				for (var i:int = 0; i < noOfLines; i++) 
+				{
+					// getting the height of one text line
+					var textLineHeight:int = 
+						this.mx_internal::getTextField().getLineMetrics(i).height;
+					// adding the height to the total height
+					totalHeight += textLineHeight;
+				}
+				// setting the new calculated height
+				this.height = totalHeight;
+			}
+		]]>
+	</mx:Script>
+</mx:TextArea>
