@@ -162,7 +162,6 @@ mx|ToolTip {
 	font-size: 12px;
 }
 
-components|ComponentBase {
+components|AbstractComponentView {
 	background-color: #FFFFFF;
-	border-visible: false;
 }

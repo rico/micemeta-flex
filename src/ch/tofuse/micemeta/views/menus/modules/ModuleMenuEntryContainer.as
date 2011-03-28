@@ -1,4 +1,4 @@
-package ch.tofuse.micemeta.views.menus.modulemenu
+package ch.tofuse.micemeta.views.menus.modules
 {
 	import org.osmf.layout.PaddingLayoutFacet;
 	

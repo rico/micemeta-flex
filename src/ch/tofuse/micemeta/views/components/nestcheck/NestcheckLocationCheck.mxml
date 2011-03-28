@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<components:ComponentBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<components:AbstractComponentView xmlns:fx="http://ns.adobe.com/mxml/2009" 
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
 						  xmlns:mx="library://ns.adobe.com/flex/mx" 
 						  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*"
@@ -253,4 +253,4 @@
 	</mx:Form>	
 	
 	
-</components:ComponentBase>
+</components:AbstractComponentView>

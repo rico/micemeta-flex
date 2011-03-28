@@ -9,7 +9,7 @@
 			import ch.tofuse.micemeta.events.ModuleManagerEvent;
 			import ch.tofuse.micemeta.managers.ComponentManager;
 			import ch.tofuse.micemeta.managers.ModuleManager;
-			import ch.tofuse.micemeta.views.menus.modulemenu.ModulesMenu;
+			import ch.tofuse.micemeta.views.menus.main.MainMenu;
 			import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
 		]]>
 	</fx:Script>
@@ -34,7 +34,7 @@
 			</mate:ObjectBuilder>
 		</mate:EventHandlers>
 		
-		<mate:Injectors target="{ModulesMenu}">
+		<mate:Injectors target="{MainMenu}">
 			<mate:PropertyInjector targetKey="moduleManager" source="{ModuleManager}" />
 			<mate:PropertyInjector targetKey="componentManager" source="{ComponentManager}" />
 		</mate:Injectors>

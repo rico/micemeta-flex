@@ -15,6 +15,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import ch.tofuse.micemeta.events.EntityEvent;
+			
 			import mx.controls.Alert;
 			import mx.events.CloseEvent;
 			
@@ -37,7 +39,7 @@
 			private function closeConfirmHandler( event:CloseEvent ):void
 			{
 				if ( event.detail == Alert.OK) {
-					dispatchEvent( new Event('deleteItem',true) );		 
+					dispatchEvent( new EntityEvent(EntityEvent.REMOVE_ENTITY,true) );		 
 				}
 			}
 			

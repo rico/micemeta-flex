@@ -4,7 +4,7 @@
 		xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:buttons="ch.tofuse.micemeta.views.buttons.*">
 	<!-- host component -->
 	<fx:Metadata>
-		[HostComponent("ch.tofuse.micemeta.views.menus.modulemenu.ModulesMenu")]
+		[HostComponent("ch.tofuse.micemeta.views.menus.main.MainMenu")]
 	</fx:Metadata>
 	<fx:Declarations>
 		<fx:Component id="moduleButton">

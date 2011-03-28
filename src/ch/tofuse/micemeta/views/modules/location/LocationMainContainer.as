@@ -1,7 +1,7 @@
 package ch.tofuse.micemeta.views.modules.location
 {
 	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
-	import ch.tofuse.micemeta.views.components.box.BoxContentView;
+	import ch.tofuse.micemeta.views.components.box.BoxView;
 	import ch.tofuse.micemeta.views.components.otherlocation.OtherLocationView;
 	import ch.tofuse.micemeta.vo.MenuEntryVO;
 	
@@ -12,7 +12,7 @@ package ch.tofuse.micemeta.views.modules.location
 	{
 		
 		private var _otherLocationView:OtherLocationView;
-		private var _boxView:BoxContentView;
+		private var _boxView:BoxView;
 		
 		public function LocationMainContainer()
 		{
@@ -20,7 +20,7 @@ package ch.tofuse.micemeta.views.modules.location
 			showFilter = false;
 			
 			_otherLocationView = new OtherLocationView();
-			_boxView = new BoxContentView();
+			_boxView = new BoxView();
 			
 			label = "Locations";
 			menuEntriesData = new ArrayCollection( [
@@ -42,7 +42,7 @@ package ch.tofuse.micemeta.views.modules.location
 		
 		protected function otherLocationView():void
 		{
-			view = _otherLocationView 
+			view = _otherLocationView;
 		}
 	}
 }

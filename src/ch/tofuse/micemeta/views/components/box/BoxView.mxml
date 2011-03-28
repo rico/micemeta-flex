@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<components:ComponentBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<components:AbstractComponentView xmlns:fx="http://ns.adobe.com/mxml/2009" 
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
 						  xmlns:mx="library://ns.adobe.com/flex/mx" 
 						  xmlns:components="ch.tofuse.micemeta.views.components.*"
 						  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*"
 						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
 						  xmlns:text="ch.tofuse.micemeta.views.text.*"
+						  width="100%"
+						  height="100%"
+						  backgroundColor="#FFFFFF"
 						  creationComplete="build()" xmlns:grids="ch.tofuse.micemeta.views.grids.*">
 	
 	<fx:Declarations>
@@ -25,11 +28,14 @@
 	<fx:Script>
 		<![CDATA[
 			import ch.tofuse.micemeta.entities.Box;
+			import ch.tofuse.micemeta.events.EntityEvent;
+			import ch.tofuse.micemeta.events.EntityManagerEvent;
 			import ch.tofuse.micemeta.helpers.DataHelpers;
 			import ch.tofuse.micemeta.vo.Segments;
 			
 			import org.davekeen.flextrine.orm.FetchMode;
 			import org.davekeen.flextrine.orm.IEntityRepository;
+			import org.davekeen.flextrine.orm.collections.EntityCollection;
 			
 			[Bindable] private var _formItemLabelLeft:Number = 15;
 			[Bindable] private var _formItemValueLeft:Number = 75;
@@ -45,10 +51,6 @@
 			{
 				_formItem = new Box();
 				_segments = new Segments();
-				
-				repository = em.getRepository( Box );
-				repository.loadAll();
-				entitiesGrid.dataSource = repository.entities;
 			}
 			
 			
@@ -70,12 +72,10 @@
 				}
 			}
 			
-			override protected function editItem( event:Event ):void
+			override protected function editEntity(e:EntityEvent):void
 			{
-				super.editItem( event )
-				
 				currentState = 'edit';
-				_formItem = event.target.data as Box;
+				_formItem = e.target.data as Box;
 				
 				box_id.text = _formItem.id;
 				segment.selectedIndex = DataHelpers.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments )
@@ -90,8 +90,7 @@
 				_formItem.segment = segment.selectedLabel;
 				_formItem.xcoord = xcoord.numericValue;
 				_formItem.ycoord = ycoord.numericValue;
-				
-				em.flush();
+				dispatchEvent( new EntityManagerEvent( EntityManagerEvent.FLUSH) );
 				
 				entitiesGrid.selectedItem = _formItem;
 				resetForm();
@@ -131,7 +130,7 @@
 			  gap="50">
 			<components:VScrollerBase gap="10">
 				<s:Label text="Current Boxes" styleName="sectionLabel" />
-				<grids:AutoResizeDataGrid id="entitiesGrid">
+				<grids:AutoResizeDataGrid id="entitiesGrid" dataSource="{entities}">
 					<grids:columns>
 						<mx:DataGridColumn headerText="id" dataField="id" width="80"/>
 						<mx:DataGridColumn headerText="segment" dataField="segment" width="80"/>
@@ -183,4 +182,4 @@
 		</s:VGroup>
 	</s:HGroup>
 	
-</components:ComponentBase>
+</components:AbstractComponentView>

@@ -1,8 +1,8 @@
 package ch.tofuse.micemeta.interfaces
 {
 	import ch.tofuse.micemeta.views.inputs.SearchTextInput;
-	import ch.tofuse.micemeta.views.menus.modulemenu.ModuleMenuContainer;
-	import ch.tofuse.micemeta.views.menus.modulemenu.ModuleMenuList;
+	import ch.tofuse.micemeta.views.menus.modules.ModuleMenuContainer;
+	import ch.tofuse.micemeta.views.menus.modules.ModuleMenuList;
 	import ch.tofuse.micemeta.views.modules.base.ModuleContainerContent;
 	
 	import flash.display.DisplayObject;

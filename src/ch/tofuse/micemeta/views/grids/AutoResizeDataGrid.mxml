@@ -22,9 +22,12 @@
 			
 			public function set dataSource(value:ArrayCollection):void
 			{
-				_dataSource = value;
-				dataProvider = _dataSource;
-				_dataSource.addEventListener(CollectionEvent.COLLECTION_CHANGE, update );
+				if( value ) {
+					_dataSource = value;
+					dataProvider = _dataSource;
+					_dataSource.addEventListener(CollectionEvent.COLLECTION_CHANGE, update );
+					update();
+				}
 			}
 			
 			private function update( event:Event = null ):void

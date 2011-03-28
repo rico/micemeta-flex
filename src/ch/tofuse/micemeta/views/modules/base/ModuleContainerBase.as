@@ -5,10 +5,10 @@ package ch.tofuse.micemeta.views.modules.base
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.managers.ModuleManager;
 	import ch.tofuse.micemeta.views.inputs.SearchTextInput;
-	import ch.tofuse.micemeta.views.menus.modulemenu.ModuleMenuContainer;
-	import ch.tofuse.micemeta.views.menus.modulemenu.ModuleMenuEntryContainer;
-	import ch.tofuse.micemeta.views.menus.modulemenu.ModuleMenuLabel;
-	import ch.tofuse.micemeta.views.menus.modulemenu.ModuleMenuList;
+	import ch.tofuse.micemeta.views.menus.modules.ModuleMenuContainer;
+	import ch.tofuse.micemeta.views.menus.modules.ModuleMenuEntryContainer;
+	import ch.tofuse.micemeta.views.menus.modules.ModuleMenuLabel;
+	import ch.tofuse.micemeta.views.menus.modules.ModuleMenuList;
 	import ch.tofuse.micemeta.views.renderers.ModuleMenuEntriesItemRenderer;
 	import ch.tofuse.micemeta.views.renderers.ModuleMenuOptionsItemRenderer;
 	
@@ -40,7 +40,6 @@ package ch.tofuse.micemeta.views.modules.base
 		private var _em:EntityManager;
 		
 		private var _viewable:Boolean = false;
-		private var _moduleManager:ModuleManager;
 		
 		private var _view:IVisualElement;
 		
@@ -210,11 +209,6 @@ package ch.tofuse.micemeta.views.modules.base
 		public function get menuEntriesFilter():SearchTextInput
 		{
 			return _menuEntriesFilter;
-		}
-		
-		public function set moduleManager( mm:ModuleManager ):void
-		{
-			_moduleManager = mm;
 		}
 		
 		protected function setLabel():void

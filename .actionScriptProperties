@@ -47,8 +47,8 @@
         </excludedEntries>
       </libraryPathEntry>
       <libraryPathEntry kind="1" linkType="1" path="libs"/>
-      <libraryPathEntry kind="3" linkType="1" path="/mate/bin/mate.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="/flextrine/bin/flextrine.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="/robotlegs/bin/robotlegs.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>

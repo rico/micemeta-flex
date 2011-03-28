@@ -13,12 +13,13 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import ch.tofuse.micemeta.views.buttons.ComponentButton;
-			import ch.tofuse.micemeta.views.buttons.ContentButton;
-			import ch.tofuse.micemeta.views.buttons.ModuleButton;
+			import ch.tofuse.micemeta.events.MainMenuEvent;
 			import ch.tofuse.micemeta.interfaces.IContent;
 			import ch.tofuse.micemeta.managers.ComponentManager;
 			import ch.tofuse.micemeta.managers.ModuleManager;
+			import ch.tofuse.micemeta.views.buttons.ComponentButton;
+			import ch.tofuse.micemeta.views.buttons.ContentButton;
+			import ch.tofuse.micemeta.views.buttons.ModuleButton;
 			import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
 			
 			import spark.components.HGroup;
@@ -38,8 +39,8 @@
 			[SkinPart(required="false")]
 			public var settingsGroup:HGroup;	
 			
-			private var _moduleManager:ModuleManager;
-			private var _componentManager:ComponentManager;
+			private var _components:Vector.<IContent>;
+			private var _modules:Vector.<IContent>;
 			
 			private function build():void
 			{
@@ -48,17 +49,17 @@
 			
 			private function addStartupContent():void
 			{
-				for each( var module:IContent in _moduleManager.modules ) {
+				/*for each( var module:IContent in _modules ) {
 					if( module.addInstanceOnStart ) {
 						_moduleManager.addModuleInstanceToNavigator( module );
 					}
 				}
 				
-				for each ( var component:IContent in _componentManager.components) {
+				for each ( var component:IContent in _components ) {
 					if( component.addInstanceOnStart ) {
 						_componentManager.addComponentInstanceToNavigator( component );
 					}
-				}
+				}*/
 				
 			}
 			
@@ -90,38 +91,33 @@
 			}
 				
 			
-			public function set moduleManager( mm:ModuleManager ):void
+			public function set modules( m:Vector.<IContent> ):void
 			{
-				if( !_moduleManager ) {
-					_moduleManager = mm;
-					
-					var mb:ModuleButton;
-					for each( var module:IContent in _moduleManager.modules ) {
-						mb = createDynamicPartInstance( "moduleButton" ) as ModuleButton;   
-						mb.component = module;
-						modulesGroup.addElement( mb );
-					}
+				_modules = m;
+				var mb:ModuleButton;
+				for each( var module:IContent in _modules ) {
+					mb = createDynamicPartInstance( "moduleButton" ) as ModuleButton;   
+					mb.component = module;
+					modulesGroup.addElement( mb );
 				}
 			}
 			
-			public function set componentManager( cm:ComponentManager ):void
+			public function set components( c:Vector.<IContent> ):void
 			{
-				if( !_componentManager ) {
-					_componentManager = cm;
-					
-					var cb:ComponentButton;
-					for each( var component:IContent in _componentManager.components ) {
-						cb = createDynamicPartInstance( "componentButton" ) as ComponentButton;   
-						cb.component = component;
-						modulesGroup.addElement( cb );
-					}
+				_components = c;
+				var cb:ComponentButton;
+				for each( var component:IContent in _components ) {
+					cb = createDynamicPartInstance( "componentButton" ) as ComponentButton;   
+					cb.component = component;
+					modulesGroup.addElement( cb );
 				}
 			}
 			
 			protected function addContent( event:MouseEvent ):void
 			{
-				var m:IContent = ( event.target as ContentButton ).component;
-				_moduleManager.addModuleInstanceToNavigator( m );
+				var c:IContent = ( event.target as ContentButton ).component;
+				dispatchEvent( new MainMenuEvent(MainMenuEvent.ADD_CONTENT, c) );
+				
 			}
 		]]>
 	</fx:Script>

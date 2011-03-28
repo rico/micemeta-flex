@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<components:ComponentBase xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<components:AbstractComponentView xmlns:fx="http://ns.adobe.com/mxml/2009" 
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
 						  xmlns:mx="library://ns.adobe.com/flex/mx" 
 						  xmlns:components="ch.tofuse.micemeta.views.components.*"
@@ -29,6 +29,7 @@
 			import ch.tofuse.micemeta.entities.OtherLocation;
 			import ch.tofuse.micemeta.entities.OtherLocationCheck;
 			import ch.tofuse.micemeta.events.AutoCompleteTextInputEvent;
+			import ch.tofuse.micemeta.events.EntityEvent;
 			import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
 			
 			import mx.collections.ArrayCollection;
@@ -52,17 +53,17 @@
 			private function build():void
 			{
 				
-				_nestcheckRepository = em.getRepository( NestCheck );
+				//_nestcheckRepository = em.getRepository( NestCheck );
 				
 				if( currentState == 'add' ) {
 					validateCheckDate();
 				}
 				
-				_boxRepository = em.getRepository( Box );
-				_boxRepository.loadAll().addResponder( new AsyncResponder( onLocationsLoadResult, onLoadFault ) );
+				//_boxRepository = em.getRepository( Box );
+				//_boxRepository.loadAll().addResponder( new AsyncResponder( onLocationsLoadResult, onLoadFault ) );
 				
-				_otherLocationRepository = em.getRepository( OtherLocation );
-				_otherLocationRepository.loadAll().addResponder( new AsyncResponder( onLocationsLoadResult, onLoadFault ) );
+				//_otherLocationRepository = em.getRepository( OtherLocation );
+				//_otherLocationRepository.loadAll().addResponder( new AsyncResponder( onLocationsLoadResult, onLoadFault ) );
 				
 				
 				validateCheckDate();
@@ -83,8 +84,6 @@
 			{
 				if( value && !_nestcheck ) {
 					_nestcheck = value;
-					em.persist( _nestcheck );
-					//em.flush();
 				}
 				
 				
@@ -98,7 +97,7 @@
 					var olc:OtherLocationCheck = new OtherLocationCheck();
 					olc.otherLocation = OtherLocation(l);
 					
-					em.persist( olc );
+					//em.persist( olc );
 					
 					_nestcheck.other_location_checks.addItem( olc );
 					
@@ -112,7 +111,7 @@
 					bc.box = Box(l);
 					
 					
-					em.persist( bc );
+					//em.persist( bc );
 					
 					_nestcheck.box_checks.addItem( bc );
 					
@@ -128,21 +127,20 @@
 				locations.selectedItem = null;
 				
 			}
-			override protected function deleteItem( event:Event ):void
+			override protected function removeEntity(e:EntityEvent):void
 			{
-				super.deleteItem( event );
+				//deleteItem( event );
 				
-				
-				if( event.target.data is OtherLocationCheck ) {
-					em.remove( OtherLocationCheck( event.target.data ) );
-					_addedLocations.removeItemAt( _addedLocations.getItemIndex( OtherLocationCheck(event.target.data).otherLocation  ) );
-				} else if( event.target.data is BoxCheck ) {
-					em.remove( BoxCheck( event.target.data ) );	
-					_addedLocations.removeItemAt( _addedLocations.getItemIndex( BoxCheck(event.target.data).box ) );
+				if( e.target.data is OtherLocationCheck ) {
+					//em.remove( OtherLocationCheck( event.target.data ) );
+					_addedLocations.removeItemAt( _addedLocations.getItemIndex( OtherLocationCheck(e.target.data).otherLocation  ) );
+				} else if( e.target.data is BoxCheck ) {
+					//em.remove( BoxCheck( event.target.data ) );	
+					_addedLocations.removeItemAt( _addedLocations.getItemIndex( BoxCheck(e.target.data).box ) );
 				}
 				
 				//em.flush();
-				_locationChecks.removeItemAt( _locationChecks.getItemIndex( event.target.data  ) );
+				_locationChecks.removeItemAt( _locationChecks.getItemIndex( e.target.data  ) );
 				
 				
 				//_locations.filterFunction = locationsFilterFunction;
@@ -282,4 +280,4 @@
 		</grids:AutoResizeDataGrid>
 	</s:VGroup>
 	
-</components:ComponentBase>
+</components:AbstractComponentView>

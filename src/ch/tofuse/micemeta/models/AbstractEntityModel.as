@@ -1,42 +1,31 @@
-package ch.tofuse.micemeta.managers
+package ch.tofuse.micemeta.models
 {
-	import ch.tofuse.micemeta.events.EntityMediatorEvent;
-	import ch.tofuse.micemeta.events.EntityManagerInstanceEvent;
-	
-	import com.asfusion.mate.utils.debug.Logger;
+	import ch.tofuse.micemeta.interfaces.IEntityModelInterface;
 	
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
-	import flash.utils.getQualifiedClassName;
 	
 	import mx.collections.IViewCursor;
 	import mx.collections.Sort;
 	import mx.collections.SortField;
-	import mx.logging.ILogger;
-	import mx.logging.Log;
-	import mx.logging.targets.TraceTarget;
+	import mx.events.CollectionEvent;
 	import mx.managers.CursorManager;
-	import mx.managers.DragManager;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.AsyncToken;
 	import mx.rpc.events.FaultEvent;
 	
-	import org.davekeen.collections.IndexedArrayCollection;
-	import org.davekeen.flextrine.orm.Configuration;
 	import org.davekeen.flextrine.orm.EntityManager;
 	import org.davekeen.flextrine.orm.IEntityRepository;
 	import org.davekeen.flextrine.orm.collections.EntityCollection;
 	import org.davekeen.flextrine.orm.metadata.MetaTags;
-	import org.davekeen.flextrine.util.ClassUtil;
 	import org.davekeen.flextrine.util.EntityUtil;
+	import org.robotlegs.mvcs.Actor;
 	
-	public class EntityManagerBase extends EventDispatcher
+	
+	public class AbstractEntityModel extends Actor implements IEntityModelInterface
 	{
 		
 		protected var _idField:String;
-		protected var _entityManagerInstance:EntityManagerInstance;
-		protected var _configuration:Configuration;
 		protected var _class:Class;
 		protected var _entititesLoaded:Boolean = false;
 		protected var _busy:Boolean;
@@ -47,87 +36,46 @@ package ch.tofuse.micemeta.managers
 		protected var _sort:Sort;
 		protected var _responder:AsyncToken;
 		
-		
+		private var _em:EntityManager;
 		private var _dispatcher:IEventDispatcher;
 		private var _repository:IEntityRepository;
-		private var _entityTimeToLive:Number = 60000;
-		private var _entityTimeToLiveSet:Boolean;
 		
-		public function EntityManagerBase( cls:Class )
+		public function AbstractEntityModel( cls:Class ):void
 		{
 			_class = cls;
 			_idField = EntityUtil.getAttributesWithTag( new _class(), MetaTags.ID ); 
-			
-			dispatchEvent( new EntityManagerInstanceEvent( EntityManagerInstanceEvent.INIT_ENTITY_MANAGER_INSTANCE ) );	
-			
-		}
-		
-		public function set entityManagerInstance( emi:EntityManagerInstance ):void
-		{
-			_entityManagerInstance = emi;
-			dispatchEvent( new Event("entityManagerInstanceChange") );
 		}
 		
 		[Bindable(Event="entityManagerInstanceChange")]
 		public function get entityManager():EntityManager
 		{
-			return _entityManagerInstance.entityManager;
-			dg:DragManager
+			if( !_em ) {
+				_em = EntityManager.getInstance();
+			}
+			
+			return _em;
 		}
-		
-		public function set dispatcher( d:IEventDispatcher ):void
-		{
-			_dispatcher = d;
-		}
-		
 		public function get repository():IEntityRepository
 		{
 			
-			if( _repository == null ) {
-				_repository = entityManager.getRepository( _class, _entityTimeToLive );
-				_entityTimeToLiveSet = true;
+			if( !_repository  ) {
+				_repository = entityManager.getRepository( _class );
+				loadAll();
 			}
 			
 			return _repository;
 		}
 		
-		public function set entityTimeToLive( ttl:Number ):void
-		{
-			if( !_entityTimeToLiveSet ) {
-				_entityTimeToLive = ttl;
-				_entityTimeToLiveSet = true;
-			}
-		}
-		
-		public function loadAll( showBusy:Boolean = true ):void
+		public function loadAll():void
 		{
 			if( !_entitiesLoading && !_entititesLoaded ) {
 				repository.loadAll().addResponder( new AsyncResponder(onEntitiesLoadResult, onLoadFault) );
 				_entitiesLoading = true;
 				loading = true;
-				busy = showBusy;
+				busy = true;
 			} else if ( _entititesLoaded ) {
-				dispatchEvent( new EntityMediatorEvent( EntityMediatorEvent.ENTITIES_LOADED) );
+				//dispatchEvent( new EntityManagerEvent( EntityManagerEvent.ENTITIES_LOADED) );
 			}
-		}
-		
-		[Bindable(Event="entitiesChanged")]
-		public function get entities():EntityCollection
-		{
-			
-			if( _entities == null ) { 
-				_entities = repository.entities;
-				_sort = new Sort();
-				_sort.fields = [ new SortField( _idField, true, false )];
-				_entities.sort = _sort;
-				_entities.refresh();
-			}
-			
-			if( !_entititesLoaded && !_entitiesLoading ) {
-				loadAll();
-			}
-			
-			return _entities;
 		}
 		
 		public function get cls():Class
@@ -135,7 +83,7 @@ package ch.tofuse.micemeta.managers
 			return _class;
 		}
 		
-		public function save():void
+		public function flush():void
 		{
 			entityManager.flush().addResponder( new AsyncResponder(onSaveResult, onFault) );
 			_entititesLoaded = false;
@@ -158,35 +106,33 @@ package ch.tofuse.micemeta.managers
 					loading = false;
 				}
 				
-				dispatchEvent( new Event("busyChange") );
+				//dispatchEvent( new Event("busyChange") );
 			}
 			
 		}
 		
-		public function set loading( dl:Boolean ):void
-		{
-			if( dl != _loading ) {
-				_loading = dl;
-				dispatchEvent( new Event("loadingChange") );
-			}
-		}
-		
-		[Bindable(Event="loadingChange")]
-		public function get loading():Boolean
-		{
-			return _loading;
-		}
-		
-		[Bindable(Event="busyChange")]
 		public function get busy():Boolean
 		{
 			return _busy;
 		}
 		
+		protected function set loading( dl:Boolean ):void
+		{
+			if( dl != _loading ) {
+				_loading = dl;
+			}
+		}
+		
+		protected function get loading():Boolean
+		{
+			return _loading;
+		}
+		
+		
 		public function get cursor():IViewCursor
 		{
 			if( !_cursor ) {
-				_cursor = entities.createCursor();
+				_cursor = repository.entities.createCursor();
 			}
 			
 			return _cursor;
@@ -195,27 +141,42 @@ package ch.tofuse.micemeta.managers
 		public function sortEntitiesByField( field:String, numeric:Boolean ):void 
 		{
 			var sf:SortField = new SortField( field, true, false, numeric );
+			
+			if( !_sort ) {
+				_sort = new Sort();
+				_entities.sort = _sort;
+			}
+			
 			_sort.fields = [ sf ];
 			_entities.refresh();
 		}
 		
-		public function addEntity( e:* , save:Boolean = false ):void
+		public function persist( e:* , f:Boolean = false ):void
 		{
 			entityManager.persist( e );
+			refreshSort();
 			
-			
-			if( save ) {
-				this.save();
+			if( f ) {
+				flush();
 			}
 		}
 		
-		public function deleteEntity( e:*, save:Boolean = false ):void
+		public function remove( e:*, f:Boolean = false ):void
 		{
 			entityManager.remove( e );
+			refreshSort();
 			
-			if( save ) {
-				this.save();
+			if( f ) {
+				flush();
 			}
+		}
+		
+		private function refreshSort():void
+		{
+			_sort = new Sort();
+			_sort.fields = [ new SortField( _idField) ];
+			repository.entities.sort = _sort;
+			repository.entities.refresh();
 		}
 		
 		/* EVENT HANDLERS */
@@ -224,15 +185,15 @@ package ch.tofuse.micemeta.managers
 		{
 			_entitiesLoading = false;
 			_entititesLoaded = true;
-			dispatchEvent( new Event("entitiesChanged") );
-			dispatchEvent( new EntityMediatorEvent( EntityMediatorEvent.ENTITIES_LOADED) );
+			refreshSort();
+			dispatch( new Event("entitiesChanged") );
 			busy = false;
 			
 		}
 		
 		protected function onSaveResult( result:Object, token:Object ):void
 		{
-			dispatchEvent( new EntityMediatorEvent( EntityMediatorEvent.ENTITIES_SAVED) );
+			//dispatchEvent( new EntityManagerEvent( EntityManagerEvent.ENTITIES_SAVED) );
 			busy = false;
 		}
 		
@@ -255,6 +216,6 @@ package ch.tofuse.micemeta.managers
 			busy = false;
 			throw new Error("[EntityManagerBase] DQL select error => " + fault);
 		}
-		
+
 	}
 }

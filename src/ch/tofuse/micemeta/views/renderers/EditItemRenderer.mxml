@@ -11,7 +11,17 @@
 						  width="100%"
 						  height="100%"
 						  toolTip="edit item"
-						  click="{dispatchEvent( new Event('editItem',true) )}">
+						  click="dispatchEditItem()">
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.events.EntityEvent;
+			
+			private function dispatchEditItem():void
+			{
+				dispatchEvent( new EntityEvent(EntityEvent.EDIT_ENTITY,true) )
+			}
+		]]>
+	</fx:Script>
 	
 	<s:HGroup verticalAlign="middle" horizontalAlign="center"
 			  width="100%" height="100%">
