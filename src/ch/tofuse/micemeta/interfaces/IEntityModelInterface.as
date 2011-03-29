@@ -9,8 +9,6 @@ package ch.tofuse.micemeta.interfaces
 	{
 		function get entityManager():EntityManager;
 		function get repository():IEntityRepository;
-		function set busy( b:Boolean ):void;
-		function get busy():Boolean;
 		function get cursor():IViewCursor;
 		
 		function loadAll():void;

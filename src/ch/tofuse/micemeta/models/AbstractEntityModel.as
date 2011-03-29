@@ -72,10 +72,7 @@ package ch.tofuse.micemeta.models
 				repository.loadAll().addResponder( new AsyncResponder(onEntitiesLoadResult, onLoadFault) );
 				_entitiesLoading = true;
 				loading = true;
-				busy = true;
-			} else if ( _entititesLoaded ) {
-				//dispatchEvent( new EntityManagerEvent( EntityManagerEvent.ENTITIES_LOADED) );
-			}
+			} 
 		}
 		
 		public function get cls():Class
@@ -87,33 +84,7 @@ package ch.tofuse.micemeta.models
 		{
 			entityManager.flush().addResponder( new AsyncResponder(onSaveResult, onFault) );
 			_entititesLoaded = false;
-			//loadAll( true );
-			busy = true;
 			
-		}
-		
-		public function set busy( b:Boolean ):void
-		{
-			if( b != _busy) {
-				
-				_busy = b;
-				
-				if( _busy ) {
-					CursorManager.setBusyCursor();
-					loading = true;
-				} else {
-					CursorManager.removeBusyCursor();
-					loading = false;
-				}
-				
-				//dispatchEvent( new Event("busyChange") );
-			}
-			
-		}
-		
-		public function get busy():Boolean
-		{
-			return _busy;
 		}
 		
 		protected function set loading( dl:Boolean ):void
@@ -187,20 +158,17 @@ package ch.tofuse.micemeta.models
 			_entititesLoaded = true;
 			refreshSort();
 			dispatch( new Event("entitiesChanged") );
-			busy = false;
 			
 		}
 		
 		protected function onSaveResult( result:Object, token:Object ):void
 		{
 			//dispatchEvent( new EntityManagerEvent( EntityManagerEvent.ENTITIES_SAVED) );
-			busy = false;
 		}
 		
 		
 		protected function onFault( fault:FaultEvent, token:Object ):void
 		{
-			busy = false;
 			//_em.rollback();
 			throw new Error("[EntityManagerBase] save failed => " + fault.fault.faultString );
 		}
@@ -208,12 +176,10 @@ package ch.tofuse.micemeta.models
 		protected function onLoadFault( result:Object, token:Object ):void
 		{
 			_entitiesLoading = false;
-			busy = false;
 			throw new Error("[EntityManagerBase] load failed => " + token.toString() ); 			
 		}
 		
 		protected function onDqlSelectFault( fault:Object, token:Object ):void {
-			busy = false;
 			throw new Error("[EntityManagerBase] DQL select error => " + fault);
 		}
 
