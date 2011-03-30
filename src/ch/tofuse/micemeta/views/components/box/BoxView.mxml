@@ -30,7 +30,7 @@
 			import ch.tofuse.micemeta.entities.Box;
 			import ch.tofuse.micemeta.events.EntityEvent;
 			import ch.tofuse.micemeta.events.EntityManagerEvent;
-			import ch.tofuse.micemeta.helpers.DataHelpers;
+			import ch.tofuse.micemeta.utils.DataUtils;
 			import ch.tofuse.micemeta.vo.Segments;
 			
 			import org.davekeen.flextrine.orm.FetchMode;
@@ -78,7 +78,7 @@
 				_formItem = e.target.data as Box;
 				
 				box_id.text = _formItem.id;
-				segment.selectedIndex = DataHelpers.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments )
+				segment.selectedIndex = DataUtils.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments )
 				xcoord.numericValue = _formItem.xcoord;
 				ycoord.numericValue = _formItem.ycoord;
 				

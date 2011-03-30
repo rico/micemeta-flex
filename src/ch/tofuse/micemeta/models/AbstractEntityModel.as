@@ -1,8 +1,10 @@
 package ch.tofuse.micemeta.models
 {
+	import ch.tofuse.micemeta.events.EntityModelEvent;
 	import ch.tofuse.micemeta.interfaces.IEntityModelInterface;
 	
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	
 	import mx.collections.IViewCursor;
@@ -27,7 +29,7 @@ package ch.tofuse.micemeta.models
 		
 		protected var _idField:String;
 		protected var _class:Class;
-		protected var _entititesLoaded:Boolean = false;
+		protected var _entititesLoaded:Boolean;
 		protected var _busy:Boolean;
 		protected var _loading:Boolean;
 		protected var _entitiesLoading:Boolean;
@@ -39,6 +41,7 @@ package ch.tofuse.micemeta.models
 		private var _em:EntityManager;
 		private var _dispatcher:IEventDispatcher;
 		private var _repository:IEntityRepository;
+		private var _dispatchLoadedEvent:Boolean;
 		
 		public function AbstractEntityModel( cls:Class ):void
 		{
@@ -66,12 +69,12 @@ package ch.tofuse.micemeta.models
 			return _repository;
 		}
 		
-		public function loadAll():void
+		public function loadAll( dispatchLoadedEvent:Boolean = false ):void
 		{
 			if( !_entitiesLoading && !_entititesLoaded ) {
-				repository.loadAll().addResponder( new AsyncResponder(onEntitiesLoadResult, onLoadFault) );
 				_entitiesLoading = true;
-				loading = true;
+				_dispatchLoadedEvent = dispatchLoadedEvent;
+				repository.loadAll().addResponder( new AsyncResponder(onEntitiesLoadResult, onLoadFault) );
 			} 
 		}
 		
@@ -86,19 +89,6 @@ package ch.tofuse.micemeta.models
 			_entititesLoaded = false;
 			
 		}
-		
-		protected function set loading( dl:Boolean ):void
-		{
-			if( dl != _loading ) {
-				_loading = dl;
-			}
-		}
-		
-		protected function get loading():Boolean
-		{
-			return _loading;
-		}
-		
 		
 		public function get cursor():IViewCursor
 		{
@@ -157,7 +147,10 @@ package ch.tofuse.micemeta.models
 			_entitiesLoading = false;
 			_entititesLoaded = true;
 			refreshSort();
-			dispatch( new Event("entitiesChanged") );
+			
+			if( _dispatchLoadedEvent ) {
+				dispatch( new EntityModelEvent( EntityModelEvent.ENTITIES_LOADED, this) );
+			}
 			
 		}
 		

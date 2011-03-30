@@ -10,6 +10,11 @@ package ch.tofuse.micemeta.events
 		private var _entity:*;
 		private var _flush:Boolean;
 		
+		public function set entity( e:*):void
+		{
+			_entity = e;
+		}
+		
 		public function get entity():*
 		{
 			return _entity;

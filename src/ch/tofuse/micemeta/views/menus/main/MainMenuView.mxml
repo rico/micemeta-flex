@@ -3,9 +3,8 @@
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
 		  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
-		  skinClass="ch.tofuse.micemeta.skins.menu.ModulesMenuSkin"
-		  width="100%"
-		  creationComplete="build()">
+		  skinClass="ch.tofuse.micemeta.skins.menu.MainMenuSkin"
+		  width="100%">
 	
 	<fx:Declarations>
 		<fx:String id="headerLabel">micemeta</fx:String>
@@ -13,14 +12,19 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import ch.tofuse.micemeta.events.MainMenuEvent;
+			import ch.tofuse.micemeta.events.ContentEvent;
 			import ch.tofuse.micemeta.interfaces.IContent;
 			import ch.tofuse.micemeta.managers.ComponentManager;
 			import ch.tofuse.micemeta.managers.ModuleManager;
 			import ch.tofuse.micemeta.views.buttons.ComponentButton;
 			import ch.tofuse.micemeta.views.buttons.ContentButton;
 			import ch.tofuse.micemeta.views.buttons.ModuleButton;
+			import ch.tofuse.micemeta.views.buttons.SettingsButton;
 			import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+			import ch.tofuse.micemeta.views.settings.SettingsView;
+			
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
 			
 			import spark.components.HGroup;
 			
@@ -37,31 +41,16 @@
 			public var componentsGroup:HGroup;
 			
 			[SkinPart(required="false")]
-			public var settingsGroup:HGroup;	
+			public var settingsGroup:HGroup;
+			
+			[SkinPart(required="false")]
+			public var settingsButton:SettingsButton;
+			
+			private var _settingsView:SettingsView;
 			
 			private var _components:Vector.<IContent>;
 			private var _modules:Vector.<IContent>;
-			
-			private function build():void
-			{
-				addStartupContent();
-			}
-			
-			private function addStartupContent():void
-			{
-				/*for each( var module:IContent in _modules ) {
-					if( module.addInstanceOnStart ) {
-						_moduleManager.addModuleInstanceToNavigator( module );
-					}
-				}
-				
-				for each ( var component:IContent in _components ) {
-					if( component.addInstanceOnStart ) {
-						_componentManager.addComponentInstanceToNavigator( component );
-					}
-				}*/
-				
-			}
+			private var _content:Vector.<IContent>;
 			
 			override protected function partAdded( partName:String, instance:Object ):void
 			{
@@ -74,6 +63,10 @@
 				
 				if( partName == "componentButton" ) {
 					ComponentButton( instance ).addEventListener( MouseEvent.CLICK, addContent );
+				}
+				
+				if( partName == "settingsButton" ) {
+					SettingsButton( instance ).addEventListener( MouseEvent.CLICK, showSettings );
 				}
 			}
 			
@@ -113,11 +106,28 @@
 				}
 			}
 			
-			protected function addContent( event:MouseEvent ):void
+			public function set content( c:Vector.<IContent> ):void
+			{
+				_content = c;
+			}
+			
+			private function addContent( event:MouseEvent ):void
 			{
 				var c:IContent = ( event.target as ContentButton ).component;
-				dispatchEvent( new MainMenuEvent(MainMenuEvent.ADD_CONTENT, c) );
+				dispatchEvent( new ContentEvent(ContentEvent.ADD_CONTENT, c) );
 				
+			}
+			
+			public function showSettings( e:MouseEvent ):void
+			{
+				if( !_settingsView ) {
+					_settingsView = new SettingsView();
+				}	
+				
+				PopUpManager.addPopUp( _settingsView, FlexGlobals.topLevelApplication as DisplayObject, true );
+				PopUpManager.centerPopUp( _settingsView );
+				
+				_settingsView.content = _content;
 			}
 		]]>
 	</fx:Script>

@@ -1,8 +1,8 @@
-package ch.tofuse.micemeta.helpers
+package ch.tofuse.micemeta.utils
 {
 	import mx.collections.ArrayCollection;
 
-	public class DataHelpers
+	public class DataUtils
 	{
 		public static function getItemIndexByPropertyValue( prop:String, value:String, data:ArrayCollection ):uint
 		{

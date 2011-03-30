@@ -1,9 +1,12 @@
 package ch.tofuse.micemeta.mediators
 {
-	import ch.tofuse.micemeta.events.MainMenuEvent;
+	import ch.tofuse.micemeta.events.ContentEvent;
 	import ch.tofuse.micemeta.models.ContentModel;
-	import ch.tofuse.micemeta.views.menus.main.MainMenu;
+	import ch.tofuse.micemeta.views.menus.main.MainMenuView;
 	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+	
+	import flash.events.Event;
+	import flash.events.MouseEvent;
 	
 	import mx.states.OverrideBase;
 	
@@ -13,20 +16,22 @@ package ch.tofuse.micemeta.mediators
 	{
 		
 		[Inject]
-		public var view:MainMenu;
+		public var view:MainMenuView;
 		
 		[Inject]
-		public var contentModel:ContentModel;
+		public var model:ContentModel;
 		
 		override public function onRegister():void
 		{
-			view.modules = contentModel.modules;
-			view.components = contentModel.components;
+			view.modules = model.modules;
+			view.components = model.components;
+			view.content = model.content;
 			
-			addViewListener( MainMenuEvent.ADD_CONTENT, addContent );
+			addViewListener( ContentEvent.ADD_CONTENT, addContent );
+			
 		}
 		
-		protected function addContent( event:MainMenuEvent ):void
+		protected function addContent( event:ContentEvent ):void
 		{
 			dispatch( event );
 		}

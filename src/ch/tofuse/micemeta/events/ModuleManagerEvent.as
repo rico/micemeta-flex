@@ -1,6 +1,6 @@
 package ch.tofuse.micemeta.events
 {
-	import ch.tofuse.micemeta.views.ContentNavigator;
+	import ch.tofuse.micemeta.views.ContentNavigatorView;
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
 	
@@ -11,7 +11,7 @@ package ch.tofuse.micemeta.events
 		public static const INIT_MODULES:String = "initModules";
 		
 		public var modules:Vector.<IContent>;
-		public var moduleNavigator:ContentNavigator;
+		public var moduleNavigator:ContentNavigatorView;
 		
 		public function ModuleManagerEvent(type:String, bubbles:Boolean=true, cancelable:Boolean=false)
 		{

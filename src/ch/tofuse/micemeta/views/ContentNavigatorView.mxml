@@ -14,19 +14,33 @@
 			import ch.tofuse.micemeta.interfaces.IContent;
 			import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
 			
-			
 			public function addContent( content:IContent ):void
 			{
 				modulesStack.addChild( content.asDisplayObject() );
 				modulesStack.selectedChild = content.asNavigatorContent();
+				
 			}
+			
+			public function set selectedChild( content:IContent ):void
+			{
+				modulesStack.selectedChild = content.asNavigatorContent();
+			}
+			
+			// bug workaround method see: http://bugs.adobe.com/jira/browse/SDK-15974
+			public function setInitialIndex( ):void
+			{
+				modulesStackTabBar.tabBar.selectedIndex = 0;
+			}
+			
 			
 		]]>
 	</fx:Script>
 	<navigation:ModulesStackTabBar id="modulesStackTabBar" 
+								   creationComplete="{modulesStackTabBar.tabBar.selectedIndex = 0;}"
 								   dataProvider="{modulesStack}" 
 								   height="25" width="100%" />
+	
 	<mx:ViewStack id="modulesStack"
-				   width="100%" height="100%"/>
+				  width="100%" height="100%"/>
 	
 </s:Group>

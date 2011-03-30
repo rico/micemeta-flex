@@ -6,7 +6,6 @@
 		 xmlns:nestcheck="ch.tofuse.micemeta.views.components.nestcheck.*"
 		 xmlns:components="ch.tofuse.micemeta.views.components.*" 
 		 xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
-		 creationComplete="build()" 
 		 height="100%">
 	<fx:Script>
 		<![CDATA[
@@ -32,11 +31,6 @@
 			[Bindable] private var _addMode:Boolean;
 			[Bindable] private var _nestcheck:NestCheck;
 			
-			
-			private function build():void
-			{
-					//repository = em.getRepository( NestCheck );
-			}
 			
 			public function set nestcheck( nc:NestCheck ):void
 			{

@@ -10,11 +10,6 @@ package ch.tofuse.micemeta.mediators
 	
 	public class OtherLocationMediator extends AbstractEntityMediator
 	{
-		public function OtherLocationMediator()
-		{
-			super();
-		}		
-		
 		[Inject(name="OtherLocationModel")]
 		override public function set model(m:IEntityModelInterface):void
 		{

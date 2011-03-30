@@ -4,7 +4,7 @@ package ch.tofuse.micemeta.events
 	
 	import flash.events.Event;
 	
-	public class MainMenuEvent extends Event
+	public class ContentEvent extends Event
 	{
 		
 		public static const ADD_CONTENT:String = "addContent";
@@ -17,7 +17,7 @@ package ch.tofuse.micemeta.events
 		}
 
 		
-		public function MainMenuEvent(type:String,content:IContent,bubbles:Boolean=false, cancelable:Boolean=false)
+		public function ContentEvent(type:String,content:IContent,bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
 			_content = content;
@@ -25,7 +25,7 @@ package ch.tofuse.micemeta.events
 		
 		override public function clone():Event
 		{
-			return new MainMenuEvent(type, content, bubbles, cancelable);
+			return new ContentEvent(type, content, bubbles, cancelable);
 
 		}
 	}

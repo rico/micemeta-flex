@@ -1,6 +1,6 @@
 package ch.tofuse.micemeta.managers
 {
-	import ch.tofuse.micemeta.views.ContentNavigator;
+	import ch.tofuse.micemeta.views.ContentNavigatorView;
 	import ch.tofuse.micemeta.events.ModuleManagerEvent;
 	import ch.tofuse.micemeta.interfaces.IContent;
 	
@@ -17,7 +17,7 @@ package ch.tofuse.micemeta.managers
 		
 		private var _dispatcher:IEventDispatcher;
 		private var _components:Vector.<IContent>;
-		private var _componentNavigator:ContentNavigator;
+		private var _componentNavigator:ContentNavigatorView;
 		
 		private var _componentFactory:ClassFactory;
 		
@@ -53,12 +53,12 @@ package ch.tofuse.micemeta.managers
 		}
 
 		[Bindable(Event="componentNavigatorChange")]
-		public function get componentNavigator():ContentNavigator
+		public function get componentNavigator():ContentNavigatorView
 		{
 			return _componentNavigator;
 		}
 
-		public function set componentNavigator( value:ContentNavigator ):void
+		public function set componentNavigator( value:ContentNavigatorView ):void
 		{
 			_componentNavigator = value;
 			dispatchEvent( new Event("componentNavigatorChange") );

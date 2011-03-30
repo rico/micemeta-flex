@@ -33,7 +33,7 @@
 			import ch.tofuse.micemeta.events.EntityEvent;
 			import ch.tofuse.micemeta.events.EntityManagerEvent;
 			import ch.tofuse.micemeta.events.EntityMediatorEvent;
-			import ch.tofuse.micemeta.helpers.DataHelpers;
+			import ch.tofuse.micemeta.utils.DataUtils;
 			import ch.tofuse.micemeta.vo.Segments;
 			
 			import org.davekeen.flextrine.orm.IEntityRepository;
@@ -104,7 +104,7 @@
 				
 				code.text = _formItem.code;
 				description.text = _formItem.description;
-				segment.selectedIndex = DataHelpers.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments );
+				segment.selectedIndex = DataUtils.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments );
 				
 				doneButton.enabled = true;
 			}

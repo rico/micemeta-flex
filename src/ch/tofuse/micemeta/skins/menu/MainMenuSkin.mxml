@@ -4,7 +4,7 @@
 		xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:buttons="ch.tofuse.micemeta.views.buttons.*">
 	<!-- host component -->
 	<fx:Metadata>
-		[HostComponent("ch.tofuse.micemeta.views.menus.main.MainMenu")]
+		[HostComponent("ch.tofuse.micemeta.views.menus.main.MainMenuView")]
 	</fx:Metadata>
 	<fx:Declarations>
 		<fx:Component id="moduleButton">
@@ -33,20 +33,26 @@
 		</s:fill>
 	</s:Rect>
 	
-	<s:Group id="contentGroup" top="0" right="0" bottom="0" left="10">
+	<s:Group id="contentGroup" top="0" left="10" bottom="0" right="20">
 		<s:layout>
 			<s:HorizontalLayout verticalAlign="middle"/>
 		</s:layout>
 		<s:Label text="{hostComponent.headerLabel}" 
-				 fontWeight="bold" color="0x333333" fontSize="16"
+				 styleName="applicationLabel"
 				 verticalCenter="0"/>
 		
 		<mx:Spacer width="50" />
 		
 		<s:HGroup id="modulesGroup" top="10" bottom="10" gap="10" verticalCenter="0" />
+		
 		<mx:Spacer width="20" />
+		
 		<s:HGroup id="componentsGroup" top="10" bottom="10" gap="10" verticalCenter="0" />
-		<mx:Spacer width="20" />
-		<s:HGroup id="settingsGroup" top="10" bottom="10" gap="10" verticalCenter="0" />
+		
+		<mx:Spacer width="100%" />
+		
+		<s:HGroup id="settingsGroup" top="10" bottom="10" gap="10" verticalCenter="0">
+			<buttons:SettingsButton id="settingsButton" />
+		</s:HGroup>
 	</s:Group>
 </s:Skin>

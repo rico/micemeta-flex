@@ -35,5 +35,10 @@ package ch.tofuse.micemeta.models
 			return _components;
 		}
 		
+		public function get content():Vector.<IContent>
+		{
+			return modules.concat( components );
+		}
+		
 	}
 }

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+	<!--
+		© Rico Leuthold [rico.leuthold@to-fuse.ch] - 2011
+		
+		This program is free software: you can redistribute it and/or modify
+	    it under the terms of the GNU General Public License as published by
+	    the Free Software Foundation, either version 3 of the License, or
+	    (at your option) any later version.
+	
+	    This program is distributed in the hope that it will be useful,
+	    but WITHOUT ANY WARRANTY; without even the implied warranty of
+	    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	    GNU General Public License for more details.
+	
+	    You should have received a copy of the GNU General Public License
+	    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	-->
+	
+<s:Panel xmlns:mx="library://ns.adobe.com/flex/mx"  
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+			   skinClass="ch.tofuse.micemeta.skins.SettingsViewSkin"
+			   xmlns:settings="ch.tofuse.micemeta.views.settings.*" 
+			   xmlns:text="ch.tofuse.micemeta.views.text.*"
+			   title="Settings"
+			   width="350"
+			   creationComplete="build()">
+	
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.config.SettingsConfig;
+			import ch.tofuse.micemeta.interfaces.IContent;
+			import ch.tofuse.micemeta.utils.VectorUtils;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.EffectEvent;
+			import mx.managers.PopUpManager;
+			
+			[Bindable]
+			[Embed(source="ch/tofuse/micemeta/assets/img/cancel.png")]
+			private var cancelIcon:Class;
+			
+			[Bindable]
+			[Embed(source="ch/tofuse/micemeta/assets/img/done.png")]
+			private var okIcon:Class;
+			
+			[Bindable]
+			private var _content:ArrayCollection;
+			
+			private var _settings:SharedObject;
+			
+			private function build():void
+			{
+				showHide.play([this]);
+			}
+			
+			public function set content( m:Vector.<IContent> ):void
+			{
+				
+				_content = VectorUtils.toArrayCollection( m );
+				
+				if( !_settings ) {
+					_settings = SharedObject.getLocal( SettingsConfig.SHARED_OBEJECT_NAME );
+				}
+				
+				if( _settings.data[ SettingsConfig.STARTUP_CONTENT_NAME] ) {
+					for each ( var startUpContentLabel:String in _settings.data[ SettingsConfig.STARTUP_CONTENT_NAME] ) {
+						for each ( var content:IContent in _content ) {
+							if( content.label == startUpContentLabel ) {
+								content.addInstanceOnStart = true;
+								break;
+							}
+						}
+					}
+				}
+				
+				contentList.dataProvider = _content;
+			}
+			
+			/**
+			 * Save the settings
+			 */
+			private function saveSettings():void
+			{
+				
+				var startupContent:Array = []
+				
+				for each ( var content:IContent in _content) {
+					if( content.addInstanceOnStart ) {
+						startupContent.push( content.label );		
+					}
+				}
+				
+				_settings.data[ SettingsConfig.STARTUP_CONTENT_NAME ] = startupContent;
+				
+				try {
+					_settings.flush()
+				} catch(err:Error){
+					Alert.show("Save settings failed: " + err.message, "Save failed");
+				}
+				
+				closeThis();
+			}
+			
+			
+			/**
+			 * Close this popUp.
+			 */
+			public function closeThis():void
+			{
+				addEventListener(EffectEvent.EFFECT_END, removeThis);
+				showHide.play([this],true);
+			}
+			
+			/**
+			 * Remove the popup without playing the effect.
+			 */
+			private function removeThis(event:EffectEvent):void
+			{
+				PopUpManager.removePopUp(this);	
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- effects -->
+		<s:Fade id="showHide" alphaFrom="0" alphaTo="1" duration="500" />
+			
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout gap="10"
+						  paddingTop="20" 
+						  paddingRight="20" 
+						  paddingBottom="20" 
+						  paddingLeft="20"/>
+	</s:layout>
+	
+	
+	
+	<mx:HRule  width="100%" />
+	<mx:Spacer height="5" />
+	
+	<s:Label text="Startup Components" styleName="partHeaderLabel"/>
+	<!-- <text:InfoText text="Checked components are added to the application when started."/> -->
+	<settings:StartupContentListView id="contentList" />
+		
+	<mx:Spacer height="5" />
+	
+	<mx:Spacer height="5" />
+	
+	<s:HGroup width="100%">
+		<buttons:IconButton id="cancelBut" label="cancel" iconUp="{cancelIcon}" click="closeThis()"/>
+		<mx:Spacer width="100%"/>
+		<buttons:IconButton id="saveBut" label="save" iconUp="{okIcon}" click="saveSettings()"/>
+	</s:HGroup>	
+		
+		
+</s:Panel>

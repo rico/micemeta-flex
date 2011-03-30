@@ -44,14 +44,14 @@ s|global {
 }
 
 
-s|Label, input|AutoCompleteTextInput, input|AutoCompleteList, s|RichEditableText, s|MXDataGridItemRenderer, s|VGroup, s|HGroup
+s|Label, input|AutoCompleteTextInput, s|RichEditableText, s|MXDataGridItemRenderer, s|VGroup, s|HGroup
 {
 	font-family: Myriad;
 	font-weight: normal;
 	direction: ltr;
 }
 
-mx|DateField, mx|Button, mx|DataGrid, mx|FormItem, mx|FormItemLabel, mx|Label, mx|ToolTip, mx|Alert 
+mx|DateField, mx|Button, mx|DataGrid, mx|FormItem, mx|FormItemLabel, mx|Label, mx|ToolTip, mx|Alert
 {
 	font-family: MyriadMX;
 }
@@ -64,6 +64,12 @@ mx|DateField, mx|Button, mx|DataGrid, mx|FormItem, mx|FormItemLabel, mx|Label, m
 }
 
 /* LABELS */
+
+.applicationLabel {
+	color: #333333;
+	font-weight: bold;
+	font-size: 16;
+}
 
 .menuLabel {
 	color: #707070;	
@@ -86,6 +92,18 @@ mx|DateField, mx|Button, mx|DataGrid, mx|FormItem, mx|FormItemLabel, mx|Label, m
 	font-size: 16px;
 	font-weight: bold;
 	direction: ltr;
+}
+
+.panelTitle {
+	color: #333333;
+	font-weight: bold;
+	font-size: 14;
+}
+
+.partHeaderLabel {
+	color: #333333;
+	font-weight: bold;
+	font-size: 13;
 }
 
 .formPartHeaderLabel {

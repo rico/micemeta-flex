@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:List xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx"
+		  skinClass="ch.tofuse.micemeta.skins.SettingsListSkin"
+		  selectionColor="#FFFFFF"
+		  rollOverColor="#FFFFFF">
+	
+	<s:layout>
+		<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1"/>
+	</s:layout>
+	
+	<s:itemRenderer>
+		<fx:Component>
+			<s:ItemRenderer>
+				<s:HGroup id="renderer"
+						  gap="5" 
+						  width="100%"
+						  verticalAlign="middle"
+						  paddingLeft="3"
+						  paddingRight="3"
+						  paddingTop="2"
+						  paddingBottom="2"
+						  useHandCursor="true"
+						  buttonMode="true"
+						  click="checkChangeHandler()">
+					
+					<fx:Script>
+						<![CDATA[
+							import ch.tofuse.micemeta.interfaces.IContent;
+							
+							private function checkChangeHandler():void
+							{
+								IContent(data).addInstanceOnStart = !IContent(data).addInstanceOnStart;
+								cb.selected = IContent(data).addInstanceOnStart;
+							}
+						]]>
+					</fx:Script>
+					<s:CheckBox id="cb" selected="{IContent(data).addInstanceOnStart}"/>
+					<s:Label text="{IContent(data).label}" />
+				</s:HGroup>
+				
+			</s:ItemRenderer>
+		</fx:Component>
+	</s:itemRenderer>
+</s:List>

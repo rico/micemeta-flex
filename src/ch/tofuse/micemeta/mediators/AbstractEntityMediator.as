@@ -12,14 +12,23 @@ package ch.tofuse.micemeta.mediators
 	
 	public class AbstractEntityMediator extends Mediator
 	{
-		[Inject]
-		public var view:AbstractComponentView;
-		
-		protected var _model:IEntityModelInterface;
+		private var _view:AbstractComponentView;
+		private var _model:IEntityModelInterface;
 		
 		public function AbstractEntityMediator()
 		{
 			super();
+		}
+		
+		[Inject]
+		public function set view( v:AbstractComponentView ):void
+		{
+			_view = v;	
+		}
+		
+		public function get view():AbstractComponentView
+		{
+			return _view;
 		}
 		
 		public function set model( m:IEntityModelInterface ):void
@@ -27,14 +36,22 @@ package ch.tofuse.micemeta.mediators
 			_model = m;
 		}
 		
+		public function get model():IEntityModelInterface
+		{
+			return _model;
+		}
+		
 		override public function onRegister():void
 		{
-			view.entities = _model.repository.entities;
-			view.repository = _model.repository;
+			_view.entities = _model.repository.entities;
+			_view.repository = _model.repository;
 			
 			addViewListener( EntityMediatorEvent.ENTITY_PERSIST, handlePersist );
 			addViewListener( EntityMediatorEvent.ENTITY_REMOVE, handleRemove );
+			
 			addViewListener( EntityManagerEvent.FLUSH, handleFlush );
+			addViewListener( EntityManagerEvent.ROLLBACK, rollbackHandler );
+			addViewListener( EntityManagerEvent.CHECK_PENDING_CHANGES, checkPendingChangesHandler );
 		}
 		
 		protected function handlePersist( e:EntityMediatorEvent ):void
@@ -59,5 +76,18 @@ package ch.tofuse.micemeta.mediators
 		{
 			_model.flush();
 		}
+		
+		protected function checkPendingChangesHandler( e:EntityManagerEvent ):void
+		{
+			if( _model.entityManager.getUnitOfWork().size() > 0 ) {
+				_view.showChangesConfirmationAlert();
+			}
+		}
+		
+		protected function rollbackHandler():void
+		{
+			_model.entityManager.rollback();
+		}
+			
 	}
 }

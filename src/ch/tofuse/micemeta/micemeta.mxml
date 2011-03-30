@@ -40,9 +40,9 @@
 	</fx:Script>
 	
 	<!-- modules menu -->
-	<main:MainMenu id="moduleMenu" height="55" />
+	<main:MainMenuView id="moduleMenu" height="55" />
 	
 	<!-- module Navigation -->
-	<views:ContentNavigator id="contentNavigator"
+	<views:ContentNavigatorView id="contentNavigator"
 								width="100%" height="100%"/>
 </s:Application>

@@ -24,7 +24,6 @@
 			import ch.tofuse.micemeta.config.LayoutConfig;
 			import ch.tofuse.micemeta.entities.Box;
 			import ch.tofuse.micemeta.entities.BoxCheck;
-			import ch.tofuse.micemeta.entities.LocationCheck;
 			import ch.tofuse.micemeta.entities.NestCheck;
 			import ch.tofuse.micemeta.entities.OtherLocation;
 			import ch.tofuse.micemeta.entities.OtherLocationCheck;
@@ -34,39 +33,21 @@
 			
 			import mx.collections.ArrayCollection;
 			import mx.events.DragEvent;
-			import mx.rpc.AsyncResponder;
 			
-			import org.davekeen.flextrine.orm.EntityManager;
-			import org.davekeen.flextrine.orm.IEntityRepository;
-			import org.davekeen.flextrine.orm.collections.EntityCollection;
+			[Bindable] public var locationsData:ArrayCollection = new ArrayCollection();
 			
-			[Bindable] private var _locations:ArrayCollection = new ArrayCollection();
 			[Bindable] private var _addedLocations:ArrayCollection = new ArrayCollection();
 			[Bindable] private var _locationChecks:ArrayCollection = new ArrayCollection();
-			[Bindable] private var _nestcheckDateValid:Boolean;
+			[Bindable] private var _nestcheckDateValid:Boolean = true;
 			
 			private var _nestcheck:NestCheck;
-			private var _boxRepository:IEntityRepository;
-			private var _otherLocationRepository:IEntityRepository;
-			private var _nestcheckRepository:IEntityRepository;
 			
 			private function build():void
 			{
 				
-				//_nestcheckRepository = em.getRepository( NestCheck );
-				
-				if( currentState == 'add' ) {
+				/*if( currentState == 'add' ) {
 					validateCheckDate();
-				}
-				
-				//_boxRepository = em.getRepository( Box );
-				//_boxRepository.loadAll().addResponder( new AsyncResponder( onLocationsLoadResult, onLoadFault ) );
-				
-				//_otherLocationRepository = em.getRepository( OtherLocation );
-				//_otherLocationRepository.loadAll().addResponder( new AsyncResponder( onLocationsLoadResult, onLoadFault ) );
-				
-				
-				validateCheckDate();
+				}*/
 				
 				locations.addEventListener( AutoCompleteTextInputEvent.CONFIRM_SELECTION, addLocationCheck );
 				
@@ -89,7 +70,7 @@
 				
 			}
 			
-			private function addLocationCheck( event:Event = null ):void
+			private function addLocationCheck( e:Event = null ):void
 			{
 				var l:Object = locations.selectedItem;
 				
@@ -97,7 +78,7 @@
 					var olc:OtherLocationCheck = new OtherLocationCheck();
 					olc.otherLocation = OtherLocation(l);
 					
-					//em.persist( olc );
+					dispatchPersistEntity( olc );
 					
 					_nestcheck.other_location_checks.addItem( olc );
 					
@@ -111,7 +92,7 @@
 					bc.box = Box(l);
 					
 					
-					//em.persist( bc );
+					dispatchPersistEntity( bc );
 					
 					_nestcheck.box_checks.addItem( bc );
 					
@@ -127,15 +108,16 @@
 				locations.selectedItem = null;
 				
 			}
-			override protected function removeEntity(e:EntityEvent):void
+			override protected function removeEntity( e:EntityEvent ):void
 			{
-				//deleteItem( event );
-				
 				if( e.target.data is OtherLocationCheck ) {
-					//em.remove( OtherLocationCheck( event.target.data ) );
+					
+					dispatchRemoveEntity( OtherLocationCheck( e.target.data ) ); 
 					_addedLocations.removeItemAt( _addedLocations.getItemIndex( OtherLocationCheck(e.target.data).otherLocation  ) );
+					
 				} else if( e.target.data is BoxCheck ) {
-					//em.remove( BoxCheck( event.target.data ) );	
+					
+					dispatchRemoveEntity( BoxCheck( e.target.data ) );	
 					_addedLocations.removeItemAt( _addedLocations.getItemIndex( BoxCheck(e.target.data).box ) );
 				}
 				
@@ -151,7 +133,7 @@
 				
 			}
 			
-			private function updateRanks( event:Event = null ):void
+			private function updateRanks( e:Event = null ):void
 			{
 				for each ( var locationCheck:Object in _locationChecks ) {
 					if ( locationCheck is OtherLocationCheck ) {
@@ -192,7 +174,7 @@
 			
 			private function onLocationsLoadResult( result:Object, token:Object ):void
 			{
-				_locations.addAllAt( new ArrayCollection( result.result ), _locations.length );
+				locationsData.addAllAt( new ArrayCollection( result.result ), locationsData.length );
 			}
 			
 			private function locationsFilterFunction( item:Object ):Boolean 
@@ -204,13 +186,16 @@
 				return false;
 			}
 			
-			private function validateCheckDate():void
+			public function validateCheckDate():void
 			{
-				if( _nestcheckRepository.findBy( {checkdate: nestcheckDate.selectedDate } ).length == 0 ) {
-					_nestcheckDateValid = true;
-				} else {
-					_nestcheckDateValid = false;
+				if( currentState == 'add' ) {
+					if( repository.findBy( {checkdate: nestcheckDate.selectedDate } ).length == 0 ) {
+						_nestcheckDateValid = true;
+					} else {
+						_nestcheckDateValid = false;
+					}
 				}
+				
 			}
 			
 		]]>
@@ -229,7 +214,7 @@
 						  left="{LayoutConfig.FORM_ITEM_VALUE_LEFT}"
 						  verticalCenter="0"
 						  enabled="{ currentState == 'add' || currentState == 'edit' }"/>	
-			<text:AttentionText text="A nestcheck already exists for the selected date.\nPlease select another date or edit the existing nestcheck."
+			<text:AttentionText text="A nestcheck already exists for the selected date.\n Please select another date or edit the existing nestcheck."
 								includeInLayout="{!_nestcheckDateValid}" visible="{!_nestcheckDateValid}" 
 								width="100"/>
 		</s:HGroup>
@@ -250,7 +235,7 @@
 		<s:HGroup left="{LayoutConfig.FORM_ITEM_VALUE_LEFT}" gap="10" verticalAlign="middle"
 				  includeIn="add">
 			<inputs:AutoCompleteTextInputFilterFunction id="locations" 
-										  dataProvider="{_locations}"
+										  dataProvider="{locationsData}"
 										  labelFunction="locationsLabelFunction"
 										  filterFunction="locationsFilterFunction"
 										  prefixOnly="false"

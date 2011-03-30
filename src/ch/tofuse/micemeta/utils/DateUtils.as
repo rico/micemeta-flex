@@ -1,6 +1,6 @@
-package ch.tofuse.micemeta.helpers
+package ch.tofuse.micemeta.utils
 {
-	public class DateHelpers
+	public class DateUtils
 	{
 		public static const MILLISECONDS_PER_DAY:uint = 1000 * 60 * 60 * 24;
 		

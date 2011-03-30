@@ -9,10 +9,6 @@ package ch.tofuse.micemeta.mediators
 	
 	public class BoxMediator extends AbstractEntityMediator
 	{
-		public function BoxMediator():void
-		{
-			super();
-		}
 		
 		[Inject(name="BoxModel")]
 		override public function set model(m:IEntityModelInterface):void

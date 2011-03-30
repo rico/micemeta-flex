@@ -17,5 +17,5 @@
 			[Bindable] public var dataProvider:IList;
 		]]>
 	</fx:Script>
-	<navigation:ExtendedTabBar dataProvider="{dataProvider}" height="100%"/>
+	<navigation:ExtendedTabBar id="tabBar" dataProvider="{dataProvider}" height="100%"/>
 </s:SkinnableContainer>
