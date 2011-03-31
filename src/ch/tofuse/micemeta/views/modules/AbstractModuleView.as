@@ -1,4 +1,4 @@
-package ch.tofuse.micemeta.views.modules.base
+package ch.tofuse.micemeta.views.modules
 {
 	import ch.tofuse.micemeta.events.ComponentEvent;
 	import ch.tofuse.micemeta.events.ModuleMenuEvent;
@@ -25,19 +25,20 @@ package ch.tofuse.micemeta.views.modules.base
 	
 	import org.davekeen.flextrine.orm.EntityManager;
 	import org.davekeen.flextrine.orm.IEntityRepository;
+	import org.davekeen.flextrine.orm.collections.EntityCollection;
 	
 	import spark.components.NavigatorContent;
 	import spark.layouts.BasicLayout;
 	
-	public class ModuleContainerBase extends NavigatorContent implements IContent
+	public class AbstractModuleView extends NavigatorContent implements IContent
 	{
 		
 		[Bindable] public var showFilter:Boolean = true;
 		[Bindable] public var showList:Boolean = true;
 		[Bindable] public var showOptions:Boolean = true;
 		
-		protected var repository:IEntityRepository;
-		private var _em:EntityManager;
+		private var _repository:IEntityRepository;
+		private var _entities:EntityCollection;
 		
 		private var _viewable:Boolean = false;
 		
@@ -62,7 +63,7 @@ package ch.tofuse.micemeta.views.modules.base
 		protected var _addInstanceOnStart:Boolean;
 		
 		
-		public function ModuleContainerBase()
+		public function AbstractModuleView()
 		{
 			super();
 			addEventListener( FlexEvent.CREATION_COMPLETE, build );
@@ -161,7 +162,7 @@ package ch.tofuse.micemeta.views.modules.base
 			_content.addEventListener( ModuleMenuEvent.DISABLE_CONTROLS, disableControls );
 			_content.addEventListener( ModuleMenuEvent.ENABLE_CONTROLS, enableControls );
 			
-			_content.addEventListener( ComponentEvent.DONE, done );
+			_content.addEventListener( ComponentEvent.CLOSE_VIEW, closeView );
 		}
 		
 		protected function build( event:FlexEvent ):void
@@ -244,19 +245,19 @@ package ch.tofuse.micemeta.views.modules.base
 		}
 		
 		[Bindable(Event="menuOptionsDataChange")]
-		public function get menuOptionsData():ArrayCollection
+		public function get menuOptionsData():Array
 		{
 			if( _menuOptionsList.dataProvider ) {
-				return ArrayCollection( _menuOptionsList.dataProvider );
+				return ArrayCollection( _menuOptionsList.dataProvider ).source;
 			} 
 			
-			return new ArrayCollection();
+			return [];
 			
 		}
 		
-		public function set menuOptionsData(value:ArrayCollection):void
+		public function set menuOptionsData(value:Array):void
 		{
-			_menuOptionsList.dataProvider = value;
+			_menuOptionsList.dataProvider = new ArrayCollection( value );
 			dispatchEvent( new Event( "menuOptionsDataChange" ) );
 		}
 		
@@ -267,8 +268,9 @@ package ch.tofuse.micemeta.views.modules.base
 		
 		public function set view( element:IVisualElement ):void
 		{
-			if( element && element != _view ) {
-				_content.removeAllElements();
+			_content.removeAllElements();
+			
+			if( element ) {
 				_content.addElement( element );
 				_view = element;
 				dispatchEvent( new Event("viewChange") );
@@ -280,11 +282,6 @@ package ch.tofuse.micemeta.views.modules.base
 		public function get view():IVisualElement
 		{ 
 			return _view;
-		}
-		
-		private function clearView():void
-		{
-			_content.removeAllElements();
 		}
 		
 		public function asDisplayObject():DisplayObject
@@ -307,15 +304,6 @@ package ch.tofuse.micemeta.views.modules.base
 			return _addInstanceOnStart;			
 		}
 
-		public function get em():EntityManager
-		{
-			if( !_em ) {
-				_em = EntityManager.getInstance();
-			}
-			
-			return _em;
-		}
-		
 		protected function disableMenu( e:ModuleMenuEvent = null ):void
 		{
 			if( e ) {
@@ -423,14 +411,39 @@ package ch.tofuse.micemeta.views.modules.base
 			enableFilter();
 		}
 		
-		protected function done( e:ComponentEvent = null ):void
+		protected function closeView( e:ComponentEvent = null ):void
 		{
 			if( e ) {
 				e.stopImmediatePropagation();
 			}
+			
+			_content.removeAllElements();
 			enableControls();
-			clearView();
+			
 		}
+
+		public function get repository():IEntityRepository
+		{
+			return _repository;
+		}
+
+		public function set repository(value:IEntityRepository):void
+		{
+			_repository = value;
+		}
+		
+		[Bindable(Event="entitiesChanged")]
+		public function get entities():EntityCollection
+		{
+			return _entities;
+		}
+
+		public function set entities(value:EntityCollection):void
+		{
+			_entities = value;
+			dispatchEvent( new Event("entitiesChanged") );
+		}
+
 
 	}
 }

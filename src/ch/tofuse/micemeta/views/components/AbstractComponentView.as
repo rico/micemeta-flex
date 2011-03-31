@@ -24,14 +24,10 @@ package ch.tofuse.micemeta.views.components
 	public class AbstractComponentView extends SkinnableContainer
 	{
 		
-		[Embed(source="ch/tofuse/micemeta/assets/img/attention.png")]
-		[Bindable]
-		public var attentionIcon:Class;
-		
 		[Bindable] public var entities:EntityCollection;
 		
-		public var repository:IEntityRepository;
-		public var entityManager:EntityManager;
+		private var _repository:IEntityRepository;
+		private var _entityManager:EntityManager;
 		
 		protected var persistEntityEvent:EntityMediatorEvent;
 		protected var removeEntityEvent:EntityMediatorEvent;
@@ -44,10 +40,8 @@ package ch.tofuse.micemeta.views.components
 			layoutDirection = "ltr";
 			
 			addEventListener( EntityEvent.PERSIST_ENTITY, addEntity );
-			addEventListener( EntityEvent.EDIT_ENTITY, editEntity );
+			//addEventListener( EntityEvent.EDIT_ENTITY, editEntity );
 			addEventListener( EntityEvent.REMOVE_ENTITY, removeEntity );
-			
-			addEventListener( Event.REMOVED, dispatchFocusOutEvent );
 			
 			removeEntityEvent = new EntityMediatorEvent( EntityMediatorEvent.ENTITY_REMOVE, {} );
 			persistEntityEvent = new EntityMediatorEvent( EntityMediatorEvent.ENTITY_PERSIST, {} );
@@ -55,29 +49,48 @@ package ch.tofuse.micemeta.views.components
 			flushEvent = new EntityManagerEvent( EntityManagerEvent.FLUSH );
 		}
 		
+		public function get repository():IEntityRepository
+		{
+			return _repository;
+		}
+		
+		public function set repository(value:IEntityRepository):void
+		{
+			_repository = value;
+		}
+		
+		public function get entityManager():EntityManager
+		{
+			return _entityManager;
+		}
+		
+		public function set entityManager(value:EntityManager):void
+		{
+			_entityManager = value;
+		}
 		
 		protected function addEntity( e:EntityEvent ):void
 		{
-			throw new Error("\t=> override this method");
+			trace("\t=> addEntity not implemented");
 		}
 		
 		protected function editEntity( e:EntityEvent ):void
 		{
-			throw new Error("\t=> override this method");
+			trace("\t=> editEntity not implemented");
 		}
 		
 		protected function removeEntity( e:EntityEvent ):void
 		{
-			throw new Error("\t=> override this method");
+			trace("\t=> removeEntity not implemented");
 		}
 		
 		protected function onLoadFault(fault:Object, token:Object):void {
 			throw new Error("An error occurred during load: " + fault);
 		}
 		
-		protected function done():void
+		protected function save():void
 		{
-			dispatchEvent( new ComponentEvent( ComponentEvent.DONE ) ); 
+			dispatchEvent( flushEvent ); 
 		}
 		
 		protected function dispatchPersistEntity( e:* ):void
@@ -91,33 +104,6 @@ package ch.tofuse.micemeta.views.components
 			removeEntityEvent.entity = e;
 			dispatchEvent( removeEntityEvent );
 		}
-		
-		/* view focus out changes confirmation */
-		protected function dispatchFocusOutEvent( e:Event ):void
-		{
-			dispatchEvent( new EntityManagerEvent( EntityManagerEvent.CHECK_PENDING_CHANGES ) );
-		}
-		
-		public function showChangesConfirmationAlert():void
-		{
-			Alert.show( "Do you want to save the changes you made to the data?", 
-				"Save Changes",
-				Alert.NO | Alert.YES, 
-				null, 
-				changesConfirmationCloseHandler, 
-				attentionIcon, 
-				Alert.YES); 
-		}
-		
-		public function changesConfirmationCloseHandler( e:CloseEvent ):void
-		{
-			if ( e.detail == Alert.YES) {
-				dispatchEvent( new EntityManagerEvent( EntityManagerEvent.FLUSH ) );			 
-			} else {
-				dispatchEvent( new EntityManagerEvent( EntityManagerEvent.ROLLBACK ) );
-			}
-			
-		}
-		
+
 	}
 }

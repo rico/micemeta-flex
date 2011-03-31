@@ -27,6 +27,7 @@
 	<fx:Script>
 		<![CDATA[
 			import ch.tofuse.micemeta.config.FlextrineConfig;
+			import ch.tofuse.micemeta.config.SettingsConfig;
 			import ch.tofuse.micemeta.events.ComponentManagerEvent;
 			import ch.tofuse.micemeta.events.ModuleManagerEvent;
 			

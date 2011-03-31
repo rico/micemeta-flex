@@ -23,15 +23,18 @@
 					   backgroundAlpha=".75"
 					   color="#FFFFFF"
 					   x="8" y="7"
-					   minHeight="14">
+					   minHeight="14"
+					   width="100%">
 		<s:layout>
 			<s:BasicLayout />
 		</s:layout>
 		
 		<mx:Image source="@Embed(source='ch/tofuse/micemeta/assets/img/info.png')" 
 				  x="-8" y="-7"/>
+		
 		<mx:Text id="infoText" text="{text}" color="#FFFFFF" minHeight="14"
-				 left="5" top="7" right="5" bottom="5"/>
+				 left="5" top="7" right="5" bottom="5"
+				 width="100%"/>
 		
 	</s:BorderContainer>
 	

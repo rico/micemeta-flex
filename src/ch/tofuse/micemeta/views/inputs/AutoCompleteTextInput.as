@@ -32,7 +32,7 @@ package ch.tofuse.micemeta.views.inputs
 	[Event (name="enter", type="mx.events.FlexEvent")]
 	[Event (name="change", type="spark.events.TextOperationEvent")]
 	[Event (name="change", type="spark.events.TextOperationEvent")]
-	
+	[Event(name="confirmSelection", type="ch.tofuse.micemeta.events.AutoCompleteTextInputEvent")]
 
 	public class AutoCompleteTextInput extends SkinnableComponent
 	{

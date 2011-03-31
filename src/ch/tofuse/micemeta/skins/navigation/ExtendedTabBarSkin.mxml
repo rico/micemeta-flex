@@ -35,13 +35,15 @@ created by the TabBarSkin use the TabBarButtonSkin class.
     
     <fx:Metadata>
         <![CDATA[ 
+		
         /** 
          * @copy spark.skins.spark.ApplicationSkin#hostComponent
          */
         [HostComponent("ch.tofuse.micemeta.views.navigation.ExtendedTabBar")]
+		
         ]]>
     </fx:Metadata> 
-    
+	
     <s:states>
         <s:State name="normal" />
         <s:State name="disabled" />
@@ -52,9 +54,9 @@ created by the TabBarSkin use the TabBarButtonSkin class.
         <s:layout>
             <s:ButtonBarHorizontalLayout gap="-1"/>
         </s:layout>
-        <s:itemRenderer>
+        <s:itemRenderer >
             <fx:Component>
-                <navigation:ExtendedTabBarButton />
+                <navigation:ExtendedTabBarButton closeable="{outerDocument.hostComponent.closable}" />
             </fx:Component>
         </s:itemRenderer>
     </s:DataGroup>

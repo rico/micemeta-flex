@@ -20,7 +20,7 @@
 			import ch.tofuse.micemeta.views.buttons.ContentButton;
 			import ch.tofuse.micemeta.views.buttons.ModuleButton;
 			import ch.tofuse.micemeta.views.buttons.SettingsButton;
-			import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+			import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 			import ch.tofuse.micemeta.views.settings.SettingsView;
 			
 			import mx.core.FlexGlobals;
@@ -120,9 +120,8 @@
 			
 			public function showSettings( e:MouseEvent ):void
 			{
-				if( !_settingsView ) {
-					_settingsView = new SettingsView();
-				}	
+				
+				_settingsView = new SettingsView();
 				
 				PopUpManager.addPopUp( _settingsView, FlexGlobals.topLevelApplication as DisplayObject, true );
 				PopUpManager.centerPopUp( _settingsView );

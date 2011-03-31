@@ -2,9 +2,9 @@ package ch.tofuse.micemeta.models
 {
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.views.components.mouse.MiceMainContainer;
-	import ch.tofuse.micemeta.views.modules.genetic.GeneticsMainContainer;
-	import ch.tofuse.micemeta.views.modules.location.LocationMainContainer;
-	import ch.tofuse.micemeta.views.modules.nestcheck.NestcheckMainContainer;
+	import ch.tofuse.micemeta.views.modules.genetic.GeneticsModuleView;
+	import ch.tofuse.micemeta.views.modules.location.LocationModuleView;
+	import ch.tofuse.micemeta.views.modules.nestcheck.NestcheckModuleView;
 	
 	import org.robotlegs.mvcs.Actor;
 	
@@ -18,7 +18,7 @@ package ch.tofuse.micemeta.models
 		{
 			if( _modules == null ) {
 				_modules = new Vector.<IContent>();
-				_modules.push( new NestcheckMainContainer(), new GeneticsMainContainer()  );
+				_modules.push( new NestcheckModuleView(), new GeneticsModuleView()  );
 			}
 			
 			return _modules;		
@@ -29,7 +29,7 @@ package ch.tofuse.micemeta.models
 		{
 			if( _components == null ) {
 				_components = new Vector.<IContent>();
-				_components.push( new MiceMainContainer(), new LocationMainContainer() );
+				_components.push( new MiceMainContainer(), new LocationModuleView() );
 			}
 			
 			return _components;

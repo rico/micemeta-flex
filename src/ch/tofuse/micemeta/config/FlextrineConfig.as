@@ -12,6 +12,7 @@ package ch.tofuse.micemeta.config
 		{
 			gateway = GATEWAY;
 			entityTimeToLive = ENTITY_TIME_TO_LIVE;
+			enabledRollback = true;
 		}
 		
 	}

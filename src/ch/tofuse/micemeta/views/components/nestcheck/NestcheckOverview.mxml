@@ -6,8 +6,7 @@
 						  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*" 
 						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*" 
 						  xmlns:grids="ch.tofuse.micemeta.views.grids.*" 
-						  xmlns:text="ch.tofuse.micemeta.views.text.*"
-						  creationComplete="build()" >
+						  xmlns:text="ch.tofuse.micemeta.views.text.*">
 	
 	<components:states>
 		<s:State name="view" />
@@ -32,7 +31,11 @@
 			import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
 			
 			import mx.collections.ArrayCollection;
+			import mx.collections.ListCollectionView;
 			import mx.events.DragEvent;
+			import mx.states.OverrideBase;
+			
+			import org.davekeen.flextrine.orm.EntityRepository;
 			
 			[Bindable] public var locationsData:ArrayCollection = new ArrayCollection();
 			
@@ -41,20 +44,6 @@
 			[Bindable] private var _nestcheckDateValid:Boolean = true;
 			
 			private var _nestcheck:NestCheck;
-			
-			private function build():void
-			{
-				
-				/*if( currentState == 'add' ) {
-					validateCheckDate();
-				}*/
-				
-				locations.addEventListener( AutoCompleteTextInputEvent.CONFIRM_SELECTION, addLocationCheck );
-				
-				locationChecksGrid.dataSource = _locationChecks;
-				locationChecksGrid.addEventListener( DragEvent.DRAG_COMPLETE, updateRanks );
-				
-			}
 			
 			public function get nestcheck():NestCheck
 			{
@@ -65,8 +54,12 @@
 			{
 				if( value && !_nestcheck ) {
 					_nestcheck = value;
+					//_locationChecks = _nestcheck.box_checks;
+					var checks:ListCollectionView = _nestcheck.box_checks;
+					var cac:ArrayCollection = new ArrayCollection( _nestcheck.box_checks.toArray().concat( _nestcheck.other_location_checks.toArray() ) );
+					_locationChecks = cac
+					//locationChecksGrid.dataSource = cac;
 				}
-				
 				
 			}
 			
@@ -108,8 +101,11 @@
 				locations.selectedItem = null;
 				
 			}
+			
 			override protected function removeEntity( e:EntityEvent ):void
 			{
+				e.stopImmediatePropagation();
+				
 				if( e.target.data is OtherLocationCheck ) {
 					
 					dispatchRemoveEntity( OtherLocationCheck( e.target.data ) ); 
@@ -186,16 +182,15 @@
 				return false;
 			}
 			
-			public function validateCheckDate():void
+			public function nestcheckDateValid():Boolean
 			{
-				if( currentState == 'add' ) {
-					if( repository.findBy( {checkdate: nestcheckDate.selectedDate } ).length == 0 ) {
-						_nestcheckDateValid = true;
-					} else {
-						_nestcheckDateValid = false;
-					}
+				if( repository.findBy( {checkdate: nestcheckDate.selectedDate } ).length == 0 ) {
+					_nestcheckDateValid = true;
+					return true;
+				} else {
+					_nestcheckDateValid = false;
+					return false;
 				}
-				
 			}
 			
 		]]>
@@ -210,7 +205,7 @@
 			<mx:DateField id="nestcheckDate" 
 						  formatString="{GeneralDateFormatter.DATE_FORMAT}" 
 						  selectedDate="{new Date()}"
-						  change="validateCheckDate()"
+						  change="nestcheckDateValid()"
 						  left="{LayoutConfig.FORM_ITEM_VALUE_LEFT}"
 						  verticalCenter="0"
 						  enabled="{ currentState == 'add' || currentState == 'edit' }"/>	
@@ -233,11 +228,12 @@
 				 verticalAlign="top"/>
 		
 		<s:HGroup left="{LayoutConfig.FORM_ITEM_VALUE_LEFT}" gap="10" verticalAlign="middle"
-				  includeIn="add">
+				  includeIn="add,edit">
 			<inputs:AutoCompleteTextInputFilterFunction id="locations" 
 										  dataProvider="{locationsData}"
 										  labelFunction="locationsLabelFunction"
 										  filterFunction="locationsFilterFunction"
+										  confirmSelection="addLocationCheck( event )"
 										  prefixOnly="false"
 										  width="150" height="22" 
 										  requireSelection="true"/>
@@ -249,6 +245,8 @@
 		</s:HGroup>
 		
 		<grids:AutoResizeDataGrid id="locationChecksGrid"
+								  dragComplete="updateRanks( event )"
+								  dataSource="{_locationChecks}"
 								  sortableColumns="false"
 								  dragEnabled="true"
 								  dragMoveEnabled="true"
@@ -259,8 +257,8 @@
 				<mx:DataGridColumn headerText="Location" labelFunction="locationChecksLabelFunction" width="100" />
 				<mx:DataGridColumn dataField="remark" headerText="Remark" wordWrap="true" width="250" />
 				<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.DetailItemRenderer" width="30" />
-				<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.EditItemRenderer" width="30" />
-				<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.DeleteItemRenderer" width="30" />
+				<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.EditItemRenderer" width="30" includeIn="add,edit"/>
+				<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.DeleteItemRenderer" width="30" includeIn="add,edit"/>
 			</grids:columns>
 		</grids:AutoResizeDataGrid>
 	</s:VGroup>

@@ -3,7 +3,8 @@
 					  xmlns:s="library://ns.adobe.com/flex/spark" 
 					  xmlns:mx="library://ns.adobe.com/flex/mx"
 					  xmlns:navigation="ch.tofuse.micemeta.views.navigation.*"
-					  skinClass="ch.tofuse.micemeta.skins.navigation.MainNavigationTabBarSkin" >
+					  skinClass="ch.tofuse.micemeta.skins.navigation.MainNavigationTabBarSkin"
+					  creationComplete="build()">
 	<s:layout>
 		<s:HorizontalLayout/>
 	</s:layout>
@@ -12,10 +13,61 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.IList;
+			import ch.tofuse.micemeta.events.ContentEvent;
 			
-			[Bindable] public var dataProvider:IList;
+			import mx.collections.IList;
+			import mx.events.CollectionEvent;
+			
+			private var _dataProvider:IList;
+			private var _closable:Boolean;
+			
+			private function build():void
+			{
+				tabBar.addEventListener( ContentEvent.REMOVE_CONTENT, removeContentDispatcher );
+			}
+			 
+			
+			private function removeContentDispatcher( e:ContentEvent ):void
+			{
+				dispatchEvent( e );
+			}
+			
+			[Bindable(Event="dataProviderChanged")]
+			public function get dataProvider():IList
+			{
+				return _dataProvider;
+			}
+
+			public function set dataProvider(value:IList):void
+			{
+				if( value != _dataProvider) {
+					_dataProvider = value;
+					_dataProvider.addEventListener( CollectionEvent.COLLECTION_CHANGE, updateClosable );
+					dispatchEvent( new Event("dataProviderChanged") );
+				}
+			}
+			
+			[Bindable(Event="closableChanged")]
+			public function get closable():Boolean
+			{
+				return _closable;
+			}
+			
+			public function set closable(value:Boolean):void
+			{
+				if( value != _closable) {
+					_closable = value;
+					dispatchEvent( new Event("closableChanged") );
+				}
+			}
+			
+			private function updateClosable( e:Event ):void
+			{
+				closable = dataProvider.length > 1;
+			}
+
+			
 		]]>
 	</fx:Script>
-	<navigation:ExtendedTabBar id="tabBar" dataProvider="{dataProvider}" height="100%"/>
+	<navigation:ExtendedTabBar id="tabBar" dataProvider="{dataProvider}" closable="{closable}" height="100%"/>
 </s:SkinnableContainer>

@@ -40,17 +40,13 @@
 			import mx.managers.PopUpManager;
 			
 			[Bindable]
-			[Embed(source="ch/tofuse/micemeta/assets/img/cancel.png")]
-			private var cancelIcon:Class;
-			
-			[Bindable]
 			[Embed(source="ch/tofuse/micemeta/assets/img/done.png")]
 			private var okIcon:Class;
 			
 			[Bindable]
 			private var _content:ArrayCollection;
 			
-			private var _settings:SharedObject;
+			private var _settings:SettingsConfig;
 			
 			private function build():void
 			{
@@ -63,16 +59,14 @@
 				_content = VectorUtils.toArrayCollection( m );
 				
 				if( !_settings ) {
-					_settings = SharedObject.getLocal( SettingsConfig.SHARED_OBEJECT_NAME );
+					_settings = SettingsConfig.instance;
 				}
 				
-				if( _settings.data[ SettingsConfig.STARTUP_CONTENT_NAME] ) {
-					for each ( var startUpContentLabel:String in _settings.data[ SettingsConfig.STARTUP_CONTENT_NAME] ) {
-						for each ( var content:IContent in _content ) {
-							if( content.label == startUpContentLabel ) {
-								content.addInstanceOnStart = true;
-								break;
-							}
+				for each ( var startUpContentLabel:String in _settings.startupContent ) {
+					for each ( var content:IContent in _content ) {
+						if( content.label == startUpContentLabel ) {
+							content.addInstanceOnStart = true;
+							break;
 						}
 					}
 				}
@@ -94,13 +88,7 @@
 					}
 				}
 				
-				_settings.data[ SettingsConfig.STARTUP_CONTENT_NAME ] = startupContent;
-				
-				try {
-					_settings.flush()
-				} catch(err:Error){
-					Alert.show("Save settings failed: " + err.message, "Save failed");
-				}
+				_settings.startupContent = startupContent;
 				
 				closeThis();
 			}
@@ -133,7 +121,7 @@
 	</fx:Declarations>
 	
 	<s:layout>
-		<s:VerticalLayout gap="10"
+		<s:VerticalLayout gap="5"
 						  paddingTop="20" 
 						  paddingRight="20" 
 						  paddingBottom="20" 
@@ -142,22 +130,25 @@
 	
 	
 	
-	<mx:HRule  width="100%" />
-	<mx:Spacer height="5" />
-	
 	<s:Label text="Startup Components" styleName="partHeaderLabel"/>
-	<!-- <text:InfoText text="Checked components are added to the application when started."/> -->
-	<settings:StartupContentListView id="contentList" />
-		
-	<mx:Spacer height="5" />
 	
-	<mx:Spacer height="5" />
+	<s:VGroup paddingLeft="10">
+		<settings:StartupContentListView id="contentList" />	
+	</s:VGroup>
+		
+	
+	
+	<text:InfoText width="100%" text="{'Checked components are added to the application when started. ' +
+				   '\nAt least one component must be checked.'}" />	
+	
+	<mx:Spacer height="10" />
 	
 	<s:HGroup width="100%">
-		<buttons:IconButton id="cancelBut" label="cancel" iconUp="{cancelIcon}" click="closeThis()"/>
-		<mx:Spacer width="100%"/>
-		<buttons:IconButton id="saveBut" label="save" iconUp="{okIcon}" click="saveSettings()"/>
+		<mx:Spacer width="100%" />
+		<buttons:IconButton id="saveBut" label="done" iconUp="{okIcon}" click="saveSettings()"/>
 	</s:HGroup>	
+	
+	
 		
 		
 </s:Panel>

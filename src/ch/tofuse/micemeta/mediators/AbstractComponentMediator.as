@@ -10,12 +10,12 @@ package ch.tofuse.micemeta.mediators
 	
 	import org.robotlegs.mvcs.Mediator;
 	
-	public class AbstractEntityMediator extends Mediator
+	public class AbstractComponentMediator extends Mediator
 	{
 		private var _view:AbstractComponentView;
 		private var _model:IEntityModelInterface;
 		
-		public function AbstractEntityMediator()
+		public function AbstractComponentMediator()
 		{
 			super();
 		}
@@ -51,7 +51,6 @@ package ch.tofuse.micemeta.mediators
 			
 			addViewListener( EntityManagerEvent.FLUSH, handleFlush );
 			addViewListener( EntityManagerEvent.ROLLBACK, rollbackHandler );
-			addViewListener( EntityManagerEvent.CHECK_PENDING_CHANGES, checkPendingChangesHandler );
 		}
 		
 		protected function handlePersist( e:EntityMediatorEvent ):void
@@ -77,17 +76,9 @@ package ch.tofuse.micemeta.mediators
 			_model.flush();
 		}
 		
-		protected function checkPendingChangesHandler( e:EntityManagerEvent ):void
-		{
-			if( _model.entityManager.getUnitOfWork().size() > 0 ) {
-				_view.showChangesConfirmationAlert();
-			}
-		}
-		
 		protected function rollbackHandler():void
 		{
 			_model.entityManager.rollback();
 		}
-			
 	}
 }

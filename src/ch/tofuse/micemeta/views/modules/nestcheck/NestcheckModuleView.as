@@ -5,7 +5,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 	import ch.tofuse.micemeta.events.ModuleMenuEvent;
 	import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
 	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckView;
-	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	import ch.tofuse.micemeta.vo.MenuOptionVO;
 	
 	import flash.events.Event;
@@ -14,25 +14,36 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 	import mx.events.FlexEvent;
 	import mx.events.ItemClickEvent;
 	
+	import org.davekeen.flextrine.orm.collections.EntityCollection;
+	
 	import spark.events.IndexChangeEvent;
 	
-	public class NestcheckMainContainer extends ModuleContainerBase
+	public class NestcheckModuleView extends AbstractModuleView
 	{
 		
 		private var _view:NestcheckView;
 		private var _options:Array; 
 		private var _generalDateFormatter:GeneralDateFormatter;
 		
-		public function NestcheckMainContainer()
+		private var _nestcheck:NestCheck;
+		
+		private var _addOption:MenuOptionVO;
+		private var _editOption:MenuOptionVO;
+		
+		
+		public function NestcheckModuleView()
 		{
 			super();
 			
 			_generalDateFormatter = new GeneralDateFormatter();
 			
 			label = "Nestchecks";
-			_options = [ new MenuOptionVO( 'Add', add ) ];
-			menuOptionsData = new ArrayCollection( _options );
 			
+			_addOption = new MenuOptionVO( 'Add', add );
+			_editOption = new MenuOptionVO( 'Edit', edit )
+			
+			menuOptionsData = [ _addOption ];
+				
 			_view = new NestcheckView();
 			
 		}
@@ -40,19 +51,17 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 		override protected function build( event:FlexEvent ):void
 		{
 			super.build( event );
-			
 			menuEntriesList.labelFunction = nestcheckLabelFunction;
-			
-			repository = em.getRepository( NestCheck );
-			repository.loadAll();
-			menuEntriesData = em.getRepository( NestCheck ).entities;
 		}
 		
 		override protected function entriesListChangeHandler( event:ItemClickEvent ):void
 		{
 			view = _view;
-			_view.currentState = "edit";
+			_view.currentState = "view";
 			_view.nestcheck = NestCheck( event.item );
+			
+			menuOptionsData = [ _editOption ];
+			
 		}
 		
 		override protected function optionsListChangeHandler( event:ItemClickEvent ):void
@@ -64,9 +73,29 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 			
 		}
 		
+		override protected function closeView( e:ComponentEvent = null ):void
+		{
+			if( _view.currentState == "view" ) {
+				super.closeView();	
+			} else {
+				_view.currentState = "view";
+			}
+			
+			menuOptionsData = [ _addOption ];
+			enableControls();
+			
+		}
+		
 		private function add():void
 		{
 			_view.currentState = "add";
+			disableControls();
+			
+		}
+		
+		private function edit():void
+		{
+			_view.currentState = "edit";
 			disableControls();
 		}
 		

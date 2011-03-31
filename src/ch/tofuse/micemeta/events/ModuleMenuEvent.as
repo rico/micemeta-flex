@@ -2,7 +2,7 @@ package ch.tofuse.micemeta.events
 {
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.views.ContentNavigatorView;
-	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	
 	import flash.events.Event;
 	

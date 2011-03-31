@@ -8,7 +8,7 @@ package ch.tofuse.micemeta.mediators
 	
 	import org.robotlegs.mvcs.Mediator;
 	
-	public class OtherLocationMediator extends AbstractEntityMediator
+	public class OtherLocationMediator extends AbstractComponentMediator
 	{
 		[Inject(name="OtherLocationModel")]
 		override public function set model(m:IEntityModelInterface):void

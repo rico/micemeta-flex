@@ -22,6 +22,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import ch.tofuse.micemeta.events.ComponentEvent;
 			import ch.tofuse.micemeta.entities.Box;
 			import ch.tofuse.micemeta.entities.Litter;
 			import ch.tofuse.micemeta.entities.NestCheck;
@@ -44,33 +45,36 @@
 			
 			private function viewStateEntered():void
 			{
+				overview.currentState = "view";
 				header.text = "Add Nestcheck";
 				_addMode = false;
-				
-				overview.currentState = "view";
-				
 			}
 			
 			private function editStateEntered():void
 			{
+				overview.currentState = "edit";
 				header.text = "Edit Nestcheck";
 				_addMode = false;	
-				
-				overview.currentState = "edit";
 			}
 			
 			private function addStateEntered():void
 			{
+				overview.currentState = "add";
 				_nestcheck = new NestCheck();
 				header.text = "Add Nestcheck";
 				_addMode = true;
-				
-				overview.currentState = "add";
 			}
 			
 			private function locationCheckEntered():void
 			{
 				header.text = "Location";
+			}
+			
+			private function done():void
+			{
+				save();
+				dispatchEvent( new ComponentEvent(ComponentEvent.CLOSE_VIEW) );
+				
 			}
 			
 			/* LITTERS */

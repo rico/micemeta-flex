@@ -26,7 +26,8 @@ package ch.tofuse.micemeta.views.navigation {
 			this.mouseChildren = true;
 		}
 		
-		[Bindable]public function get closeable():Boolean {
+		[Bindable]
+		public function get closeable():Boolean {
 			return _closeable;
 		}
 		public function set closeable(val:Boolean):void {
@@ -47,9 +48,7 @@ package ch.tofuse.micemeta.views.navigation {
 			if (instance == closeButton) {
 				closeButton.addEventListener(MouseEvent.CLICK, closeHandler);
 				closeButton.visible = closeable;
-			} else if (instance == labelDisplay) {
-				//labelDisplay.right = (closeable ? 30 : 14);
-			}
+			} 
 		}
 		
 		override protected function partRemoved(partName:String, instance:Object):void {

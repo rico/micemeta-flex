@@ -8,8 +8,11 @@ package ch.tofuse.micemeta.mediators
 	
 	import flash.net.SharedObject;
 	
+	import mx.controls.Alert;
 	import mx.core.ClassFactory;
+	import mx.events.CloseEvent;
 	
+	import org.davekeen.flextrine.orm.EntityManager;
 	import org.robotlegs.mvcs.Mediator;
 	
 	public class ContentNavigatorMediator extends Mediator
@@ -20,9 +23,23 @@ package ch.tofuse.micemeta.mediators
 		[Inject]
 		public var model:ContentModel;
 		
+		
+		[Embed(source="ch/tofuse/micemeta/assets/img/attention.png")]
+		[Bindable]
+		public var attentionIcon:Class;
+		
+		private var _em:EntityManager;
+		private var _contentToRemoveEvent:ContentEvent;
+		
+		public function ContentNavigatorMediator()
+		{
+			_em = EntityManager.getInstance();
+		}
+		
 		override public function onRegister():void
 		{
 			eventMap.mapListener( eventDispatcher, ContentEvent.ADD_CONTENT, addContent );
+			addViewListener( ContentEvent.REMOVE_CONTENT, removeContent, ContentEvent );
 			addStartupContent();
 		}
 		
@@ -35,25 +52,52 @@ package ch.tofuse.micemeta.mediators
 		
 		protected function addStartupContent():void
 		{
-				
-			var settings:SharedObject = SharedObject.getLocal( SettingsConfig.SHARED_OBEJECT_NAME );
-			//settings.clear();
-			if( settings.data[ SettingsConfig.STARTUP_CONTENT_NAME ] != null ) {
-				var startupContents:Array = settings.data[ SettingsConfig.STARTUP_CONTENT_NAME ];
-				for each ( var startupContentLabel:String in startupContents ) {
-					for each( var content:IContent in model.content ) {
-						if( content.label == startupContentLabel) {
-							addContent( new ContentEvent( ContentEvent.ADD_CONTENT, content ) );
-							break;
-						}
+			for each ( var startupContentLabel:String in SettingsConfig.instance.startupContent ) {
+				for each( var content:IContent in model.content ) {
+					if( content.label == startupContentLabel) {
+						addContent( new ContentEvent( ContentEvent.ADD_CONTENT, content ) );
+						break;
 					}
 				}
-				
-				// bug workaround see: http://bugs.adobe.com/jira/browse/SDK-15974
-				view.setInitialIndex();
 			}
 			
+			// bug workaround see: http://bugs.adobe.com/jira/browse/SDK-15974
+			view.setInitialIndex();
 			
+		}
+		
+		protected function removeContent( e:ContentEvent ):void
+		{
+			_contentToRemoveEvent = e;
+			
+			if( _em.getUnitOfWork().size() > 0 )	{
+				showChangesConfirmationAlert();
+			} else {
+				view.removeContent( _contentToRemoveEvent.content );
+			}
+			
+		}	
+		
+		private function showChangesConfirmationAlert():void
+		{
+			Alert.show( "Do you want to save the changes you made to the data?", 
+				"Save Changes",
+				Alert.NO | Alert.YES, 
+				null, 
+				changesConfirmationCloseHandler, 
+				attentionIcon, 
+				Alert.YES); 
+		}
+		
+		private function changesConfirmationCloseHandler( e:CloseEvent ):void
+		{
+			if ( e.detail == Alert.YES) {
+				_em.flush();			 
+			} else {
+				_em.rollback();
+			}
+			
+			dispatch( _contentToRemoveEvent );
 			
 		}
 		

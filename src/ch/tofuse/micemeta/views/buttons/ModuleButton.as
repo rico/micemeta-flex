@@ -2,7 +2,7 @@ package ch.tofuse.micemeta.views.buttons
 {
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.skins.button.ContentButtonSkin;
-	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	
 	import mx.controls.Image;
 	

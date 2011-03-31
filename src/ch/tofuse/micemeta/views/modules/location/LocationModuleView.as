@@ -1,6 +1,6 @@
 package ch.tofuse.micemeta.views.modules.location
 {
-	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	import ch.tofuse.micemeta.views.components.box.BoxView;
 	import ch.tofuse.micemeta.views.components.otherlocation.OtherLocationView;
 	import ch.tofuse.micemeta.vo.MenuEntryVO;
@@ -8,13 +8,13 @@ package ch.tofuse.micemeta.views.modules.location
 	import mx.collections.ArrayCollection;
 	import mx.events.ItemClickEvent;
 	
-	public class LocationMainContainer extends ModuleContainerBase
+	public class LocationModuleView extends AbstractModuleView
 	{
 		
 		private var _otherLocationView:OtherLocationView;
 		private var _boxView:BoxView;
 		
-		public function LocationMainContainer()
+		public function LocationModuleView()
 		{
 			super();
 			showFilter = false;

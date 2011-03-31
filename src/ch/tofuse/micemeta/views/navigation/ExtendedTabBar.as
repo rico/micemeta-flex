@@ -1,7 +1,11 @@
 package ch.tofuse.micemeta.views.navigation {
 	
+	import ch.tofuse.micemeta.events.ContentEvent;
 	import ch.tofuse.micemeta.events.ExtendedTabBarEvent;
+	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.skins.navigation.ExtendedTabBarSkin;
+	
+	import flash.events.Event;
 	
 	import mx.collections.IList;
 	import mx.containers.ViewStack;
@@ -10,22 +14,29 @@ package ch.tofuse.micemeta.views.navigation {
 	
 	public class ExtendedTabBar extends TabBar {
 		
+		[Bindable] public var closable:Boolean;
+		
 		public function ExtendedTabBar() {
 			super();
 			setStyle("skinClass", ExtendedTabBarSkin);
 		}
 		
+		
 		public function setCloseableTab(index:int, value:Boolean):void {
-			if (index >= 0 && index < dataGroup.numElements) {
+			if (index > 0 && index < dataGroup.numElements) {
 				var btn:ExtendedTabBarButton = dataGroup.getElementAt(index) as ExtendedTabBarButton;
 				btn.closeable = value;
+				dispatchEvent( new Event("setClosableTabChanged") );
 			}
 		}
+		
+		[Bindable(Event="setClosableTabChanged")]
 		public function getCloseableTab(index:int):Boolean {
-			if (index >= 0 && index < dataGroup.numElements) {
+			if (index > 0 && index < dataGroup.numElements) {
 				var btn:ExtendedTabBarButton = dataGroup.getElementAt(index) as ExtendedTabBarButton;
 				return btn.closeable;
 			}
+			
 			return false;
 		}
 		
@@ -37,10 +48,11 @@ package ch.tofuse.micemeta.views.navigation {
 			if (dataProvider.length == 0) return;
 			
 			if (dataProvider is IList) {
-				dataProvider.removeItemAt(closedTab);
+				//dataProvider.removeItemAt(closedTab);
+				dispatchEvent( new ContentEvent( ContentEvent.REMOVE_CONTENT, IContent( dataProvider.getItemAt(closedTab) ) ) );
 			} else if (dataProvider is ViewStack){
-				//remove the entire child from the dataProvider, which also removes it from the ViewStack
-				(dataProvider as ViewStack).removeChildAt(closedTab);
+				dispatchEvent( new ContentEvent( ContentEvent.REMOVE_CONTENT, IContent( (dataProvider as ViewStack).getChildAt(closedTab) ) ) );
+				//(dataProvider as ViewStack).removeChildAt(closedTab);
 			}
 			
 			//adjust selectedIndex appropriately

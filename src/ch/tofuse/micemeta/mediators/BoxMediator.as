@@ -7,7 +7,7 @@ package ch.tofuse.micemeta.mediators
 	
 	import org.robotlegs.mvcs.Mediator;
 	
-	public class BoxMediator extends AbstractEntityMediator
+	public class BoxMediator extends AbstractComponentMediator
 	{
 		
 		[Inject(name="BoxModel")]

@@ -3,7 +3,7 @@ package ch.tofuse.micemeta.mediators
 	import ch.tofuse.micemeta.events.ContentEvent;
 	import ch.tofuse.micemeta.models.ContentModel;
 	import ch.tofuse.micemeta.views.menus.main.MainMenuView;
-	import ch.tofuse.micemeta.views.modules.base.ModuleContainerBase;
+	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	
 	import flash.events.Event;
 	import flash.events.MouseEvent;

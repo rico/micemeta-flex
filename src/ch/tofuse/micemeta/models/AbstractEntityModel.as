@@ -58,6 +58,7 @@ package ch.tofuse.micemeta.models
 			
 			return _em;
 		}
+		
 		public function get repository():IEntityRepository
 		{
 			

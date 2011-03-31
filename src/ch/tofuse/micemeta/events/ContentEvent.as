@@ -8,6 +8,7 @@ package ch.tofuse.micemeta.events
 	{
 		
 		public static const ADD_CONTENT:String = "addContent";
+		public static const REMOVE_CONTENT:String = "removeContent";
 		
 		private var _content:IContent;
 		

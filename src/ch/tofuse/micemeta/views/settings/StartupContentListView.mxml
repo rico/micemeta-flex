@@ -4,14 +4,56 @@
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
 		  skinClass="ch.tofuse.micemeta.skins.SettingsListSkin"
 		  selectionColor="#FFFFFF"
-		  rollOverColor="#FFFFFF">
+		  rollOverColor="#FFFFFF"
+		  itemRenderer="{startupContentRenderer}">
 	
 	<s:layout>
 		<s:VerticalLayout useVirtualLayout="false" requestedMinRowCount="1"/>
 	</s:layout>
 	
-	<s:itemRenderer>
-		<fx:Component>
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.interfaces.IContent;
+			
+			import mx.collections.IList;
+			
+			private var _startupContent:Array;
+			
+			override public function set dataProvider(value:IList):void
+			{
+				super.dataProvider = value;
+				updateStartupContent();
+			}
+			
+			public function checkSelection( c:IContent ):Boolean
+			{
+				if( !c.addInstanceOnStart ) {
+					return true;
+				}
+				
+				if( _startupContent.length > 1 ) {
+					return true;
+				}
+				
+				return false;
+				
+			}
+			
+			public function updateStartupContent():void
+			{
+				_startupContent = [];
+				
+				for each ( var c:IContent in dataProvider ) {
+					if( c.addInstanceOnStart ) {
+						_startupContent.push( c );
+					}
+				} 
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<fx:Component id="startupContentRenderer">
 			<s:ItemRenderer>
 				<s:HGroup id="renderer"
 						  gap="5" 
@@ -31,16 +73,21 @@
 							
 							private function checkChangeHandler():void
 							{
-								IContent(data).addInstanceOnStart = !IContent(data).addInstanceOnStart;
-								cb.selected = IContent(data).addInstanceOnStart;
+								if( outerDocument.checkSelection( IContent(data) ) ) {
+									IContent(data).addInstanceOnStart = !IContent(data).addInstanceOnStart;
+									cb.selected = IContent(data).addInstanceOnStart;
+									outerDocument.updateStartupContent();
+								}
+								
 							}
+							
 						]]>
 					</fx:Script>
 					<s:CheckBox id="cb" selected="{IContent(data).addInstanceOnStart}"/>
 					<s:Label text="{IContent(data).label}" />
 				</s:HGroup>
-				
 			</s:ItemRenderer>
-		</fx:Component>
-	</s:itemRenderer>
+		</fx:Component>        
+	</fx:Declarations>
+	
 </s:List>
