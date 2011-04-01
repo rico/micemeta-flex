@@ -28,6 +28,7 @@ package ch.tofuse.micemeta.views.modules
 	import org.davekeen.flextrine.orm.collections.EntityCollection;
 	
 	import spark.components.NavigatorContent;
+	import spark.events.TextOperationEvent;
 	import spark.layouts.BasicLayout;
 	
 	public class AbstractModuleView extends NavigatorContent implements IContent
@@ -101,6 +102,9 @@ package ch.tofuse.micemeta.views.modules
 			_menuEntriesFilter = new SearchTextInput();
 			_menuEntriesFilter.percentWidth = 100;
 			_menuEntriesFilter.height = 22;
+			_menuEntriesFilter.addEventListener( TextOperationEvent.CHANGE, filterMenuEntriesList );
+			
+			
 			_menuEntriesFilterContainer.addElement( _menuEntriesFilter );
 			
 			_menu.addElement( _menuEntriesFilterContainer );
@@ -419,6 +423,25 @@ package ch.tofuse.micemeta.views.modules
 			
 			_content.removeAllElements();
 			enableControls();
+			
+		}
+		
+		protected function filterMenuEntriesList( e:TextOperationEvent ):void
+		{
+			if( _entities ) {
+				_entities.filterFunction = menuEntriesFilterFunction;
+				_entities.refresh();	
+			}
+			
+		}
+		
+		protected function menuEntriesFilterFunction( item:Object ):Boolean
+		{
+			if( String( item.label ).indexOf( _menuEntriesFilter.text )  == -1 ) {
+				return false;
+			}
+			
+			return true;
 			
 		}
 

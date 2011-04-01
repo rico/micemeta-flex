@@ -8,22 +8,28 @@ package ch.tofuse.micemeta.entities {
 	[Entity]
 	public class NestCheck extends NestCheckEntityBase {
 		
+		private var _locations:ArrayCollection;
 		
-		public function get locationChecks():PersistentCollection
+		
+		public function get locationChecks():ArrayCollection
 		{
-			if( box_checks && other_location_checks ) {
-				return PersistentCollection( box_checks.addAll( other_location_checks ) );
+			return new  ArrayCollection( box_checks.toArray().concat( other_location_checks.toArray() ) )
+		}
+		
+		public function get locations():ArrayCollection
+		{
+			_locations = new ArrayCollection();
+			
+			for each ( var bc:BoxCheck in box_checks ) {
+				_locations.addItem( bc.box );
 			}
 			
-			if( box_checks ) {
-				return box_checks;
+			for each ( var olc:OtherLocationCheck in other_location_checks ) {
+				locations.addItem( olc.otherLocation );
 			}
 			
-			if ( other_location_checks ) {
-				return other_location_checks;
-			}
+			return _locations;
 			
-			return new PersistentCollection();
 		}
 	}
 

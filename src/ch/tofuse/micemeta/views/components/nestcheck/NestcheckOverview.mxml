@@ -43,7 +43,7 @@
 			[Bindable] private var _locationChecks:ArrayCollection = new ArrayCollection();
 			[Bindable] private var _nestcheckDateValid:Boolean = true;
 			
-			private var _nestcheck:NestCheck;
+			[Bindable] private var _nestcheck:NestCheck;
 			
 			public function get nestcheck():NestCheck
 			{
@@ -52,15 +52,17 @@
 			
 			public function set nestcheck(value:NestCheck):void
 			{
-				if( value && !_nestcheck ) {
+				if( value ) {
 					_nestcheck = value;
-					//_locationChecks = _nestcheck.box_checks;
-					var checks:ListCollectionView = _nestcheck.box_checks;
-					var cac:ArrayCollection = new ArrayCollection( _nestcheck.box_checks.toArray().concat( _nestcheck.other_location_checks.toArray() ) );
-					_locationChecks = cac
-					//locationChecksGrid.dataSource = cac;
+					
+					if( currentState == "add" ) {
+						nestcheckDateValid();
+					}
+					
+					_locationChecks = _nestcheck.locationChecks;
+					_addedLocations = nestcheck.locations;
+					
 				}
-				
 			}
 			
 			private function addLocationCheck( e:Event = null ):void
@@ -95,8 +97,6 @@
 					bc.rank = _locationChecks.getItemIndex( bc ) + 1;
 				}
 				
-				//em.flush();
-				
 				_addedLocations.addItem( l );
 				locations.selectedItem = null;
 				
@@ -117,12 +117,7 @@
 					_addedLocations.removeItemAt( _addedLocations.getItemIndex( BoxCheck(e.target.data).box ) );
 				}
 				
-				//em.flush();
 				_locationChecks.removeItemAt( _locationChecks.getItemIndex( e.target.data  ) );
-				
-				
-				//_locations.filterFunction = locationsFilterFunction;
-				//_locations.refresh();
 				
 				updateRanks();
 				locationChecksGrid.selectedIndex = 0;
@@ -168,11 +163,6 @@
 				return "(no location associated)";
 			}
 			
-			private function onLocationsLoadResult( result:Object, token:Object ):void
-			{
-				locationsData.addAllAt( new ArrayCollection( result.result ), locationsData.length );
-			}
-			
 			private function locationsFilterFunction( item:Object ):Boolean 
 			{
 				if( _addedLocations.getItemIndex( item ) == -1) {
@@ -184,13 +174,19 @@
 			
 			public function nestcheckDateValid():Boolean
 			{
-				if( repository.findBy( {checkdate: nestcheckDate.selectedDate } ).length == 0 ) {
-					_nestcheckDateValid = true;
-					return true;
-				} else {
-					_nestcheckDateValid = false;
-					return false;
+				trace( nestcheckDate.selectedDate.toString() );
+				
+				for each ( var nc:NestCheck in repository.entities ) {
+					if( nc.checkdate.getTime() == nestcheckDate.selectedDate.getTime() ) {
+						_nestcheckDateValid = false;
+						return false;
+					}
 				}
+				
+				_nestcheck.checkdate = nestcheckDate.selectedDate;
+				_nestcheckDateValid = true;
+				dispatchPersistEntity( _nestcheck );
+				return true;
 			}
 			
 		]]>
@@ -204,12 +200,12 @@
 		<s:HGroup gap="10" verticalAlign="middle">
 			<mx:DateField id="nestcheckDate" 
 						  formatString="{GeneralDateFormatter.DATE_FORMAT}" 
-						  selectedDate="{new Date()}"
+						  selectedDate="{_nestcheck.checkdate ||= new Date()}"
 						  change="nestcheckDateValid()"
 						  left="{LayoutConfig.FORM_ITEM_VALUE_LEFT}"
 						  verticalCenter="0"
 						  enabled="{ currentState == 'add' || currentState == 'edit' }"/>	
-			<text:AttentionText text="A nestcheck already exists for the selected date.\n Please select another date or edit the existing nestcheck."
+			<text:AttentionText text="{'A nestcheck already exists for the selected date.' + '\nPlease select another date or edit the existing nestcheck.'}"
 								includeInLayout="{!_nestcheckDateValid}" visible="{!_nestcheckDateValid}" 
 								width="100"/>
 		</s:HGroup>
@@ -248,9 +244,9 @@
 								  dragComplete="updateRanks( event )"
 								  dataSource="{_locationChecks}"
 								  sortableColumns="false"
-								  dragEnabled="true"
-								  dragMoveEnabled="true"
-								  dropEnabled="true"
+								  dragEnabled="{currentState == 'view' ? false : true}"
+								  dragMoveEnabled="{currentState == 'view' ? false : true}"
+								  dropEnabled="{currentState == 'view' ? false : true}"
 								  width="440">
 			<grids:columns>
 				<mx:DataGridColumn dataField="rank" headerText="Rank" width="50" />

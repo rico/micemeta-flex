@@ -163,7 +163,6 @@ package ch.tofuse.micemeta.models
 		
 		protected function onFault( fault:FaultEvent, token:Object ):void
 		{
-			//_em.rollback();
 			throw new Error("[EntityManagerBase] save failed => " + fault.fault.faultString );
 		}
 		

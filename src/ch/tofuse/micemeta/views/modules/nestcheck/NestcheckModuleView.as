@@ -13,7 +13,9 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 	import mx.collections.ArrayCollection;
 	import mx.events.FlexEvent;
 	import mx.events.ItemClickEvent;
+	import mx.utils.ObjectProxy;
 	
+	import org.davekeen.flextrine.orm.EntityProxy;
 	import org.davekeen.flextrine.orm.collections.EntityCollection;
 	
 	import spark.events.IndexChangeEvent;
@@ -75,14 +77,32 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 		
 		override protected function closeView( e:ComponentEvent = null ):void
 		{
-			if( _view.currentState == "view" ) {
-				super.closeView();	
-			} else {
-				_view.currentState = "view";
+			switch ( _view.currentState ) {
+				
+				case "view":
+				case "add":
+					super.closeView();	
+					menuOptionsData = [ _addOption ];
+				break;
+				
+				case "edit":
+					_view.currentState = "view";
+					menuOptionsData = [ _editOption ];
+				break;
+				
 			}
 			
-			menuOptionsData = [ _addOption ];
 			enableControls();
+			
+		}
+		
+		override protected function menuEntriesFilterFunction( item:Object ):Boolean
+		{
+			if( menuEntriesList.labelFunction.call(null, EntityProxy(item)._item ).indexOf( menuEntriesFilter.text )  == -1 ) {
+				return false;
+			}
+			
+			return true;
 			
 		}
 		
@@ -99,7 +119,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 			disableControls();
 		}
 		
-		private function nestcheckLabelFunction( nc:NestCheck ):String
+		public function nestcheckLabelFunction( nc:NestCheck ):String
 		{
 			return _generalDateFormatter.format( nc.checkdate );
 		}

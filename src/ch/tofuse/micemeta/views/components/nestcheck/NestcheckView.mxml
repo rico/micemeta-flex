@@ -77,6 +77,12 @@
 				
 			}
 			
+			private function close():void
+			{
+				dispatchEvent( new ComponentEvent(ComponentEvent.CLOSE_VIEW) );
+				
+			}
+			
 			/* LITTERS */
 			
 			/* SAVE */
@@ -116,6 +122,10 @@
 	<mx:Spacer height="20" />
 	<buttons:IconButton id="doneButton" label="done" click="done()"
 						includeIn="add,edit"
+						iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
+	
+	<buttons:IconButton id="closeButton" label="close" click="done()"
+						includeIn="view"
 						iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
 	
 </components:AbstractComponentView>

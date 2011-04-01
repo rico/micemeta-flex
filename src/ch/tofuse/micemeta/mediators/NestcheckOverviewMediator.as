@@ -32,11 +32,8 @@ package ch.tofuse.micemeta.mediators
 			_otherLocationModel.loadAll( true );
 			_boxModel.loadAll( true );
 			
-			if( _view.nestcheckDateValid() ) {
-				if( model.repository.getEntityState( _view.nestcheck ) == EntityRepository.STATE_NEW ) {
-					_view.nestcheck.checkdate = _view.nestcheckDate.selectedDate;
-					model.persist( _view.nestcheck );
-				}
+			if( _view.currentState == "add" ) {
+				_view.nestcheckDateValid();
 			}
 			
 		}
@@ -74,6 +71,14 @@ package ch.tofuse.micemeta.mediators
 		protected function locationEntitiesLoadedHandler( e:EntityModelEvent ):void
 		{
 			_view.locationsData.addAll( e.model.repository.entities );
+		}
+		
+		protected function persistNestcheckHandler():void
+		{
+			if( model.repository.getEntityState( _view.nestcheck ) == EntityRepository.STATE_NEW ) {
+				_view.nestcheck.checkdate = _view.nestcheckDate.selectedDate;
+				model.persist( _view.nestcheck );
+			}
 		}
 		
 	}
