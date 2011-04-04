@@ -8,6 +8,10 @@
 						  xmlns:grids="ch.tofuse.micemeta.views.grids.*" 
 						  xmlns:text="ch.tofuse.micemeta.views.text.*">
 	
+	<fx:Metadata>
+		[Event(name="addLocationCheck", type="ch.tofuse.micemeta.events.NestcheckViewEvent")]
+	</fx:Metadata>
+		
 	<components:states>
 		<s:State name="view" />
 		<s:State name="edit" />
@@ -23,11 +27,13 @@
 			import ch.tofuse.micemeta.config.LayoutConfig;
 			import ch.tofuse.micemeta.entities.Box;
 			import ch.tofuse.micemeta.entities.BoxCheck;
+			import ch.tofuse.micemeta.entities.LocationCheck;
 			import ch.tofuse.micemeta.entities.NestCheck;
 			import ch.tofuse.micemeta.entities.OtherLocation;
 			import ch.tofuse.micemeta.entities.OtherLocationCheck;
 			import ch.tofuse.micemeta.events.AutoCompleteTextInputEvent;
 			import ch.tofuse.micemeta.events.EntityEvent;
+			import ch.tofuse.micemeta.events.NestcheckViewEvent;
 			import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
 			
 			import mx.collections.ArrayCollection;
@@ -68,9 +74,11 @@
 			private function addLocationCheck( e:Event = null ):void
 			{
 				var l:Object = locations.selectedItem;
+				var lc:LocationCheck;
 				
 				if( l is OtherLocation ) {
 					var olc:OtherLocationCheck = new OtherLocationCheck();
+					lc = LocationCheck( olc );
 					olc.otherLocation = OtherLocation(l);
 					
 					dispatchPersistEntity( olc );
@@ -84,6 +92,7 @@
 					
 				} else if ( l is Box ) {
 					var bc:BoxCheck = new BoxCheck();
+					lc = LocationCheck( bc );
 					bc.box = Box(l);
 					
 					
@@ -99,6 +108,8 @@
 				
 				_addedLocations.addItem( l );
 				locations.selectedItem = null;
+				
+				dispatchEvent( new NestcheckViewEvent( NestcheckViewEvent.ADD_LOCATION_CHECK, lc) );
 				
 			}
 			
@@ -174,8 +185,6 @@
 			
 			public function nestcheckDateValid():Boolean
 			{
-				trace( nestcheckDate.selectedDate.toString() );
-				
 				for each ( var nc:NestCheck in repository.entities ) {
 					if( nc.checkdate.getTime() == nestcheckDate.selectedDate.getTime() ) {
 						_nestcheckDateValid = false;

@@ -15,6 +15,10 @@
 			import ch.tofuse.micemeta.events.ContentEvent;
 			import ch.tofuse.micemeta.interfaces.IContent;
 			
+			import mx.collections.ArrayCollection;
+			
+			private var _children:ArrayCollection = new ArrayCollection();
+			
 			private function build():void
 			{
 				modulesStackTabBar.addEventListener( ContentEvent.REMOVE_CONTENT, removeContentHandler );
@@ -24,12 +28,14 @@
 			{
 				modulesStack.addChild( content.asDisplayObject() );
 				modulesStack.selectedChild = content.asNavigatorContent();
+				_children.addItem( content );
 				
 			}
 			
 			public function removeContent( content:IContent ):void
 			{
 				if( modulesStack.contains( content.asDisplayObject() ) ) {
+					_children.removeItemAt( modulesStack.getChildIndex( content.asDisplayObject() ) );
 					modulesStack.removeChild( content.asDisplayObject() );
 				}
 				
@@ -49,6 +55,13 @@
 			private function removeContentHandler( e:ContentEvent ):void
 			{
 				dispatchEvent( e );
+			}
+			
+			public function resetPendingChanges():void
+			{
+				for each ( var content:IContent in _children ) {
+					content.pendingChanges = false;
+				}
 			}
 			
 			

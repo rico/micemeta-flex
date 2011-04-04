@@ -6,12 +6,15 @@ package ch.tofuse.micemeta.views.navigation {
 	
 	import flash.events.MouseEvent;
 	
+	import mx.states.OverrideBase;
+	
 	import spark.components.Button;
 	import spark.components.ButtonBarButton;
 	
 	[Event('closeTab',type='ch.tofuse.micemta.events.ExtendedTabBarEvent')]
 	
-	public class ExtendedTabBarButton extends ButtonBarButton {
+	public class ExtendedTabBarButton extends ButtonBarButton 
+	{
 		
 		[SkinPart("false")]
 		public var closeButton:Button;
@@ -21,9 +24,11 @@ package ch.tofuse.micemeta.views.navigation {
 		public function ExtendedTabBarButton() {
 			super();
 			setStyle("skinClass", ExtendedTabBarButtonSkin);
+			allowDeselection = false;
 			
 			//NOTE: this enables the button's children (aka the close button) to receive mouse events
 			this.mouseChildren = true;
+			
 		}
 		
 		[Bindable]

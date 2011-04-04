@@ -22,6 +22,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import ch.tofuse.micemeta.entities.LocationCheck;
+			import ch.tofuse.micemeta.events.NestcheckViewEvent;
 			import ch.tofuse.micemeta.events.ComponentEvent;
 			import ch.tofuse.micemeta.entities.Box;
 			import ch.tofuse.micemeta.entities.Litter;
@@ -31,6 +33,7 @@
 			
 			[Bindable] private var _addMode:Boolean;
 			[Bindable] private var _nestcheck:NestCheck;
+			[Bindable] private var _locationCheck:LocationCheck;
 			
 			
 			public function set nestcheck( nc:NestCheck ):void
@@ -86,9 +89,10 @@
 			/* LITTERS */
 			
 			/* SAVE */
-			private function addLocationCheck():void
+			private function addLocationCheck( e:NestcheckViewEvent ):void
 			{
-				//_nestcheckData.addItem( );
+				currentState = "locationCheck";
+				_locationCheck = e.locationCheck;
 			}
 			
 		]]>
@@ -110,12 +114,16 @@
 		<nestcheck:NestcheckOverview id="overview" 
 									 width="100%"
 									 nestcheck="{_nestcheck}"
-									 includeIn="add,view,edit" />
+									 includeIn="add,view,edit" 
+									 addLocationCheck="addLocationCheck()"/>
 			
 		<!-- location check -->
-		<!-- <s:Scroller height="100%" width="100%">
-			<nestcheck:NestcheckLocationCheck id="locationCheck" includeIn="locationCheck"/>
-		</s:Scroller> -->
+		<s:Scroller height="100%" width="100%">
+			<nestcheck:NestcheckLocationCheckView id="locationCheck"
+											  nestcheck="{_nestcheck}"
+											  locationCheck="{_locationCheck}"
+											  includeIn="locationCheck"/>
+		</s:Scroller>
 			
 	</s:VGroup>
 	

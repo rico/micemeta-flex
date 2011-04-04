@@ -5,6 +5,7 @@ package ch.tofuse.micemeta.views.components
 	import ch.tofuse.micemeta.events.EntityManagerEvent;
 	import ch.tofuse.micemeta.events.EntityMediatorEvent;
 	import ch.tofuse.micemeta.events.ModuleMenuEvent;
+	import ch.tofuse.micemeta.events.PendingChangesEvent;
 	
 	import flash.events.Event;
 	import flash.events.FocusEvent;
@@ -91,19 +92,22 @@ package ch.tofuse.micemeta.views.components
 		protected function save():void
 		{
 			dispatchEvent( flushEvent ); 
+			dispatchEvent( new PendingChangesEvent( PendingChangesEvent.PENDING_CHANGES, false) );
 		}
 		
 		protected function dispatchPersistEntity( e:* ):void
 		{
 			persistEntityEvent.entity = e;
 			dispatchEvent( persistEntityEvent );
+			dispatchEvent( new PendingChangesEvent( PendingChangesEvent.PENDING_CHANGES, true) );
 		}
 		
 		protected function dispatchRemoveEntity( e:* ):void
 		{
 			removeEntityEvent.entity = e;
 			dispatchEvent( removeEntityEvent );
+			dispatchEvent( new PendingChangesEvent( PendingChangesEvent.PENDING_CHANGES, true) );
 		}
-
+		
 	}
 }

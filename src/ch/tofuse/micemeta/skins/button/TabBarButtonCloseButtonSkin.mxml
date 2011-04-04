@@ -23,15 +23,29 @@
          * @copy spark.skins.spark.ApplicationSkin#hostComponent
          */
         [HostComponent("spark.components.Button")]
+		
         ]]>
     </fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			[Bindable] private var _pendingChanges:Boolean;
+			
+			public function set pendingChanges( pc:Boolean ):void
+			{
+				trace("pending changes => " + pc);
+			}
+			
+		]]>
+	</fx:Script>
     
     <!-- states -->
     <s:states>
-        <s:State name="up" />
-        <s:State name="over" />
-        <s:State name="down" />
-        <s:State name="disabled" />
+        <s:State name="up" stateGroups="normal" />
+        <s:State name="over" stateGroups="normal"/>
+        <s:State name="down" stateGroups="normal"/>
+        <s:State name="disabled" stateGroups="normal"/>
     </s:states>
     
 	<!-- transitions -->

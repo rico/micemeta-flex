@@ -1,7 +1,9 @@
 package ch.tofuse.micemeta.views.modules
 {
 	import ch.tofuse.micemeta.events.ComponentEvent;
+	import ch.tofuse.micemeta.events.ContentEvent;
 	import ch.tofuse.micemeta.events.ModuleMenuEvent;
+	import ch.tofuse.micemeta.events.PendingChangesEvent;
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.managers.ModuleManager;
 	import ch.tofuse.micemeta.views.inputs.SearchTextInput;
@@ -17,9 +19,11 @@ package ch.tofuse.micemeta.views.modules
 	
 	import mx.collections.ArrayCollection;
 	import mx.containers.HDividedBox;
+	import mx.controls.Alert;
 	import mx.controls.Spacer;
 	import mx.core.ClassFactory;
 	import mx.core.IVisualElement;
+	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	import mx.events.ItemClickEvent;
 	
@@ -40,6 +44,8 @@ package ch.tofuse.micemeta.views.modules
 		
 		private var _repository:IEntityRepository;
 		private var _entities:EntityCollection;
+		
+		private var _pendingChanges:Boolean;
 		
 		private var _viewable:Boolean = false;
 		
@@ -68,6 +74,7 @@ package ch.tofuse.micemeta.views.modules
 		{
 			super();
 			addEventListener( FlexEvent.CREATION_COMPLETE, build );
+			addEventListener( PendingChangesEvent.PENDING_CHANGES, pendingChangesHandler );
 			
 			percentWidth = 100;
 			percentHeight = 100;
@@ -467,6 +474,22 @@ package ch.tofuse.micemeta.views.modules
 			dispatchEvent( new Event("entitiesChanged") );
 		}
 
+		[Bindable(Event="pendingChangesChanged")]
+		public function get pendingChanges():Boolean
+		{
+			return _pendingChanges;
+		}
+
+		public function set pendingChanges(value:Boolean):void
+		{
+			_pendingChanges = value;
+			dispatchEvent( new Event("pendingChangesChanged") );
+		}
+		
+		private function pendingChangesHandler( e:PendingChangesEvent ):void
+		{
+			pendingChanges = e.pendingChanges;
+		}
 
 	}
 }

@@ -11,6 +11,8 @@ package ch.tofuse.micemeta.mediators
 	import mx.controls.Alert;
 	import mx.core.ClassFactory;
 	import mx.events.CloseEvent;
+	import mx.rpc.AsyncResponder;
+	import mx.rpc.events.FaultEvent;
 	
 	import org.davekeen.flextrine.orm.EntityManager;
 	import org.robotlegs.mvcs.Mediator;
@@ -69,16 +71,13 @@ package ch.tofuse.micemeta.mediators
 		protected function removeContent( e:ContentEvent ):void
 		{
 			_contentToRemoveEvent = e;
+			_em.flush().addResponder( new AsyncResponder(onFlushSuccess, onFlushError) );	
 			
-			if( _em.getUnitOfWork().size() > 0 )	{
-				showChangesConfirmationAlert();
-			} else {
-				view.removeContent( _contentToRemoveEvent.content );
-			}
+			view.removeContent( _contentToRemoveEvent.content );
 			
 		}	
 		
-		private function showChangesConfirmationAlert():void
+		/*private function showChangesConfirmationAlert():void
 		{
 			Alert.show( "Do you want to save the changes you made to the data?", 
 				"Save Changes",
@@ -99,6 +98,19 @@ package ch.tofuse.micemeta.mediators
 			
 			dispatch( _contentToRemoveEvent );
 			
+		}*/
+		
+		private function onFlushSuccess( result:Object, token:Object ):void
+		{
+			view.resetPendingChanges();
+			view.removeContent( _contentToRemoveEvent.content );
+			
+		}
+		
+		
+		protected function onFlushError( fault:FaultEvent, token:Object ):void
+		{
+			throw new Error("[ContentNavigatorMediator] flush failed => " + fault.fault.faultString );
 		}
 		
 	}

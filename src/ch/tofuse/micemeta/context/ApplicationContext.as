@@ -4,6 +4,7 @@ package ch.tofuse.micemeta.context
 	import ch.tofuse.micemeta.mediators.BoxMediator;
 	import ch.tofuse.micemeta.mediators.ContentNavigatorMediator;
 	import ch.tofuse.micemeta.mediators.MainMenuMediator;
+	import ch.tofuse.micemeta.mediators.NestcheckLocationCheckMediator;
 	import ch.tofuse.micemeta.mediators.NestcheckModuleMediator;
 	import ch.tofuse.micemeta.mediators.NestcheckOverviewMediator;
 	import ch.tofuse.micemeta.mediators.NestcheckViewMediator;
@@ -11,12 +12,14 @@ package ch.tofuse.micemeta.context
 	import ch.tofuse.micemeta.models.BoxCheckModel;
 	import ch.tofuse.micemeta.models.BoxModel;
 	import ch.tofuse.micemeta.models.ContentModel;
+	import ch.tofuse.micemeta.models.LocationCheckModel;
 	import ch.tofuse.micemeta.models.NestcheckModel;
 	import ch.tofuse.micemeta.models.OtherLocationCheckModel;
 	import ch.tofuse.micemeta.models.OtherLocationModel;
 	import ch.tofuse.micemeta.views.ContentNavigatorView;
 	import ch.tofuse.micemeta.views.components.AbstractComponentView;
 	import ch.tofuse.micemeta.views.components.box.BoxView;
+	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckLocationCheckView;
 	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckOverview;
 	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckView;
 	import ch.tofuse.micemeta.views.components.otherlocation.OtherLocationView;
@@ -44,6 +47,7 @@ package ch.tofuse.micemeta.context
 			injector.mapSingletonOf( IEntityModelInterface, NestcheckModel, 'NestcheckModel' );
 			injector.mapSingletonOf( IEntityModelInterface, BoxCheckModel, 'BoxCheckModel' );
 			injector.mapSingletonOf( IEntityModelInterface, OtherLocationCheckModel, 'OtherLocationCheckModel' );
+			injector.mapSingletonOf( IEntityModelInterface, LocationCheckModel, 'LocationCheckModel' );
 			
 			// MEDIATORS
 			mediatorMap.mapView( MainMenuView, MainMenuMediator );
@@ -57,6 +61,7 @@ package ch.tofuse.micemeta.context
 			mediatorMap.mapView( BoxView, BoxMediator, AbstractComponentView );
 			mediatorMap.mapView( NestcheckView, NestcheckViewMediator, AbstractComponentView );
 			mediatorMap.mapView( NestcheckOverview, NestcheckOverviewMediator, AbstractComponentView );
+			mediatorMap.mapView( NestcheckLocationCheckView, NestcheckLocationCheckMediator, AbstractComponentView );
 			
 			
 		}

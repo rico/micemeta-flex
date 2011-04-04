@@ -53,25 +53,20 @@
 				}
 			}
 			
-			override protected function addNewLitter( event:Event ):void
+			protected function addNewLitter( event:Event ):void
 			{
 				_litter = new Litter();
 				_litter.identifier = new_litter_id.text;
 				_litter.first_found_age = int( new_litter_age.text );
 				_litter.first_found_date = new Date();
 				
-				em.persist( _litter );
-				
-				//addLitter( l );
-				em.flush();
+				dispatchPersistEntity( _litter );
 				proposeLitterIdentifier();
 			}
 			
 			private function addExistingLitter( event:Event ):void
 			{
 				var l:Litter = litters_list.selectedItem as Litter;
-				//addLitter( l );
-				em.flush();
 			}
 			
 			/*private function addLitter( l:Litter ):void
@@ -90,8 +85,7 @@
 			
 			private function deleteLitter( event:Event ):void
 			{
-				em.remove( Litter(event.target.data) );
-				em.flush();
+				dispatchRemoveEntity( Litter(event.target.data) );
 			}
 			
 			private function proposeLitterIdentifier():void

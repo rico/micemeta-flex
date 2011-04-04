@@ -3,6 +3,7 @@ package ch.tofuse.micemeta.views.navigation {
 	import ch.tofuse.micemeta.events.ContentEvent;
 	import ch.tofuse.micemeta.events.ExtendedTabBarEvent;
 	import ch.tofuse.micemeta.interfaces.IContent;
+	import ch.tofuse.micemeta.skins.button.ExtendedButtonBarSkin;
 	import ch.tofuse.micemeta.skins.navigation.ExtendedTabBarSkin;
 	
 	import flash.events.Event;
@@ -10,17 +11,19 @@ package ch.tofuse.micemeta.views.navigation {
 	import mx.collections.IList;
 	import mx.containers.ViewStack;
 	
+	import spark.components.ButtonBar;
 	import spark.components.TabBar;
 	
-	public class ExtendedTabBar extends TabBar {
+	public class ExtendedTabBar extends ButtonBar {
 		
 		[Bindable] public var closable:Boolean;
 		
 		public function ExtendedTabBar() {
 			super();
-			setStyle("skinClass", ExtendedTabBarSkin);
+			//setStyle("skinClass", ExtendedTabBarSkin);
+			setStyle("skinClass", ExtendedButtonBarSkin);
+			requireSelection = true;
 		}
-		
 		
 		public function setCloseableTab(index:int, value:Boolean):void {
 			if (index > 0 && index < dataGroup.numElements) {

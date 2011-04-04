@@ -41,9 +41,8 @@
 			
 			private function build():void
 			{
-				
-				_boxRepository = em.getRepository( Box );
-				_otherLocationRepository = em.getRepository( OtherLocation );
+				//_boxRepository = em.getRepository( Box );
+				//_otherLocationRepository = em.getRepository( OtherLocation );
 			}
 			
 			public function get nestcheck():NestCheck
@@ -98,7 +97,7 @@
 			
 			private function saveCheck( ):void
 			{
-				_locationCheck.rank = _nestcheckData.length + 1;
+				//_locationCheck.rank = ;
 				_locationCheck.non_transpondered = non_transpondered.numericValue;
 				_locationCheck.sub_adults = sub_adults.numericValue;
 				_locationCheck.pups = pups.numericValue;
@@ -151,6 +150,28 @@
 				
 				_currentLocation = si._item;
 				location.text = locations.labelFunction.call( null, si );
+				
+			}
+
+			public function get locationCheck():LocationCheck
+			{
+				return _locationCheck;
+			}
+
+			public function set locationCheck(value:LocationCheck):void
+			{
+				if( value ) {
+					
+					_locationCheck = value; 
+					
+					if( value is BoxCheck ) {
+						boxCheck = BoxCheck( value );
+					} else if( value is OtherLocationCheck ) {
+						otherLocationCheck = OtherLocationCheck( value );
+					}	
+				}
+				
+				
 				
 			}
 			
@@ -234,7 +255,7 @@
 		<!-- litters -->
 		<mx:FormItem label="litters">
 			<mx:Spacer height="15" />
-			<litter:LitterView id="litters" />
+			<!-- <litter:LitterView id="litters" /> -->
 		</mx:FormItem>
 		
 		<mx:FormItem label="communal">

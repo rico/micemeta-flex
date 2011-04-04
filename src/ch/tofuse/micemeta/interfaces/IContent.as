@@ -22,13 +22,17 @@ package ch.tofuse.micemeta.interfaces
 		function get menuOptionsList():ModuleMenuList;
 		function get menuEntriesFilter():SearchTextInput;
 		
+		[Bindable(Event="pendingChanged")]
+		function get pendingChanges():Boolean;
+		function set pendingChanges( pc:Boolean ):void;
+		
 		[Bindable(Event="labelChange")]
 		function get label():String;
 		
 		function asDisplayObject():DisplayObject;
 		function asNavigatorContent():NavigatorContent;
 		
-		function set addInstanceOnStart(aios:Boolean):void
+		function set addInstanceOnStart( aios:Boolean  ):void
 		[Bindable(Event="addInstanceOnStartChange")]
 		function get addInstanceOnStart():Boolean
 		
