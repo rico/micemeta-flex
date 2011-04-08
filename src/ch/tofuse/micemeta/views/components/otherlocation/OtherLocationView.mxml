@@ -29,19 +29,17 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import ch.tofuse.micemeta.entities.OtherLocation;
-			import ch.tofuse.micemeta.events.EntityEvent;
+			import ch.tofuse.micemeta.entities.OtherLocationEntity;
+			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
 			import ch.tofuse.micemeta.events.EntityManagerEvent;
 			import ch.tofuse.micemeta.events.EntityMediatorEvent;
 			import ch.tofuse.micemeta.utils.DataUtils;
 			import ch.tofuse.micemeta.vo.Segments;
 			
-			import org.davekeen.flextrine.orm.IEntityRepository;
-			
 			[Bindable] private var _formItemLabelLeft:Number = 15;
 			[Bindable] private var _formItemValueLeft:Number = 75;
 			[Bindable] private var _editMode:Boolean = false;
-			[Bindable] private var _formItem:OtherLocation;
+			[Bindable] private var _formItem:OtherLocationEntity;
 			[Bindable] private var _segments:Segments;
 			
 			private var _code_valid:Boolean = false;
@@ -49,7 +47,11 @@
 			
 			private function build():void
 			{
-				_formItem = new OtherLocation();
+				
+				addEventListener( DataGridItemRendererEvent.EDIT_ITEM, editEntity );
+				addEventListener( DataGridItemRendererEvent.REMOVE_ITEM, removeEntity );
+				
+				_formItem = new OtherLocationEntity();
 				_segments = new Segments();
 			}
 			
@@ -91,16 +93,19 @@
 				}
 			}
 			
-			override protected function removeEntity(e:EntityEvent):void
+			private function removeEntity( e:DataGridItemRendererEvent ):void
 			{
-				dispatchEvent( new EntityMediatorEvent( EntityMediatorEvent.ENTITY_REMOVE, OtherLocation(e.target.data),true ) );
+				e.stopImmediatePropagation();
+				dispatchEvent( new EntityMediatorEvent( EntityMediatorEvent.ENTITY_REMOVE, OtherLocationEntity(e.target.data),true ) );
 				entitiesGrid.selectedIndex = 0;
 			}
 			
-			override protected function editEntity(e:EntityEvent):void
+			private function editEntity( e:DataGridItemRendererEvent ):void
 			{
+				e.stopImmediatePropagation();
+				
 				currentState = 'edit';
-				_formItem = e.target.data as OtherLocation;
+				_formItem = e.target.data as OtherLocationEntity;
 				
 				code.text = _formItem.code;
 				description.text = _formItem.description;
@@ -121,7 +126,7 @@
 				currentState = 'view';
 			}
 			
-			override protected function addEntity(e:EntityEvent):void
+			private function addEntity():void
 			{
 				currentState = 'add';
 				resetForm();
@@ -129,7 +134,7 @@
 			
 			private function addSave():void
 			{
-				var ol:OtherLocation = new OtherLocation();
+				var ol:OtherLocationEntity = new OtherLocationEntity();
 				ol.code = code.text;
 				ol.segment = segment.selectedLabel;
 				ol.description = description.text;
@@ -177,15 +182,15 @@
 					<mx:DataGridColumn headerText="code" dataField="code" width="80"/>
 					<mx:DataGridColumn headerText="description" dataField="description" width="150" wordWrap="true"/>
 					<mx:DataGridColumn headerText="segment" dataField="segment" width="80"/>
-					<mx:DataGridColumn width="30" itemRenderer="ch.tofuse.micemeta.views.renderers.EditItemRenderer"/>
-					<mx:DataGridColumn width="30" itemRenderer="ch.tofuse.micemeta.views.renderers.DeleteItemRenderer"/>
+					<mx:DataGridColumn width="30" itemRenderer="ch.tofuse.micemeta.views.renderers.datagrid.EditItemRenderer"/>
+					<mx:DataGridColumn width="30" itemRenderer="ch.tofuse.micemeta.views.renderers.datagrid.DeleteItemRenderer"/>
 				</grids:columns>
 			</grids:AutoResizeDataGrid>	
 			
 			<s:Group width="100%">
 				<buttons:IconButton id="addEntityButton"
 								   right="0"
-								   click="addEntity( new EntityEvent(EntityEvent.ADD_ENTITY) )"
+								   click="addEntity()"
 								   label="Add Other Location"
 								   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/add.png')"/>	
 			</s:Group>

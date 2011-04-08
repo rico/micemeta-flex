@@ -7,6 +7,9 @@ package ch.tofuse.micemeta.events
 	public class EntityModelEvent extends Event
 	{
 		public static const ENTITIES_LOADED:String = "entitiesLoaded";
+		public static const LITTER_ENTITIES_LOADED:String = "litterEntitiesLoaded";
+		public static const OTHER_LOCATION_ENTITIES_LOADED:String = "otherLocationEntitiesLoaded";
+		public static const BOX_ENTITIES_LOADED:String = "boxEntitiesLoaded";
 		
 		private var _model:IEntityModelInterface;
 		

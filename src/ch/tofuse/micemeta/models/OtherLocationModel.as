@@ -1,7 +1,7 @@
 package ch.tofuse.micemeta.models
 {
 	
-	import ch.tofuse.micemeta.entities.OtherLocation;
+	import ch.tofuse.micemeta.entities.OtherLocationEntity;
 	
 	import org.robotlegs.mvcs.Actor;
 
@@ -9,7 +9,7 @@ package ch.tofuse.micemeta.models
 	{
 		public function OtherLocationModel()
 		{
-			super( OtherLocation );
+			super( OtherLocationEntity );
 		}
 	}
 }

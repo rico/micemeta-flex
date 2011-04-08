@@ -1,12 +1,12 @@
 package ch.tofuse.micemeta.models
 {
-	import ch.tofuse.micemeta.entities.OtherLocationCheck;
+	import ch.tofuse.micemeta.entities.OtherLocationCheckEntity;
 
 	public class OtherLocationCheckModel extends AbstractEntityModel
 	{
 		public function OtherLocationCheckModel()
 		{
-			super( OtherLocationCheck );
+			super( OtherLocationCheckEntity );
 		}
 	}
 }

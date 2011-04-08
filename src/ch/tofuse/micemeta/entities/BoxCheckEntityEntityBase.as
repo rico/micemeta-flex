@@ -2,20 +2,23 @@ package ch.tofuse.micemeta.entities {
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	import mx.events.PropertyChangeEvent;
+	import mx.collections.errors.ItemPendingError;
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
 	import org.davekeen.flextrine.orm.events.EntityEvent;
 	import org.davekeen.flextrine.flextrine;
-      	import ch.tofuse.micemeta.entities.OtherLocation;
-   	import ch.tofuse.micemeta.entities.NestCheck;
-  
+	import ch.tofuse.micemeta.entities.BoxEntity;
+	import ch.tofuse.micemeta.entities.NestCheckEntity;
+
 	[Bindable]
-	public class OtherLocationCheckEntityBase extends EventDispatcher {
+	public class BoxCheckEntityEntityBase extends EventDispatcher {
 		
 		public var isUnserialized__:Boolean;
 		
 		public var isInitialized__:Boolean = true;
 		
 		flextrine var savedState:Dictionary;
+		
+		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
 		public function get id():String { return _id; }
@@ -78,6 +81,10 @@ package ch.tofuse.micemeta.entities {
 		public function set remark(value:String):void { _remark = value; }
 		private var _remark:String;
 		
+		public function get open_nest():Boolean { checkIsInitialized("open_nest"); return _open_nest; }
+		public function set open_nest(value:Boolean):void { _open_nest = value; }
+		private var _open_nest:Boolean;
+		
 		[Association(side="owning", oppositeAttribute="locationChecks", oppositeCardinality="*")]
 		public function get mice():PersistentCollection { checkIsInitialized("mice"); return _mice; }
 		public function set mice(value:PersistentCollection):void { _mice = value; }
@@ -88,28 +95,32 @@ package ch.tofuse.micemeta.entities {
 		public function set litters(value:PersistentCollection):void { _litters = value; }
 		private var _litters:PersistentCollection;
 		
-		[Association(side="owning")]
-		public function get otherLocation():OtherLocation { checkIsInitialized("otherLocation"); return _otherLocation; }
-		public function set otherLocation(value:OtherLocation):void { _otherLocation = value; }
-		private var _otherLocation:OtherLocation;
+		[Association(side="owning", oppositeAttribute="box_checks", oppositeCardinality="*")]
+		public function get box():BoxEntity { checkIsInitialized("box"); return _box; }
+		public function set box(value:BoxEntity):void { (value) ? value.flextrine::addValue('box_checks', this) : ((_box) ? _box.flextrine::removeValue('box_checks', this) : null); _box = value; }
+		private var _box:BoxEntity;
 		
-		[Association(side="owning", oppositeAttribute="other_location_checks", oppositeCardinality="*")]
-		public function get nestcheck():NestCheck { checkIsInitialized("nestcheck"); return _nestcheck; }
-		public function set nestcheck(value:NestCheck):void { (value) ? value.flextrine::addValue('other_location_checks', this) : ((_nestcheck) ? _nestcheck.flextrine::removeValue('other_location_checks', this) : null); _nestcheck = value; }
-		private var _nestcheck:NestCheck;
+		[Association(side="owning", oppositeAttribute="box_checks", oppositeCardinality="*")]
+		public function get nestcheck():NestCheckEntity { checkIsInitialized("nestcheck"); return _nestcheck; }
+		public function set nestcheck(value:NestCheckEntity):void { (value) ? value.flextrine::addValue('box_checks', this) : ((_nestcheck) ? _nestcheck.flextrine::removeValue('box_checks', this) : null); _nestcheck = value; }
+		private var _nestcheck:NestCheckEntity;
 		
-		public function OtherLocationCheckEntityBase() {
+		public function BoxCheckEntityEntityBase() {
 			if (!_mice) _mice = new PersistentCollection(null, true, "mice", this);
 			if (!_litters) _litters = new PersistentCollection(null, true, "litters", this);
 		}
 		
 		override public function toString():String {
-			return "[OtherLocationCheck id=" + id + "]";
+			return "[BoxCheckEntityEntity id=" + id + "]";
 		}
 		
 		private function checkIsInitialized(property:String):void {
-			if (!isInitialized__ && isUnserialized__)
-				dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property));
+			if (!isInitialized__ && isUnserialized__) {
+				if (!flextrine::itemPendingError) {
+					flextrine::itemPendingError = new ItemPendingError("ItemPendingError - initializing entity " + this);
+					dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property, flextrine::itemPendingError));
+				}
+			}
 		}
 		
 		flextrine function setValue(attributeName:String, value:*):void {
@@ -161,9 +172,10 @@ package ch.tofuse.micemeta.entities {
 				flextrine::savedState["new_litter"] = new_litter;
 				flextrine::savedState["communal"] = communal;
 				flextrine::savedState["remark"] = remark;
+				flextrine::savedState["open_nest"] = open_nest;
 				mice.flextrine::saveState();
 				litters.flextrine::saveState();
-				flextrine::savedState["otherLocation"] = otherLocation;
+				flextrine::savedState["box"] = box;
 				flextrine::savedState["nestcheck"] = nestcheck;
 			}
 		}
@@ -185,9 +197,10 @@ package ch.tofuse.micemeta.entities {
 				new_litter = (flextrine::savedState["new_litter"] == true);
 				communal = (flextrine::savedState["communal"] == true);
 				remark = flextrine::savedState["remark"];
+				open_nest = (flextrine::savedState["open_nest"] == true);
 				mice.flextrine::restoreState();
 				litters.flextrine::restoreState();
-				otherLocation = flextrine::savedState["otherLocation"];
+				box = flextrine::savedState["box"];
 				nestcheck = flextrine::savedState["nestcheck"];
 			}
 		}

@@ -13,5 +13,10 @@ package ch.tofuse.micemeta.events
 		{
 			super(type, bubbles, cancelable);
 		}
+		
+		override public function clone():Event
+		{
+			return new EntityEvent(type, bubbles, cancelable);
+		}
 	}
 }

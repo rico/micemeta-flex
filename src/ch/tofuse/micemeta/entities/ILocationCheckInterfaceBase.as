@@ -1,7 +1,7 @@
 package ch.tofuse.micemeta.entities {
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
      
-	public interface LocationCheckInterfaceBase {
+	public interface ILocationCheckInterfaceBase {
 	
 		[Bindable(event="propertyChange")]
 		function get id():String;

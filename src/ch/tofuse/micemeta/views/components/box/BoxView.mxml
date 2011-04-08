@@ -27,20 +27,16 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import ch.tofuse.micemeta.entities.Box;
-			import ch.tofuse.micemeta.events.EntityEvent;
+			import ch.tofuse.micemeta.entities.BoxEntity;
+			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
 			import ch.tofuse.micemeta.events.EntityManagerEvent;
 			import ch.tofuse.micemeta.utils.DataUtils;
 			import ch.tofuse.micemeta.vo.Segments;
 			
-			import org.davekeen.flextrine.orm.FetchMode;
-			import org.davekeen.flextrine.orm.IEntityRepository;
-			import org.davekeen.flextrine.orm.collections.EntityCollection;
-			
 			[Bindable] private var _formItemLabelLeft:Number = 15;
 			[Bindable] private var _formItemValueLeft:Number = 75;
 			[Bindable] private var _editMode:Boolean = false;
-			[Bindable] private var _formItem:Box;
+			[Bindable] private var _formItem:BoxEntity;
 			[Bindable] private var _segments:Segments;
 			
 			private var _number_valid:Boolean = false;
@@ -49,7 +45,8 @@
 			
 			private function build():void
 			{
-				_formItem = new Box();
+				addEventListener( DataGridItemRendererEvent.EDIT_ITEM, editEntity );
+				_formItem = new BoxEntity();
 				_segments = new Segments();
 			}
 			
@@ -72,10 +69,11 @@
 				}
 			}
 			
-			override protected function editEntity(e:EntityEvent):void
+			private function editEntity( e:DataGridItemRendererEvent):void
 			{
+				e.stopImmediatePropagation();
 				currentState = 'edit';
-				_formItem = e.target.data as Box;
+				_formItem = e.target.data as BoxEntity;
 				
 				box_id.text = _formItem.id;
 				segment.selectedIndex = DataUtils.getItemIndexByPropertyValue( 'label', _formItem.segment, _segments )
@@ -139,7 +137,7 @@
 						<mx:DataGridColumn headerText="data count" dataField="data_count" width="100"/>
 						<mx:DataGridColumn headerText="dir count" dataField="dir_count" width="100"/>
 						<mx:DataGridColumn headerText="res count" dataField="res_count" width="100"/>
-						<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.EditItemRenderer" width="30"/>
+						<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.datagrid.EditItemRenderer" width="30"/>
 					</grids:columns>
 				</grids:AutoResizeDataGrid>	
 			</components:VScrollerBase>

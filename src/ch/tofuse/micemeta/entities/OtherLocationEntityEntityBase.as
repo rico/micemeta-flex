@@ -2,13 +2,13 @@ package ch.tofuse.micemeta.entities {
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	import mx.events.PropertyChangeEvent;
+	import mx.collections.errors.ItemPendingError;
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
 	import org.davekeen.flextrine.orm.events.EntityEvent;
 	import org.davekeen.flextrine.flextrine;
-  	import ch.tofuse.micemeta.entities.UserGroup;
-  
+
 	[Bindable]
-	public class UserEntityBase extends EventDispatcher {
+	public class OtherLocationEntityEntityBase extends EventDispatcher {
 		
 		public var isUnserialized__:Boolean;
 		
@@ -16,38 +16,39 @@ package ch.tofuse.micemeta.entities {
 		
 		flextrine var savedState:Dictionary;
 		
+		flextrine var itemPendingError:ItemPendingError;
+		
 		[Id]
 		public function get id():String { return _id; }
 		public function set id(value:String):void { _id = value; }
 		private var _id:String;
 		
-		public function get fname():String { checkIsInitialized("fname"); return _fname; }
-		public function set fname(value:String):void { _fname = value; }
-		private var _fname:String;
+		public function get description():String { checkIsInitialized("description"); return _description; }
+		public function set description(value:String):void { _description = value; }
+		private var _description:String;
 		
-		public function get lname():String { checkIsInitialized("lname"); return _lname; }
-		public function set lname(value:String):void { _lname = value; }
-		private var _lname:String;
+		public function get code():String { checkIsInitialized("code"); return _code; }
+		public function set code(value:String):void { _code = value; }
+		private var _code:String;
 		
-		public function get acronym():String { checkIsInitialized("acronym"); return _acronym; }
-		public function set acronym(value:String):void { _acronym = value; }
-		private var _acronym:String;
+		public function get segment():String { checkIsInitialized("segment"); return _segment; }
+		public function set segment(value:String):void { _segment = value; }
+		private var _segment:String;
 		
-		[Association(side="owning", oppositeAttribute="users", oppositeCardinality="*")]
-		public function get userGroup():UserGroup { checkIsInitialized("userGroup"); return _userGroup; }
-		public function set userGroup(value:UserGroup):void { (value) ? value.flextrine::addValue('users', this) : ((_userGroup) ? _userGroup.flextrine::removeValue('users', this) : null); _userGroup = value; }
-		private var _userGroup:UserGroup;
-		
-		public function UserEntityBase() {
+		public function OtherLocationEntityEntityBase() {
 		}
 		
 		override public function toString():String {
-			return "[User id=" + id + "]";
+			return "[OtherLocationEntity id=" + id + "]";
 		}
 		
 		private function checkIsInitialized(property:String):void {
-			if (!isInitialized__ && isUnserialized__)
-				dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property));
+			if (!isInitialized__ && isUnserialized__) {
+				if (!flextrine::itemPendingError) {
+					flextrine::itemPendingError = new ItemPendingError("ItemPendingError - initializing entity " + this);
+					dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property, flextrine::itemPendingError));
+				}
+			}
 		}
 		
 		flextrine function setValue(attributeName:String, value:*):void {
@@ -85,20 +86,18 @@ package ch.tofuse.micemeta.entities {
 			if (isInitialized__) {
 				flextrine::savedState = new Dictionary(true);
 				flextrine::savedState["id"] = id;
-				flextrine::savedState["fname"] = fname;
-				flextrine::savedState["lname"] = lname;
-				flextrine::savedState["acronym"] = acronym;
-				flextrine::savedState["userGroup"] = userGroup;
+				flextrine::savedState["description"] = description;
+				flextrine::savedState["code"] = code;
+				flextrine::savedState["segment"] = segment;
 			}
 		}
 		
 		flextrine function restoreState():void {
 			if (isInitialized__) {
 				id = flextrine::savedState["id"];
-				fname = flextrine::savedState["fname"];
-				lname = flextrine::savedState["lname"];
-				acronym = flextrine::savedState["acronym"];
-				userGroup = flextrine::savedState["userGroup"];
+				description = flextrine::savedState["description"];
+				code = flextrine::savedState["code"];
+				segment = flextrine::savedState["segment"];
 			}
 		}
 		

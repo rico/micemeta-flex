@@ -1,24 +1,16 @@
 package ch.tofuse.micemeta.views.modules.nestcheck
 {
-	import ch.tofuse.micemeta.entities.NestCheck;
+	import ch.tofuse.micemeta.entities.NestCheckEntity;
 	import ch.tofuse.micemeta.events.ComponentEvent;
-	import ch.tofuse.micemeta.events.ModuleMenuEvent;
 	import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
 	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckView;
 	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	import ch.tofuse.micemeta.vo.MenuOptionVO;
 	
-	import flash.events.Event;
-	
-	import mx.collections.ArrayCollection;
 	import mx.events.FlexEvent;
 	import mx.events.ItemClickEvent;
-	import mx.utils.ObjectProxy;
 	
 	import org.davekeen.flextrine.orm.EntityProxy;
-	import org.davekeen.flextrine.orm.collections.EntityCollection;
-	
-	import spark.events.IndexChangeEvent;
 	
 	public class NestcheckModuleView extends AbstractModuleView
 	{
@@ -27,7 +19,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 		private var _options:Array; 
 		private var _generalDateFormatter:GeneralDateFormatter;
 		
-		private var _nestcheck:NestCheck;
+		private var _nestcheck:NestCheckEntity;
 		
 		private var _addOption:MenuOptionVO;
 		private var _editOption:MenuOptionVO;
@@ -60,7 +52,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 		{
 			view = _view;
 			_view.currentState = "view";
-			_view.nestcheck = NestCheck( event.item );
+			_view.nestcheck = NestCheckEntity( event.item );
 			
 			menuOptionsData = [ _editOption ];
 			
@@ -119,7 +111,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 			disableControls();
 		}
 		
-		public function nestcheckLabelFunction( nc:NestCheck ):String
+		public function nestcheckLabelFunction( nc:NestCheckEntity ):String
 		{
 			return _generalDateFormatter.format( nc.checkdate );
 		}

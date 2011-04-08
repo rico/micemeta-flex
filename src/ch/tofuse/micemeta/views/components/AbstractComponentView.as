@@ -6,6 +6,7 @@ package ch.tofuse.micemeta.views.components
 	import ch.tofuse.micemeta.events.EntityMediatorEvent;
 	import ch.tofuse.micemeta.events.ModuleMenuEvent;
 	import ch.tofuse.micemeta.events.PendingChangesEvent;
+	import ch.tofuse.micemeta.skins.components.AbstractComponentViewSkin;
 	
 	import flash.events.Event;
 	import flash.events.FocusEvent;
@@ -14,6 +15,7 @@ package ch.tofuse.micemeta.views.components
 	import mx.controls.Alert;
 	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
+	import mx.states.State;
 	
 	import org.davekeen.flextrine.orm.EntityManager;
 	import org.davekeen.flextrine.orm.IEntityRepository;
@@ -27,6 +29,8 @@ package ch.tofuse.micemeta.views.components
 		
 		[Bindable] public var entities:EntityCollection;
 		
+		[Bindable] protected var _mode:String;
+		
 		private var _repository:IEntityRepository;
 		private var _entityManager:EntityManager;
 		
@@ -39,17 +43,16 @@ package ch.tofuse.micemeta.views.components
 			super();
 			
 			layoutDirection = "ltr";
-			
-			addEventListener( EntityEvent.PERSIST_ENTITY, addEntity );
-			//addEventListener( EntityEvent.EDIT_ENTITY, editEntity );
-			addEventListener( EntityEvent.REMOVE_ENTITY, removeEntity );
+			setStyle('skinClass', AbstractComponentViewSkin);
 			
 			removeEntityEvent = new EntityMediatorEvent( EntityMediatorEvent.ENTITY_REMOVE, {} );
 			persistEntityEvent = new EntityMediatorEvent( EntityMediatorEvent.ENTITY_PERSIST, {} );
 			
 			flushEvent = new EntityManagerEvent( EntityManagerEvent.FLUSH );
 		}
+			
 		
+		[Bindable(Event="repositoryChanged")]
 		public function get repository():IEntityRepository
 		{
 			return _repository;
@@ -58,6 +61,7 @@ package ch.tofuse.micemeta.views.components
 		public function set repository(value:IEntityRepository):void
 		{
 			_repository = value;
+			dispatchEvent( new Event("repositoryChanged") );
 		}
 		
 		public function get entityManager():EntityManager
@@ -70,21 +74,20 @@ package ch.tofuse.micemeta.views.components
 			_entityManager = value;
 		}
 		
-		protected function addEntity( e:EntityEvent ):void
+		[Bindable(Event="modeChanged")]
+		public function get mode():String
 		{
-			trace("\t=> addEntity not implemented");
+			return _mode;
 		}
 		
-		protected function editEntity( e:EntityEvent ):void
+		[Inspectable(category="General",type="String", defaultValue="view",enumeration="view, edit, add")]
+		public function set mode(value:String):void
 		{
-			trace("\t=> editEntity not implemented");
+			_mode = value;
+			currentState = _mode;
+			dispatchEvent( new Event("modeChanged") );
 		}
-		
-		protected function removeEntity( e:EntityEvent ):void
-		{
-			trace("\t=> removeEntity not implemented");
-		}
-		
+				
 		protected function onLoadFault(fault:Object, token:Object):void {
 			throw new Error("An error occurred during load: " + fault);
 		}

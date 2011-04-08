@@ -4,6 +4,7 @@
 @namespace button "ch.tofuse.micemeta.views.buttons.*";
 @namespace input "ch.tofuse.micemeta.views.inputs.*";
 @namespace components "ch.tofuse.micemeta.views.components.*";
+@namespace nestcheck "ch.tofuse.micemeta.views.components.nestcheck.*";
 
 @font-face { 
 	src: url("../fonts/MyriadWebPro.ttf"); 
@@ -41,10 +42,11 @@ s|global {
 	font-grid-fit-type: pixel;
 	font-weight: normal;
 	font-anti-alias-type: advanced;
+	color: #000000;
 }
 
 
-s|Label, input|AutoCompleteTextInput, s|RichEditableText, s|MXDataGridItemRenderer, s|VGroup, s|HGroup
+s|Label, input|AutoCompleteTextInput, s|RichEditableText, s|MXDataGridItemRenderer, s|VGroup, s|HGroup, s|TextInput, nestcheck|NestcheckLitterView 
 {
 	font-family: Myriad;
 	font-weight: normal;
@@ -107,9 +109,10 @@ mx|DateField, mx|Button, mx|DataGrid, mx|FormItem, mx|FormItemLabel, mx|Label, m
 }
 
 .formPartHeaderLabel {
-	font-size: 13px;
 	color: #707070;
-	font-weight: normal;
+	font-size: 13px;
+	font-weight: bold;
+	direction: ltr;
 }
 
 .inputInfoLabel {
@@ -157,13 +160,20 @@ button|IconButton {
 
 /* FORMS */
 
-.addForm {
-	padding-top: 0px;
+mx|FormItem {
+	padding-left: 10px;
+	label-style-name: formItemLabelStyle;
+	
 }
 
-mx|FormItem {
-	padding-left: 0px;
-	
+.addEditForm {
+	label-width: 170px;	
+}
+
+.formItemLabelStyle {
+	padding-left: 10px;
+	text-align: left;
+	label-width: 150px;
 }
 
 .subForm {

@@ -9,18 +9,19 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			import mx.collections.ListCollectionView;
 			import mx.controls.dataGridClasses.DataGridColumn;
 			import mx.events.CollectionEvent;
 			
-			[Bindable] private var _dataSource:ArrayCollection;
+			[Bindable] private var _dataSource:ListCollectionView;
 			[Bindable] public var scrollHeight:Number = 500;
 			
-			public function get dataSource():ArrayCollection
+			public function get dataSource():ListCollectionView
 			{
-				return _dataSource as ArrayCollection;
+				return _dataSource;
 			}
 			
-			public function set dataSource(value:ArrayCollection):void
+			public function set dataSource(value:ListCollectionView):void
 			{
 				if( value ) {
 					_dataSource = value;

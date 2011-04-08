@@ -1,10 +1,10 @@
 package ch.tofuse.micemeta.entities {
-
-	[RemoteClass(alias="ch.tofuse.micemeta.entities.OtherLocationCheck")]
+	import ch.tofuse.micemeta.entities.ILocationCheck;
+	[RemoteClass(alias="ch.tofuse.micemeta.entities.OtherLocationCheckEntity")]
 	[Entity]
-	public class OtherLocationCheck extends OtherLocationCheckEntityBase {
-	
-		public function OtherLocationCheck():void
+	public class OtherLocationCheckEntity extends OtherLocationCheckEntityEntityBase implements ILocationCheck {
+		
+		public function OtherLocationCheckEntity():void
 		{
 			super();
 			

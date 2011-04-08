@@ -2,18 +2,21 @@ package ch.tofuse.micemeta.entities {
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	import mx.events.PropertyChangeEvent;
+	import mx.collections.errors.ItemPendingError;
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
 	import org.davekeen.flextrine.orm.events.EntityEvent;
 	import org.davekeen.flextrine.flextrine;
-   
+
 	[Bindable]
-	public class UserGroupEntityBase extends EventDispatcher {
+	public class UserGroupEntityEntityBase extends EventDispatcher {
 		
 		public var isUnserialized__:Boolean;
 		
 		public var isInitialized__:Boolean = true;
 		
 		flextrine var savedState:Dictionary;
+		
+		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
 		public function get id():String { return _id; }
@@ -33,17 +36,21 @@ package ch.tofuse.micemeta.entities {
 		public function set users(value:PersistentCollection):void { _users = value; }
 		private var _users:PersistentCollection;
 		
-		public function UserGroupEntityBase() {
+		public function UserGroupEntityEntityBase() {
 			if (!_users) _users = new PersistentCollection(null, true, "users", this);
 		}
 		
 		override public function toString():String {
-			return "[UserGroup id=" + id + "]";
+			return "[UserGroupEntity id=" + id + "]";
 		}
 		
 		private function checkIsInitialized(property:String):void {
-			if (!isInitialized__ && isUnserialized__)
-				dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property));
+			if (!isInitialized__ && isUnserialized__) {
+				if (!flextrine::itemPendingError) {
+					flextrine::itemPendingError = new ItemPendingError("ItemPendingError - initializing entity " + this);
+					dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property, flextrine::itemPendingError));
+				}
+			}
 		}
 		
 		flextrine function setValue(attributeName:String, value:*):void {

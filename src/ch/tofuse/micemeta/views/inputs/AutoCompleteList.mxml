@@ -7,6 +7,14 @@
 		  paddingTop="0" paddingRight="0" paddingBottom="0" paddingLeft="0"
 		  >
 	
+	<fx:Metadata>
+		[Event(name="confirmSelection", type="ch.tofuse.micemeta.events.AutoCompleteTextInputEvent")]
+		[Event(name="removeEntity", type="ch.tofuse.micemeta.events.EntityEvent")]
+		[Event(name="itemAdded", type="ch.tofuse.micemeta.events.AutoCompleteListEvent")]
+		[Event(name="itemRemoved", type="ch.tofuse.micemeta.events.AutoCompleteListEvent")]
+	</fx:Metadata>
+	
+	
 	<s:states>
 		<s:State name="add" />
 		<s:State name="select" />
@@ -14,27 +22,48 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import ch.tofuse.micemeta.views.renderers.DeleteItemRenderer;
-			import ch.tofuse.micemeta.views.renderers.DeleteItemWithoutConfirmRenderer;
+			import ch.tofuse.micemeta.events.AutoCompleteListEvent;
 			import ch.tofuse.micemeta.events.AutoCompleteTextInputEvent;
+			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
+			import ch.tofuse.micemeta.events.EntityEvent;
+			import ch.tofuse.micemeta.utils.DataUtils;
+			import ch.tofuse.micemeta.views.renderers.datagrid.DeleteItemWithoutConfirmRenderer;
 			
 			import mx.collections.ArrayCollection;
+			import mx.collections.ListCollectionView;
 			import mx.controls.dataGridClasses.DataGridColumn;
-			import mx.controls.listClasses.ListData;
+			import mx.utils.ObjectUtil;
 			
-			[Bindable] public var listData:ArrayCollection;
-			[Bindable] public var textInputWidthInChars:Number;
+			[Bindable] public var widthInPixels:Number = 150;
 			
+			[Bindable] private var _listData:ArrayCollection;
 			[Bindable] private var _field:String;
-			[Bindable] private var _data:ArrayCollection = new ArrayCollection();
+ 			[Bindable] private var _data:ListCollectionView = new ListCollectionView();
 			[Bindable] private var _inputsEnabled:Boolean = true;
 			[Bindable] private var _showGrid:Boolean = true;
 			
+
 			private function build():void
 			{
-				itemsGrid.addEventListener( "deleteItem", deleteItem );
 				addInput.addEventListener( AutoCompleteTextInputEvent.CONFIRM_SELECTION, addItem );
 				addInput.addEventListener( "selectedItemChange", function(event:Event):void{ dispatchEvent( new Event("selectedItemChange") )} );
+				itemsGrid.addEventListener( DataGridItemRendererEvent.REMOVE_ITEM, removeItem );
+			}
+			
+			public function set listData( value:ArrayCollection ):void
+			{
+				_listData = new ArrayCollection( DataUtils.copyOverArray( value.source ) );
+			}
+			
+			[Bindable]
+			public function get data():ListCollectionView
+			{
+				return _data;
+			}
+			
+			public function set data(value:ListCollectionView):void
+			{
+				_data = value;
 			}
 			
 			public function set field( f:String ):void
@@ -58,6 +87,11 @@
 			public function set labelFunction( f:Function ):void
 			{
 				addInput.labelFunction = f;
+			}
+			
+			public function set filterFunction( f:Function ):void
+			{
+				addInput.filterFunction = f;
 			}
 			
 			[Inspectable(category="General",type="String", defaultValue="add",enumeration="add,select")]
@@ -88,36 +122,39 @@
 				addInput.requireSelection = rs;
 			}
 			
-			private function addItem( event:AutoCompleteTextInputEvent = null ):void
+			private function confirmSelection( e:AutoCompleteTextInputEvent ):void
 			{
-				if ( _data.getItemIndex( addInput.selectedItem ) == -1 ) {
-					
-					_data.addItemAt( addInput.selectedItem, 0 );
-					addInput.text = '';
-					
-					if( _showGrid ) {
-						itemsGrid.selectedItem = addInput.selectedItem;
-						updateGridRowCount( true );
-					} else {
-						dispatchEvent( new Event("dataChange") );			
+				e.stopImmediatePropagation();
+				addItem( e.data );
+			}
+			
+			private function addItem( item:Object ):void
+			{
+				if( _showGrid ) {
+					if ( _data.getItemIndex( item ) == -1 ) {
+						
+						_data.addItemAt( item, 0 );
+						addInput.text = '';
+						
+						if( _showGrid ) {
+							itemsGrid.selectedItem = addInput.selectedItem;
+							updateGridRowCount( true );
+						} else {
+							dispatchEvent( new Event("dataChange") );			
+						}
+						
 					}
-					
-					dispatchEvent( new Event("itemAdded") );
-										
 				}
+				
+				dispatchEvent( new AutoCompleteListEvent( AutoCompleteListEvent.ITEM_ADDED, item) );
+				
 			}
 			
-			[Bindable(Event="dataChange")]
-			public function get data():ArrayCollection
+			private function removeItem( e:Event ):void
 			{
-				return _data;
-			}
-			
-			private function deleteItem( event:Event ):void
-			{
-				event.stopImmediatePropagation();
-				_data.removeItemAt( _data.getItemIndex( event.target.data ) );
-				dispatchEvent( new Event("dataChange") );
+				e.stopImmediatePropagation();
+				_data.removeItemAt( _data.getItemIndex( e.target.data ) );
+				dispatchEvent( new AutoCompleteListEvent( AutoCompleteListEvent.ITEM_REMOVED, e.target.data) );
 				updateGridRowCount( false );
 			}
 			
@@ -168,24 +205,25 @@
 	
 	<s:HGroup gap="10" verticalAlign="middle"
 			  paddingTop="0" paddingRight="0" paddingBottom="0" paddingLeft="0">
-		<inputs:AutoCompleteTextInput id="addInput" 
+		<inputs:AutoCompleteTextInputFilterFunction id="addInput" 
 									 requireSelection="true"
-									 widthInChars="{textInputWidthInChars}"
+									 width="{widthInPixels}"
 									 enabled="{_inputsEnabled}"
-									 dataProvider="{listData}"
+									 dataProvider="{_listData}"
 									 labelField="{_field}"
+									 confirmSelection="confirmSelection( event )"
 									 prefixOnly="false"
 									 height="22" />
 		<buttons:IconButton label="Add" 
 						   includeIn="add"
-						   click="addItem()"
+						   click="addItem( addInput.selectedItem )"
 						   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/add.png')" 
 						   height="22"
 						   enabled="{(addInput.selectedItem != null) &amp;&amp; (_inputsEnabled)}"/>
 		
 		<buttons:IconButton label="Select"
 						   includeIn="select"
-						   click="addItem()"
+						   click="addItem( addInput.selectedItem )"
 						   iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/accept.png')" 
 						   height="22"
 						   enabled="{(addInput.selectedItem != null) &amp;&amp; (_inputsEnabled)}"/>
@@ -193,7 +231,7 @@
 	</s:HGroup>
 	
 	<mx:DataGrid id="itemsGrid" 
-				 width="130"
+				 width="{widthInPixels}"
 				 dataProvider="{_data}"
 				 visible="{ (_data.length > 0) &amp;&amp; (_showGrid) }"
 				 includeInLayout="{ (_data.length > 0) &amp;&amp; (_showGrid) }"
@@ -203,7 +241,7 @@
 				 useRollOver="false">
 		<mx:columns>
 			<mx:DataGridColumn id="fieldColumn" width="100" />
-			<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.DeleteItemWithoutConfirmRenderer" width="30" />
+			<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.datagrid.DeleteItemWithoutConfirmRenderer" width="30" />
 		</mx:columns>
 	</mx:DataGrid>
 	

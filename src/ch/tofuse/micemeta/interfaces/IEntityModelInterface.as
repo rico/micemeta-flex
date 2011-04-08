@@ -1,5 +1,7 @@
 package ch.tofuse.micemeta.interfaces
 {
+	import ch.tofuse.micemeta.events.EntityModelEvent;
+	
 	import flash.events.IEventDispatcher;
 	
 	import mx.collections.IViewCursor;
@@ -13,7 +15,7 @@ package ch.tofuse.micemeta.interfaces
 		function get repository():IEntityRepository;
 		function get cursor():IViewCursor;
 		
-		function loadAll( dispatchLoadedEvent:Boolean = false ):void;
+		function loadAll( eventToDispatchWhenLoaded:EntityModelEvent ):void;
 		function flush():void;
 		function sortEntitiesByField( field:String, numeric:Boolean):void
 		function persist( entity:*, flush:Boolean = false ):void;

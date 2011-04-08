@@ -10,23 +10,17 @@
 						  buttonMode="true"
 						  width="100%"
 						  height="100%"
-						  toolTip="delete item"
-						  click="{dispatchEvent( new EntityEvent(EntityEvent.REMOVE_ENTITY,true) );}">
-	
+						  toolTip="edit item"
+						  click="{dispatchEvent( new DataGridItemRendererEvent( DataGridItemRendererEvent.EDIT_ITEM ) )}">
 	<fx:Script>
 		<![CDATA[
-			import ch.tofuse.micemeta.events.EntityEvent;
-			
-			[Embed(source="ch/tofuse/micemeta/assets/img/attention.png")]
-			[Bindable]
-			public var attentionIcon:Class;
-			
+			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
 		]]>
 	</fx:Script>
 	
 	<s:HGroup verticalAlign="middle" horizontalAlign="center"
 			  width="100%" height="100%">
-		<mx:Image source="@Embed(source='ch/tofuse/micemeta/assets/img/delete.png')" />	
+		<mx:Image source="@Embed(source='ch/tofuse/micemeta/assets/img/edit.png')" />	
 	</s:HGroup>
 	
 	

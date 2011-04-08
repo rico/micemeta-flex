@@ -37,11 +37,11 @@ package ch.tofuse.micemeta.models
 		protected var _entities:EntityCollection;
 		protected var _sort:Sort;
 		protected var _responder:AsyncToken;
+		protected var _eventToDispatchWhenLoaded:EntityModelEvent;
 		
 		private var _em:EntityManager;
 		private var _dispatcher:IEventDispatcher;
 		private var _repository:IEntityRepository;
-		private var _dispatchLoadedEvent:Boolean;
 		
 		public function AbstractEntityModel( cls:Class ):void
 		{
@@ -64,19 +64,23 @@ package ch.tofuse.micemeta.models
 			
 			if( !_repository  ) {
 				_repository = entityManager.getRepository( _class );
-				loadAll();
+				loadAll( new EntityModelEvent( EntityModelEvent.ENTITIES_LOADED, this ) );
 			}
 			
 			return _repository;
 		}
 		
-		public function loadAll( dispatchLoadedEvent:Boolean = false ):void
+		public function loadAll( eventToDispatchWhenLoaded:EntityModelEvent ):void
 		{
 			if( !_entitiesLoading && !_entititesLoaded ) {
+				_eventToDispatchWhenLoaded = eventToDispatchWhenLoaded;
 				_entitiesLoading = true;
-				_dispatchLoadedEvent = dispatchLoadedEvent;
 				repository.loadAll().addResponder( new AsyncResponder(onEntitiesLoadResult, onLoadFault) );
-			} 
+			} else if( !_loading && _entititesLoaded ) {
+				if( _eventToDispatchWhenLoaded ) {
+					dispatch( _eventToDispatchWhenLoaded );
+				}
+			}
 		}
 		
 		public function get cls():Class
@@ -149,8 +153,8 @@ package ch.tofuse.micemeta.models
 			_entititesLoaded = true;
 			refreshSort();
 			
-			if( _dispatchLoadedEvent ) {
-				dispatch( new EntityModelEvent( EntityModelEvent.ENTITIES_LOADED, this) );
+			if( _eventToDispatchWhenLoaded ) {
+				dispatch( _eventToDispatchWhenLoaded );
 			}
 			
 		}

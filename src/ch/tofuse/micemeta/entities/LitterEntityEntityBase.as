@@ -2,18 +2,21 @@ package ch.tofuse.micemeta.entities {
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	import mx.events.PropertyChangeEvent;
+	import mx.collections.errors.ItemPendingError;
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
 	import org.davekeen.flextrine.orm.events.EntityEvent;
 	import org.davekeen.flextrine.flextrine;
-       
+
 	[Bindable]
-	public class LitterEntityBase extends EventDispatcher {
+	public class LitterEntityEntityBase extends EventDispatcher {
 		
 		public var isUnserialized__:Boolean;
 		
 		public var isInitialized__:Boolean = true;
 		
 		flextrine var savedState:Dictionary;
+		
+		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
 		public function get id():String { return _id; }
@@ -32,34 +35,32 @@ package ch.tofuse.micemeta.entities {
 		public function set first_found_age(value:int):void { _first_found_age = value; }
 		private var _first_found_age:int;
 		
-		[Association(side="inverse", oppositeAttribute="litters", oppositeCardinality="*")]
-		public function get boxChecks():PersistentCollection { checkIsInitialized("boxChecks"); return _boxChecks; }
-		public function set boxChecks(value:PersistentCollection):void { _boxChecks = value; }
-		private var _boxChecks:PersistentCollection;
-		
 		[Association(side="owning", oppositeAttribute="litters", oppositeCardinality="*")]
-		public function get otherLocationChecks():PersistentCollection { checkIsInitialized("otherLocationChecks"); return _otherLocationChecks; }
-		public function set otherLocationChecks(value:PersistentCollection):void { _otherLocationChecks = value; }
-		private var _otherLocationChecks:PersistentCollection;
+		public function get locationChecks():PersistentCollection { checkIsInitialized("locationChecks"); return _locationChecks; }
+		public function set locationChecks(value:PersistentCollection):void { _locationChecks = value; }
+		private var _locationChecks:PersistentCollection;
 		
 		[Association(side="inverse", oppositeAttribute="litter", oppositeCardinality="1")]
 		public function get litterChecks():PersistentCollection { checkIsInitialized("litterChecks"); return _litterChecks; }
 		public function set litterChecks(value:PersistentCollection):void { _litterChecks = value; }
 		private var _litterChecks:PersistentCollection;
 		
-		public function LitterEntityBase() {
-			if (!_boxChecks) _boxChecks = new PersistentCollection(null, true, "boxChecks", this);
-			if (!_otherLocationChecks) _otherLocationChecks = new PersistentCollection(null, true, "otherLocationChecks", this);
+		public function LitterEntityEntityBase() {
+			if (!_locationChecks) _locationChecks = new PersistentCollection(null, true, "locationChecks", this);
 			if (!_litterChecks) _litterChecks = new PersistentCollection(null, true, "litterChecks", this);
 		}
 		
 		override public function toString():String {
-			return "[Litter id=" + id + "]";
+			return "[LitterEntity id=" + id + "]";
 		}
 		
 		private function checkIsInitialized(property:String):void {
-			if (!isInitialized__ && isUnserialized__)
-				dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property));
+			if (!isInitialized__ && isUnserialized__) {
+				if (!flextrine::itemPendingError) {
+					flextrine::itemPendingError = new ItemPendingError("ItemPendingError - initializing entity " + this);
+					dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property, flextrine::itemPendingError));
+				}
+			}
 		}
 		
 		flextrine function setValue(attributeName:String, value:*):void {
@@ -100,8 +101,7 @@ package ch.tofuse.micemeta.entities {
 				flextrine::savedState["identifier"] = identifier;
 				flextrine::savedState["first_found_date"] = first_found_date;
 				flextrine::savedState["first_found_age"] = first_found_age;
-				boxChecks.flextrine::saveState();
-				otherLocationChecks.flextrine::saveState();
+				locationChecks.flextrine::saveState();
 				litterChecks.flextrine::saveState();
 			}
 		}
@@ -112,8 +112,7 @@ package ch.tofuse.micemeta.entities {
 				identifier = flextrine::savedState["identifier"];
 				first_found_date = flextrine::savedState["first_found_date"];
 				first_found_age = flextrine::savedState["first_found_age"];
-				boxChecks.flextrine::restoreState();
-				otherLocationChecks.flextrine::restoreState();
+				locationChecks.flextrine::restoreState();
 				litterChecks.flextrine::restoreState();
 			}
 		}

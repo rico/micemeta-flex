@@ -1,7 +1,11 @@
 package ch.tofuse.micemeta.mediators
 {
 	import ch.tofuse.micemeta.events.EntityModelEvent;
+	import ch.tofuse.micemeta.events.NestcheckModelEvent;
 	import ch.tofuse.micemeta.interfaces.IEntityModelInterface;
+	import ch.tofuse.micemeta.models.BoxModel;
+	import ch.tofuse.micemeta.models.NestcheckModel;
+	import ch.tofuse.micemeta.models.OtherLocationModel;
 	import ch.tofuse.micemeta.views.components.AbstractComponentView;
 	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckOverview;
 	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckView;
@@ -10,50 +14,36 @@ package ch.tofuse.micemeta.mediators
 	import mx.collections.ListCollectionView;
 	
 	import org.davekeen.flextrine.orm.EntityRepository;
-
+	
 	public class NestcheckOverviewMediator extends AbstractComponentMediator
 	{
 		
 		private var _view:NestcheckOverview;
-		
-		private var _otherLocationModel:IEntityModelInterface;
-		private var _boxModel:IEntityModelInterface;
-		private var _boxCheckModel:IEntityModelInterface;
-		private var _otherLocationCheckModel:IEntityModelInterface;
+		private var _nestcheckModel:NestcheckModel;
 		
 		override public function onRegister():void
 		{
 			super.onRegister();
 			
-			// location entities
-			eventMap.mapListener( _boxModel.eventDispatcher, EntityModelEvent.ENTITIES_LOADED, locationEntitiesLoadedHandler, EntityModelEvent );
-			eventMap.mapListener( _otherLocationModel.eventDispatcher, EntityModelEvent.ENTITIES_LOADED, locationEntitiesLoadedHandler, EntityModelEvent );
-			
-			_otherLocationModel.loadAll( true );
-			_boxModel.loadAll( true );
-			
-			if( _view.currentState == "add" ) {
-				_view.nestcheckDateValid();
+			eventMap.mapListener( _nestcheckModel.eventDispatcher, NestcheckModelEvent.LOCATIONS_LOADED, locationEntitiesLoadedHandler, EntityModelEvent );
+			_view.locationsData = _nestcheckModel.locations;
+
+			if( _view.currentState == 'new' ) {
+				_view.validateNestcheckDate();
 			}
 			
+		}
+
+		private function locationEntitiesLoadedHandler( e:NestcheckModelEvent ):void
+		{
+			_view.locationsData = _nestcheckModel.locations;
 		}
 		
 		[Inject(name="NestcheckModel")]
 		override public function set model(m:IEntityModelInterface):void
 		{
+			_nestcheckModel = NestcheckModel( m );
 			super.model = m;
-		}
-		
-		[Inject(name="OtherLocationModel")]
-		public function set otherLocationModel(m:IEntityModelInterface):void
-		{
-			_boxModel = m;
-		}
-		
-		[Inject(name="BoxModel")]
-		public function set boxModel(m:IEntityModelInterface):void
-		{
-			_otherLocationModel = m;
 		}
 		
 		[Inject]
@@ -66,11 +56,6 @@ package ch.tofuse.micemeta.mediators
 		override public function get view():AbstractComponentView
 		{
 			return _view;
-		}
-		
-		protected function locationEntitiesLoadedHandler( e:EntityModelEvent ):void
-		{
-			_view.locationsData.addAll( e.model.repository.entities );
 		}
 		
 		protected function persistNestcheckHandler():void

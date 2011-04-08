@@ -28,7 +28,7 @@ package ch.tofuse.micemeta.views.inputs
 	import spark.components.supportClasses.SkinnableComponent;
 	import spark.events.TextOperationEvent;
 	
-	[Event (name="select", type="org.flashcommander.event.CustomEvent")]
+	//[Event (name="select", type="org.flashcommander.event.CustomEvent")]
 	[Event (name="enter", type="mx.events.FlexEvent")]
 	[Event (name="change", type="spark.events.TextOperationEvent")]
 	[Event (name="change", type="spark.events.TextOperationEvent")]
@@ -214,7 +214,6 @@ package ch.tofuse.micemeta.views.inputs
 		}
 		
 		// default filter function 
-		
 		public function labelsFilterFunction(item:Object):Boolean{
 			var label:String = itemToLabel(item).toLowerCase();
 			// prefix mode

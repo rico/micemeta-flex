@@ -2,13 +2,14 @@ package ch.tofuse.micemeta.entities {
 	import flash.events.EventDispatcher;
 	import flash.utils.Dictionary;
 	import mx.events.PropertyChangeEvent;
+	import mx.collections.errors.ItemPendingError;
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
 	import org.davekeen.flextrine.orm.events.EntityEvent;
 	import org.davekeen.flextrine.flextrine;
-  	import ch.tofuse.micemeta.entities.User;
-      
+	import ch.tofuse.micemeta.entities.UserGroupEntity;
+
 	[Bindable]
-	public class NestCheckEntityBase extends EventDispatcher {
+	public class UserEntityEntityBase extends EventDispatcher {
 		
 		public var isUnserialized__:Boolean;
 		
@@ -16,42 +17,44 @@ package ch.tofuse.micemeta.entities {
 		
 		flextrine var savedState:Dictionary;
 		
+		flextrine var itemPendingError:ItemPendingError;
+		
 		[Id]
 		public function get id():String { return _id; }
 		public function set id(value:String):void { _id = value; }
 		private var _id:String;
 		
-		public function get checkdate():Date { checkIsInitialized("checkdate"); return (_checkdate && _checkdate.getTime() > 0) ? _checkdate : null; }
-		public function set checkdate(value:*):void { _checkdate = (value is Date) ? value : new Date(value); }
-		private var _checkdate:Date;
+		public function get fname():String { checkIsInitialized("fname"); return _fname; }
+		public function set fname(value:String):void { _fname = value; }
+		private var _fname:String;
 		
-		[Association(side="owning")]
-		public function get user():User { checkIsInitialized("user"); return _user; }
-		public function set user(value:User):void { _user = value; }
-		private var _user:User;
+		public function get lname():String { checkIsInitialized("lname"); return _lname; }
+		public function set lname(value:String):void { _lname = value; }
+		private var _lname:String;
 		
-		[Association(side="inverse", oppositeAttribute="nestcheck", oppositeCardinality="1")]
-		public function get box_checks():PersistentCollection { checkIsInitialized("box_checks"); return _box_checks; }
-		public function set box_checks(value:PersistentCollection):void { _box_checks = value; }
-		private var _box_checks:PersistentCollection;
+		public function get acronym():String { checkIsInitialized("acronym"); return _acronym; }
+		public function set acronym(value:String):void { _acronym = value; }
+		private var _acronym:String;
 		
-		[Association(side="inverse", oppositeAttribute="nestcheck", oppositeCardinality="1")]
-		public function get other_location_checks():PersistentCollection { checkIsInitialized("other_location_checks"); return _other_location_checks; }
-		public function set other_location_checks(value:PersistentCollection):void { _other_location_checks = value; }
-		private var _other_location_checks:PersistentCollection;
+		[Association(side="owning", oppositeAttribute="users", oppositeCardinality="*")]
+		public function get userGroup():UserGroupEntity { checkIsInitialized("userGroup"); return _userGroup; }
+		public function set userGroup(value:UserGroupEntity):void { (value) ? value.flextrine::addValue('users', this) : ((_userGroup) ? _userGroup.flextrine::removeValue('users', this) : null); _userGroup = value; }
+		private var _userGroup:UserGroupEntity;
 		
-		public function NestCheckEntityBase() {
-			if (!_box_checks) _box_checks = new PersistentCollection(null, true, "box_checks", this);
-			if (!_other_location_checks) _other_location_checks = new PersistentCollection(null, true, "other_location_checks", this);
+		public function UserEntityEntityBase() {
 		}
 		
 		override public function toString():String {
-			return "[NestCheck id=" + id + "]";
+			return "[UserEntity id=" + id + "]";
 		}
 		
 		private function checkIsInitialized(property:String):void {
-			if (!isInitialized__ && isUnserialized__)
-				dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property));
+			if (!isInitialized__ && isUnserialized__) {
+				if (!flextrine::itemPendingError) {
+					flextrine::itemPendingError = new ItemPendingError("ItemPendingError - initializing entity " + this);
+					dispatchEvent(new EntityEvent(EntityEvent.INITIALIZE_ENTITY, property, flextrine::itemPendingError));
+				}
+			}
 		}
 		
 		flextrine function setValue(attributeName:String, value:*):void {
@@ -89,20 +92,20 @@ package ch.tofuse.micemeta.entities {
 			if (isInitialized__) {
 				flextrine::savedState = new Dictionary(true);
 				flextrine::savedState["id"] = id;
-				flextrine::savedState["checkdate"] = checkdate;
-				flextrine::savedState["user"] = user;
-				box_checks.flextrine::saveState();
-				other_location_checks.flextrine::saveState();
+				flextrine::savedState["fname"] = fname;
+				flextrine::savedState["lname"] = lname;
+				flextrine::savedState["acronym"] = acronym;
+				flextrine::savedState["userGroup"] = userGroup;
 			}
 		}
 		
 		flextrine function restoreState():void {
 			if (isInitialized__) {
 				id = flextrine::savedState["id"];
-				checkdate = flextrine::savedState["checkdate"];
-				user = flextrine::savedState["user"];
-				box_checks.flextrine::restoreState();
-				other_location_checks.flextrine::restoreState();
+				fname = flextrine::savedState["fname"];
+				lname = flextrine::savedState["lname"];
+				acronym = flextrine::savedState["acronym"];
+				userGroup = flextrine::savedState["userGroup"];
 			}
 		}
 		

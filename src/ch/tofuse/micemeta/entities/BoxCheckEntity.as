@@ -1,10 +1,10 @@
 package ch.tofuse.micemeta.entities {
-
-	[RemoteClass(alias="ch.tofuse.micemeta.entities.BoxCheck")]
+	import ch.tofuse.micemeta.entities.ILocationCheck;
+	[RemoteClass(alias="ch.tofuse.micemeta.entities.BoxCheckEntityEntity")]
 	[Entity]
-	public class BoxCheck extends BoxCheckEntityBase {
+	public class BoxCheckEntity extends BoxCheckEntityEntityBase implements ILocationCheck {
 		
-		public function BoxCheck():void
+		public function BoxCheckEntity():void
 		{
 			super();
 			
@@ -24,6 +24,7 @@ package ch.tofuse.micemeta.entities {
 			this.remark = '';
 			
 		}
+		
 	}
 
 }

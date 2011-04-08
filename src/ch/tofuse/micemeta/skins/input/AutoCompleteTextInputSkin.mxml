@@ -33,14 +33,12 @@
         popUpPosition="below" >
         
         <s:Group id="dropDown" minHeight="22" width="100%">
-        
 			<inputs:AutoCompleteTextInputList id="list" width="100%" minWidth="22" />
-			
         </s:Group>
 		
     </s:PopUpAnchor>
 	
-	<s:TextInput id="inputTxt" left="0" right="0" top="0" bottom="0" />
+	<s:TextInput id="inputTxt" left="0" right="0" top="0" bottom="0"/>
 
 
 </s:Skin>

@@ -6,7 +6,9 @@
 		 xmlns:nestcheck="ch.tofuse.micemeta.views.components.nestcheck.*"
 		 xmlns:components="ch.tofuse.micemeta.views.components.*" 
 		 xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
-		 height="100%">
+		 width="100%"
+		 height="100%"
+		 backgroundColor="#FFFFFF">
 	<fx:Script>
 		<![CDATA[
 			import ch.tofuse.micemeta.config.LayoutConfig;
@@ -22,55 +24,65 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import ch.tofuse.micemeta.entities.LocationCheck;
+			import ch.tofuse.micemeta.entities.NestCheckEntity;
+			import ch.tofuse.micemeta.entities.ILocationCheck;
 			import ch.tofuse.micemeta.events.NestcheckViewEvent;
 			import ch.tofuse.micemeta.events.ComponentEvent;
-			import ch.tofuse.micemeta.entities.Box;
-			import ch.tofuse.micemeta.entities.Litter;
-			import ch.tofuse.micemeta.entities.NestCheck;
-			import ch.tofuse.micemeta.entities.OtherLocation;
 			import ch.tofuse.micemeta.events.ModuleMenuEvent;
 			
-			[Bindable] private var _addMode:Boolean;
-			[Bindable] private var _nestcheck:NestCheck;
-			[Bindable] private var _locationCheck:LocationCheck;
+			[Bindable] private var _nestcheck:NestCheckEntity;
+			[Bindable] private var _locationCheck:ILocationCheck;
 			
-			
-			public function set nestcheck( nc:NestCheck ):void
+			public function set nestcheck( nc:NestCheckEntity ):void
 			{
 				_nestcheck = nc;
 			}
 			
-			public function get nestcheck():NestCheck
+			public function get nestcheck():NestCheckEntity
 			{
 				return _nestcheck;
 			}
 			
 			private function viewStateEntered():void
 			{
-				overview.currentState = "view";
+				_mode = 'view';
 				header.text = "Add Nestcheck";
-				_addMode = false;
 			}
 			
 			private function editStateEntered():void
 			{
-				overview.currentState = "edit";
+				_mode = 'edit';
 				header.text = "Edit Nestcheck";
-				_addMode = false;	
 			}
 			
 			private function addStateEntered():void
 			{
-				overview.currentState = "add";
-				_nestcheck = new NestCheck();
+				_mode = 'add';
+				
+				if( !_nestcheck) {
+					_nestcheck = new NestCheckEntity();
+					dispatchPersistEntity( _nestcheck );
+				}
+				
 				header.text = "Add Nestcheck";
-				_addMode = true;
 			}
 			
 			private function locationCheckEntered():void
 			{
-				header.text = "Location";
+				switch( _mode ) {
+					case 'view':
+						header.text = "Location Details";		
+					break;
+					
+					case 'edit':
+						header.text = "Edit Location Details";		
+					break;
+					
+					case 'add':
+						header.text = "Add Location Details";		
+					break;
+				}
+				
 			}
 			
 			private function done():void
@@ -80,19 +92,22 @@
 				
 			}
 			
+			private function addLocationCheck( e:NestcheckViewEvent ):void
+			{
+				currentState = 'locationCheck';
+				_locationCheck = e.locationCheck;
+				
+			}
+
+			private function editLocationCheck( e:NestcheckViewEvent ):void
+			{
+				currentState = 'locationCheck';
+				_locationCheck = e.locationCheck;
+			}
+			
 			private function close():void
 			{
 				dispatchEvent( new ComponentEvent(ComponentEvent.CLOSE_VIEW) );
-				
-			}
-			
-			/* LITTERS */
-			
-			/* SAVE */
-			private function addLocationCheck( e:NestcheckViewEvent ):void
-			{
-				currentState = "locationCheck";
-				_locationCheck = e.locationCheck;
 			}
 			
 		]]>
@@ -115,15 +130,18 @@
 									 width="100%"
 									 nestcheck="{_nestcheck}"
 									 includeIn="add,view,edit" 
-									 addLocationCheck="addLocationCheck()"/>
+									 mode="{_mode}"
+									 addLocationCheck="addLocationCheck( event )"
+									 editLocationCheck="editLocationCheck( event )"/>
 			
 		<!-- location check -->
-		<s:Scroller height="100%" width="100%">
-			<nestcheck:NestcheckLocationCheckView id="locationCheck"
+		<nestcheck:NestcheckLocationCheckView id="locationCheck"
+											  width="100%"
 											  nestcheck="{_nestcheck}"
 											  locationCheck="{_locationCheck}"
-											  includeIn="locationCheck"/>
-		</s:Scroller>
+											  includeIn="locationCheck"
+											  mode="{_mode}"
+											  closeLocationCheck="{currentState = _mode}"/>
 			
 	</s:VGroup>
 	
