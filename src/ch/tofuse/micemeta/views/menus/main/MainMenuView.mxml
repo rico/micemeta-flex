@@ -6,9 +6,13 @@
 		  skinClass="ch.tofuse.micemeta.skins.menu.MainMenuSkin"
 		  width="100%">
 	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="edit" />
+	</s:states>
+	
 	<fx:Declarations>
 		<fx:String id="headerLabel">micemeta</fx:String>
-		
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
@@ -26,15 +30,16 @@
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
 			
+			import spark.components.Button;
 			import spark.components.HGroup;
 			
-			[SkinPart(type="ch.tofuse.micemeta.views.components.buttons.ModuleButton", required="false")]
+			[SkinPart(type="ch.tofuse.micemeta.views.buttons.ModuleButton", required="false")]
 			public var moduleButton:IFactory;
 			
-			[SkinPart(type="ch.tofuse.micemeta.views.components.buttons.ComponentButton", required="false")]
+			[SkinPart(type="ch.tofuse.micemeta.views.buttons.ComponentButton", required="false")]
 			public var componentButton:IFactory;
 			
-			[SkinPart(required="true")]
+			[SkinPart(required="false")]
 			public var modulesGroup:HGroup;
 			
 			[SkinPart(required="true")]
@@ -50,6 +55,7 @@
 			
 			private var _components:Vector.<IContent>;
 			private var _modules:Vector.<IContent>;
+			private var _buttons:Vector.<Button> = new Vector.<Button>();
 			private var _content:Vector.<IContent>;
 			
 			override protected function partAdded( partName:String, instance:Object ):void
@@ -59,15 +65,20 @@
 				
 				if ( partName == "moduleButton" ) {
 					ModuleButton( instance ).addEventListener( MouseEvent.CLICK, addContent );
+					_buttons.push( ModuleButton( instance ) );
 				}
 				
 				if( partName == "componentButton" ) {
 					ComponentButton( instance ).addEventListener( MouseEvent.CLICK, addContent );
+					_buttons.push( ComponentButton( instance ) );
 				}
 				
 				if( partName == "settingsButton" ) {
 					SettingsButton( instance ).addEventListener( MouseEvent.CLICK, showSettings );
+					_buttons.push( SettingsButton( instance ) );
 				}
+				
+				
 			}
 			
 			override protected function partRemoved(partName:String, instance:Object) : void
@@ -127,6 +138,23 @@
 				PopUpManager.centerPopUp( _settingsView );
 				
 				_settingsView.content = _content;
+			}
+			
+			public function set mode( value:String ):void
+			{
+				var enabled:Boolean;
+				switch( value ) {
+					case 'view':
+						enabled = true;
+					break;
+					case 'edit':
+						enabled = false;
+					break;
+				}
+				
+				for each( var button:Button in _buttons ) {
+					button.enabled = enabled;
+				}
 			}
 		]]>
 	</fx:Script>

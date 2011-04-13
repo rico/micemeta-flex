@@ -42,10 +42,12 @@
 				
 		<mx:Image
 			id="icon"
-			source="{hostComponent.settingsIcon}" />
+			source="{hostComponent.settingsIcon}" 
+			alpha.disabled=".5"/>
 		
 		<s:Label id="buttonLabel"
 			text="{hostComponent.label}"
+			alpha.disabled=".5"
 			color="0x222222"
 			color.over="0x000000"/>
 		

@@ -4,7 +4,6 @@ package ch.tofuse.micemeta.views.navigation {
 	import ch.tofuse.micemeta.events.ExtendedTabBarEvent;
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.skins.button.ExtendedButtonBarSkin;
-	import ch.tofuse.micemeta.skins.navigation.ExtendedTabBarSkin;
 	
 	import flash.events.Event;
 	
@@ -12,22 +11,35 @@ package ch.tofuse.micemeta.views.navigation {
 	import mx.containers.ViewStack;
 	
 	import spark.components.ButtonBar;
+	import spark.components.ButtonBarButton;
+	import spark.components.DataGroup;
 	import spark.components.TabBar;
 	
 	public class ExtendedTabBar extends ButtonBar {
-		
+				
 		[Bindable] public var closable:Boolean;
 		
 		public function ExtendedTabBar() {
 			super();
 			setStyle("skinClass", ExtendedButtonBarSkin);
 			requireSelection = true;
-			/*addEventListener( ExtendedTabBarEvent.DISABLE_BUTTONS, disableButtonsHandler );
-			addEventListener( ExtendedTabBarEvent.ENABLE_BUTTONS, enableButtonsHandler );*/
 		}
 				
 		private function closeHandler(e:ExtendedTabBarEvent):void {
 			closeTab(e.index, selectedIndex);
+		}
+		
+		override public function set enabled( value:Boolean ):void
+		{
+			super.enabled = value;
+			
+			if( dataGroup ) {
+				for (var i:uint=0; i<dataGroup.numElements; ++i) {
+					var obj:ExtendedTabBarButton = dataGroup.getElementAt(i) as ExtendedTabBarButton;
+					obj.enabled = value;
+				}
+			}
+			
 		}
 		
 		public function closeTab(closedTab:int, selectedTab:int):void {

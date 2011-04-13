@@ -32,7 +32,6 @@ package ch.tofuse.micemeta.views.navigation {
 			//NOTE: this enables the button's children (aka the close button) to receive mouse events
 			this.mouseChildren = true;
 			
-			
 		}
 		
 		

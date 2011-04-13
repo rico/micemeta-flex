@@ -8,10 +8,29 @@
 		<s:VerticalLayout gap="0" />
 	</s:layout>
 	<s:states>
-		<s:State name="view"/>
+		<s:State name="view" />
 		<s:State name="edit" />			
 	</s:states>
+	
+	<s:transitions>
+		<s:Transition id="toEdit" fromState="view" toState="edit" >
+			<s:Resize target="{modulesStackTabBar}" heightTo="0" effectStart="{modulesStackTabBar.enabled = false}"/>
+			<!-- <s:Parallel target="{modulesStackTabBar}" duration="500">
+				<s:Resize heightTo="0" />
+				<s:Fade alphaTo="0" startDelay="100"/>
+			</s:Parallel> -->
+		</s:Transition>	
+		<s:Transition id="toDefault" fromState="edit" toState="view" >
+			<s:Resize target="{modulesStackTabBar}" heightTo="25" effectEnd="{modulesStackTabBar.enabled = true}"/>
+			<!-- <s:Parallel target="{modulesStackTabBar}" duration="500">
+				<s:Resize heightTo="25" />
+				<s:Fade alphaTo="1" startDelay="100"/>
+			</s:Parallel> -->
+		</s:Transition>	
+	</s:transitions>
+	
 	<fx:Declarations>
+		
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<fx:Script>
@@ -27,18 +46,15 @@
 			private function build():void
 			{
 				modulesStackTabBar.addEventListener( ContentEvent.REMOVE_CONTENT, removeContentHandler );
-				modulesStackTabBar.addEventListener( ExtendedTabBarEvent.DISABLE_BUTTONS, hideNavigaton );
-				modulesStackTabBar.addEventListener( ExtendedTabBarEvent.ENABLE_BUTTONS, showNavigaton );
+				/*modulesStackTabBar.addEventListener( ExtendedTabBarEvent.DISABLE_BUTTONS, hideNavigaton );
+				modulesStackTabBar.addEventListener( ExtendedTabBarEvent.ENABLE_BUTTONS, showNavigaton );*/
 			}
-
-			private function showNavigaton(e:ExtendedTabBarEvent):void
+				
+			[Inspectable(category="General",type="String", defaultValue="view",enumeration="view, edit")]
+			public function set mode( value:String ):void
 			{
-				currentState = 'view';
-			}
+				currentState = value;
 
-			private function hideNavigaton(e:ExtendedTabBarEvent):void
-			{
-				currentState = 'edit';
 			}
 			
 			public function addContent( content:IContent ):void
@@ -85,7 +101,6 @@
 		]]>
 	</fx:Script>
 	<navigation:ModulesStackTabBar id="modulesStackTabBar" 
-								   includeIn="view"
 								   dataProvider="{modulesStack}" 
 								   height="25" width="100%" />
 	

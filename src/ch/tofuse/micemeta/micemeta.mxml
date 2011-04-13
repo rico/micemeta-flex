@@ -17,7 +17,7 @@
 			   initialize="init()">
 	
 	<s:layout>
-		<s:VerticalLayout gap="0"/>
+		<s:BasicLayout />
 	</s:layout>
 	
 	<fx:Style source="assets/css/style.css"/>
@@ -30,20 +30,36 @@
 	<fx:Script>
 		<![CDATA[
 			import ch.tofuse.micemeta.config.FlextrineConfig;
+			import ch.tofuse.micemeta.events.PendingChangesEvent;
 			
 			import org.davekeen.flextrine.orm.EntityManager;
+			
+			[Bindable] private var _mode:String = 'view';
 			
 			private function init():void
 			{
 				EntityManager.getInstance().setConfiguration( new FlextrineConfig() );
+				addEventListener( PendingChangesEvent.PENDING_CHANGES, pendingChangesHandler );
+			}
+
+			private function pendingChangesHandler(e:PendingChangesEvent):void
+			{
+				if( e.pendingChanges ) {
+					_mode = 'edit';	
+				} else {
+					_mode = 'view';
+				}
 			}
 		]]>
 	</fx:Script>
 	
 	<!-- modules menu -->
-	<main:MainMenuView id="moduleMenu" height="55" />
+	<main:MainMenuView id="moduleMenu" 
+					   mode="{_mode}"
+					   top="0" right="0" left="0" height="55" />
 	
 	<!-- module Navigation -->
 	<views:ContentNavigatorView id="contentNavigator"
-								width="100%" height="100%"/>
+								mode="{_mode}"
+								top="55" left="0" right="0" bottom="0"/>
 </s:Application>

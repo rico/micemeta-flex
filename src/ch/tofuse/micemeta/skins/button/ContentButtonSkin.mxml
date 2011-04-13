@@ -42,12 +42,14 @@
 				
 		<mx:Image
 			id="icon"
-			source="{hostComponent.modulesIcon}" />
+			source="{hostComponent.modulesIcon}" 
+			alpha.disabled=".5"/>
 		
 		<s:Label id="buttonLabel"
 			text="{hostComponent.label}"
 			color="0x222222"
 			color.over="0x000000"
+			alpha.disabled=".5"
 			includeInLayout="{( hostComponent.label != '' )}"
 			visible="{( hostComponent.label != '' )}"/>
 	</s:Group>

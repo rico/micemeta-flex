@@ -20,13 +20,14 @@
 			
 			private var _dataProvider:IList;
 			private var _closable:Boolean;
+			private var _enabled:Boolean;
+			
 			
 			private function build():void
 			{
 				tabBar.addEventListener( ContentEvent.REMOVE_CONTENT, removeContentDispatcher );
 			}
 			 
-			
 			private function removeContentDispatcher( e:ContentEvent ):void
 			{
 				dispatchEvent( e );
@@ -69,5 +70,5 @@
 			
 		]]>
 	</fx:Script>
-	<navigation:ExtendedTabBar id="tabBar" dataProvider="{dataProvider}" closable="{closable}" height="100%"/>
+	<navigation:ExtendedTabBar id="tabBar" dataProvider="{dataProvider}" enabled="{enabled}" closable="{closable}" height="100%"/>
 </s:SkinnableContainer>
