@@ -15,8 +15,6 @@ package ch.tofuse.micemeta.entities {
 		
 		public var isInitialized__:Boolean = true;
 		
-		flextrine var savedState:Dictionary;
-		
 		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
@@ -88,24 +86,27 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["fname"] = fname;
-				flextrine::savedState["lname"] = lname;
-				flextrine::savedState["acronym"] = acronym;
-				flextrine::savedState["userGroup"] = userGroup;
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["fname"] = fname;
+				memento["lname"] = lname;
+				memento["acronym"] = acronym;
+				memento["userGroup"] = userGroup;
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				fname = flextrine::savedState["fname"];
-				lname = flextrine::savedState["lname"];
-				acronym = flextrine::savedState["acronym"];
-				userGroup = flextrine::savedState["userGroup"];
+				id = memento["id"];
+				fname = memento["fname"];
+				lname = memento["lname"];
+				acronym = memento["acronym"];
+				userGroup = memento["userGroup"];
 			}
 		}
 		

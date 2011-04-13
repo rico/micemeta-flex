@@ -14,6 +14,7 @@
 	<fx:Metadata>
 		[Event(name="addLocationCheck", type="ch.tofuse.micemeta.events.NestcheckViewEvent")]
 		[Event(name="editLocationCheck", type="ch.tofuse.micemeta.events.NestcheckViewEvent")]
+		[Event(name="showLocationCheck", type="ch.tofuse.micemeta.events.NestcheckViewEvent")]
 	</fx:Metadata>
 		
 	<components:states>
@@ -35,6 +36,7 @@
 			import ch.tofuse.micemeta.entities.NestCheckEntity;
 			import ch.tofuse.micemeta.entities.OtherLocationCheckEntity;
 			import ch.tofuse.micemeta.entities.OtherLocationEntity;
+			import ch.tofuse.micemeta.events.ComponentEvent;
 			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
 			import ch.tofuse.micemeta.events.EntityEvent;
 			import ch.tofuse.micemeta.events.NestcheckViewEvent;
@@ -43,18 +45,22 @@
 			
 			import mx.collections.ArrayCollection;
 			
+			import org.davekeen.flextrine.orm.EntityRepository;
+			import org.davekeen.flextrine.util.EntityUtil;
+			
 			[Bindable] public var locationsData:ArrayCollection = new ArrayCollection();
-			[Bindable] public var newNestcheck:Boolean;
-			[Bindable] private var _nestcheckDateValid:Boolean = true;
 			[Bindable] private var _nestcheck:NestCheckEntity;
+			[Bindable] private var _disabledNestcheckDates:Array;
 			
 			
 			private function build():void
 			{
 				ILocationChecksGrid.addEventListener( DataGridItemRendererEvent.EDIT_ITEM, editILocationCheck );
 				ILocationChecksGrid.addEventListener( DataGridItemRendererEvent.REMOVE_ITEM, removeILocationCheck );
+				ILocationChecksGrid.addEventListener( DataGridItemRendererEvent.SHOW_ITEM, showILocationCheck );
 			}
 			
+			[Bindable(Event="nestcheckChanged")]
 			public function get nestcheck():NestCheckEntity
 			{
 				return _nestcheck;
@@ -63,18 +69,16 @@
 			public function set nestcheck(value:NestCheckEntity):void
 			{
 				if( value ) {
-					
 					_nestcheck = value;
-					
-					if( value.checkdate == null ) {
-						nestcheck.checkdate = new Date();
-						newNestcheck = true;
-						nestcheckDate.enabled = true;
-					} else {
-						newNestcheck = false;
-						nestcheckDate.enabled = false;
-					}
+					nestcheckDate.selectedDate = _nestcheck.checkdate;
+					ILocationChecksGrid.dataSource = _nestcheck.locationChecks;
+					dispatchEvent( new Event("nestcheckChanged") );
 				}
+			}
+			
+			public function set disabledNestcheckDates( value:Array ):void
+			{
+				_disabledNestcheckDates = value;
 			}
 			
 			private function addILocationCheck( e:Event = null ):void
@@ -88,7 +92,7 @@
 					olc.otherLocation = OtherLocationEntity(l);
 					
 					dispatchPersistEntity( olc );
-					_nestcheck.other_location_checks.addItem( olc );
+					_nestcheck.locationChecks.addItem( olc );
 					ILocationChecksGrid.selectedItem = olc;
 					
 				} else if ( l is BoxEntity ) {
@@ -97,8 +101,8 @@
 					bc.box = BoxEntity(l);
 					
 					dispatchPersistEntity( bc );
-					_nestcheck.box_checks.addItem( bc );
-					ILocationChecksGrid.selectedItem = bc;
+					_nestcheck.locationChecks.addItem( bc );
+					ILocationChecksGrid.selectedItem = bc;e
 				}
 				
 				updateRanks();
@@ -114,16 +118,22 @@
 				dispatchEvent( new NestcheckViewEvent( NestcheckViewEvent.EDIT_LOCATION_CHECK, ILocationCheck(e.target.data) ) );
 			}
 			
-			private function removeILocationCheck( e:EntityEvent ):void
+			private function showILocationCheck( e:DataGridItemRendererEvent ):void
+			{
+				e.stopImmediatePropagation();
+				dispatchEvent( new NestcheckViewEvent( NestcheckViewEvent.SHOW_LOCATION_CHECK, ILocationCheck(e.target.data) ) );
+			}
+			
+			private function removeILocationCheck( e:DataGridItemRendererEvent ):void
 			{
 				e.stopImmediatePropagation();
 				
 				if( e.target.data is OtherLocationCheckEntity ) {
-					_nestcheck.other_location_checks.removeItem( e.target.data  );
+					_nestcheck.locationChecks.removeItem( e.target.data  );
 					dispatchRemoveEntity( OtherLocationCheckEntity( e.target.data ) );
 					
 				} else if( e.target.data is BoxCheckEntity ) {
-					_nestcheck.box_checks.removeItem( e.target.data );
+					_nestcheck.locationChecks.removeItem( e.target.data );
 					dispatchRemoveEntity( BoxCheckEntity( e.target.data ) );
 				}
 				
@@ -141,34 +151,23 @@
 			
 			private function locationsFilterFunction( item:Object ):Boolean 
 			{
-				if( _nestcheck.locations.getItemIndex( item ) == -1) {
+			
+				if( _nestcheck.locationChecks.getItemIndex( item ) == -1) {
 					return true;
 				}
 				
 				return false;
 			}
-			
-			public function validateNestcheckDate():Boolean
-			{
-				if( newNestcheck ) {
-					for each ( var nc:NestCheckEntity in repository.entities ) {
-						if( nc.checkdate.getTime() == nestcheckDate.selectedDate.getTime() ) {
-							_nestcheckDateValid = false;
-							return false;
-						}
-					}
-					
-					_nestcheck.checkdate = nestcheckDate.selectedDate;
-					_nestcheckDateValid = true;
-					dispatchPersistEntity( _nestcheck );
-					return true;	
-				}
-				
-				_nestcheckDateValid = true;
-				return true;
-				
-			}
 
+			private function updateNestcheckDate():void
+			{
+				_nestcheck.checkdate = nestcheckDate.selectedDate;
+				
+				if ( repository.getEntityState( _nestcheck ) == EntityRepository.STATE_NEW ) {
+					dispatchPersistEntity( _nestcheck );
+				}
+			}
+			
 			
 		]]>
 	</fx:Script>
@@ -182,13 +181,15 @@
 				  paddingTop="2" paddingRight="2" paddingLeft="2" paddingBottom="2">
 			<mx:DateField id="nestcheckDate"
 						  formatString="{GeneralDateFormatter.DATE_FORMAT}" 
-						  selectedDate="{_nestcheck.checkdate}"
-						  change="validateNestcheckDate()"
+						  disabledRanges="{_disabledNestcheckDates}"
+						  change="updateNestcheckDate()"
 						  left="{LayoutConfig.FORM_ITEM_VALUE_LEFT}"
 						  verticalCenter="0"
-						  enabled="{ currentState == 'add' || currentState == 'edit' }"/>	
-			<text:AttentionText text="{'A nestcheck already exists for the selected date.' + '\nPlease select another date or edit the existing nestcheck.'}"
-								includeInLayout="{!_nestcheckDateValid}" visible="{!_nestcheckDateValid}" />
+						  enabled="{currentState != 'view'}"
+						  showToday="false"/>	
+			<text:InfoText text="Select the date the nestcheck took place."
+						   visible="{_nestcheck.checkdate == null}"
+						   includeInLayout="{_nestcheck.checkdate == null}" />
 		</s:HGroup>
 		
 	</s:VGroup>
@@ -196,8 +197,8 @@
 	<!-- checks -->
 	<s:VGroup id="checks"
 			  gap="10"
-			  includeInLayout="{_nestcheckDateValid}"
-			  visible="{_nestcheckDateValid}">
+			  includeInLayout="{nestcheckDate.selectedDate != null}"
+			  visible="{nestcheckDate.selectedDate != null}">
 		
 		<s:Label text="Locations" 
 				 styleName="formItemlabel" 
@@ -225,7 +226,6 @@
 		
 		<grids:AutoResizeDataGrid id="ILocationChecksGrid"
 								  dragComplete="updateRanks( event )"
-								  dataSource="{_nestcheck.locationChecks}"
 								  sortableColumns="false"
 								  dragEnabled="{currentState == 'view' ? false : true}"
 								  dragMoveEnabled="{currentState == 'view' ? false : true}"

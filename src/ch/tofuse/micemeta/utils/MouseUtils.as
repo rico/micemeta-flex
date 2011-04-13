@@ -6,7 +6,7 @@ package ch.tofuse.micemeta.utils
 	{
 		public static function mouseLabelFunction( mouse:MouseEntity ):String
 		{
-			return mouse.id;
+			return mouse.rfid;
 		}
 	}
 }

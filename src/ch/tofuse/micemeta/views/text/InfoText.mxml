@@ -33,8 +33,7 @@
 				  x="-8" y="-7"/>
 		
 		<mx:Text id="infoText" text="{text}" color="#FFFFFF" minHeight="14"
-				 left="5" top="7" right="5" bottom="5"
-				 width="100%"/>
+				 left="5" top="7" right="5" bottom="5"/>
 		
 	</s:BorderContainer>
 	

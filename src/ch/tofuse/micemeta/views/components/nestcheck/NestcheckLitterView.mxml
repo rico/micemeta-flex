@@ -28,23 +28,28 @@
 			import ch.tofuse.micemeta.entities.OtherLocationEntity;
 			import ch.tofuse.micemeta.events.AutoCompleteListEvent;
 			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
+			import ch.tofuse.micemeta.utils.BindingDebugger;
+			import ch.tofuse.micemeta.utils.DataUtils;
 			import ch.tofuse.micemeta.utils.LitterUtils;
+			
+			import mx.collections.ArrayCollection;
 			
 			import org.davekeen.flextrine.orm.EntityProxy;
 
 			
 			private var _litter:LitterEntity;
-			private var _locationCheck:ILocationCheck;
 			private var _currentLocation:Object;
 			private var _boxCheck:BoxCheckEntity;
 			private var _otherLocationCheck:OtherLocationCheckEntity;
 			private var _newLitter:Boolean;
 			
-			[Bindable] private var _proposedLitterIdentifier:String = "";
-			[Bindable] private var _nestcheck:NestCheckEntity;
+			[Bindable] private var _proposedLitterIdentifier:String;
+			[Bindable] private var _existingLittersData:ArrayCollection; 
+			[Bindable] private var _locationCheck:ILocationCheck;
 
 			private function build():void
 			{
+				//BindingDebugger.debugComponent( this );
 				litters.addEventListener( DataGridItemRendererEvent.REMOVE_ITEM, removeLitter );
 			}
 			
@@ -63,14 +68,16 @@
 					otherLocationCheck = OtherLocationCheckEntity( _locationCheck );
 				}
 				
+				litters.dataSource = _locationCheck.litterChecks;
 			}
 			
-			public function set nestcheck( value:NestCheckEntity ):void
+			public function set existingLittersData( value:ArrayCollection ):void
 			{
-				_nestcheck = value;
-				_nestcheck.litterChecks = _nestcheck.litterChecks;
-			}	
+				if( value ) {
+					_existingLittersData = new ArrayCollection( DataUtils.copyEntitiesOverArray( entities.source ) );
+				}
 				
+			}
 			
 			[Inspectable(category="General",type="String", defaultValue="view",enumeration="view, edit, add")]
 			override public function set mode(value:String):void
@@ -108,7 +115,9 @@
 			{
 				if( value ) {
 					_otherLocationCheck = value;
+					_locationCheck = _otherLocationCheck;
 					_currentLocation = _otherLocationCheck.otherLocation;
+					proposeLitterIdentifier();
 					_boxCheck = null;
 					mode = _mode;
 				}
@@ -123,7 +132,9 @@
 			{
 				if( value ) {
 					_boxCheck = value;
+					_locationCheck = _boxCheck;
 					_currentLocation = _boxCheck.box;
+					proposeLitterIdentifier();
 					_otherLocationCheck = null;
 					mode = _mode;
 				}
@@ -132,12 +143,11 @@
 			protected function addNewLitter( ):void
 			{
 				_litter = new LitterEntity();
-				_litter.identifier = new_litter_id.text;
+				_litter.identifier = new_litter_ti.text;
 				_litter.first_found_age = int( new_litter_age.text );
 				_litter.first_found_date = new Date();
 				
 				dispatchPersistEntity( _litter );
-				_locationCheck.litters.addItem( _litter );
 				
 				_newLitter = true;
 				addLitterCheck();
@@ -147,7 +157,6 @@
 			private function addExistingLitter( e:AutoCompleteListEvent ):void
 			{
 				_litter = LitterEntity( e.item );
-				_locationCheck.litters.addItem( _litter );
 				
 				_newLitter = false;
 				addLitterCheck();
@@ -156,7 +165,6 @@
 			private function addLitterCheck( ):void
 			{
 				var lc:LitterCheckEntity = new LitterCheckEntity();
-				lc.nestcheck = _nestcheck;
 				
 				if( _newLitter ) {
 					lc.remark = new_litter_remark.text;	
@@ -167,13 +175,14 @@
 				lc.litter = _litter;
 				
 				if( _locationCheck is OtherLocationCheckEntity ) {
-					lc.otherLocation = otherLocationCheck.otherLocation;
+					lc.locationCheck = otherLocationCheck;
 				} else if( _locationCheck is BoxCheckEntity ) {
-					lc.box = boxCheck.box;
+					lc.locationCheck = boxCheck;
 				}
 				
 				dispatchPersistEntity( lc );
-				_nestcheck.litterChecks.addItem( lc );
+				_litter.litterChecks.addItem( lc );
+				_locationCheck.litterChecks.addItem( lc );
 				
 				new_litter_remark.text = '';
 				existing_litter_remark.text = '';
@@ -182,24 +191,25 @@
 			
 			public function proposeLitterIdentifier():void
 			{
-				_proposedLitterIdentifier = litterIdentifierDateFormatter.format( new Date() );
+				
+				var litterIdentifier:String = litterIdentifierDateFormatter.format( new Date() );
 				
 				if( _locationCheck is BoxCheckEntity ) {
-					_proposedLitterIdentifier = _proposedLitterIdentifier.concat( BoxEntity(_currentLocation).id );
+					litterIdentifier = litterIdentifier.concat( BoxEntity(_currentLocation).id );
 				}else if( _locationCheck is OtherLocationCheckEntity ) {
-					_proposedLitterIdentifier = _proposedLitterIdentifier.concat( OtherLocationEntity(_currentLocation).code );
+					litterIdentifier = litterIdentifier.concat( OtherLocationEntity(_currentLocation).code );
 				}
 				
 				var i:uint = 0;
 				var secondaryCode:String = '';
 				if( repository ) {
-					while( repository.findOneBy( { identifier: _proposedLitterIdentifier + secondaryCode } ) != null ) {					
+					while( repository.findOneBy( { identifier: litterIdentifier + secondaryCode } ) != null ) {					
 						i++;
 						secondaryCode = '_' + i.toString();
 					}
 				}
 				
-				_proposedLitterIdentifier = _proposedLitterIdentifier.concat( secondaryCode );					
+				_proposedLitterIdentifier = litterIdentifier.concat( secondaryCode );					
 			}
 			
 			/**
@@ -217,14 +227,16 @@
 					proposeLitterIdentifier();
 				}
 				
-				_nestcheck.litterChecks.removeItemAt( _nestcheck.litterChecks.getItemIndex( litterCheck ) );
+				_locationCheck.litterChecks.removeItemAt( _locationCheck.litterChecks.getItemIndex( litterCheck ) );
 				dispatchRemoveEntity(  litterCheck );
 			}
 			
 			private function existingLitterFilterFunction( item:EntityProxy ):Boolean
 			{
-				if( _locationCheck.litters.getItemIndex( item._item ) == -1) {
-					return true;
+				for each ( var litterCheck:LitterCheckEntity in _locationCheck.litterChecks ) {
+					if( litterCheck.litter.id == LitterEntity(item._item).id ) {
+						return false
+					}
 				}
 				
 				return false;
@@ -243,14 +255,13 @@
 	</components:layout>
 	
 	<!-- new litter -->
-	<s:VGroup gap="10" includeIn="edit, add">
+	<s:VGroup gap="10" includeIn="boxAdd,boxEdit,otherLocationAdd,otherLocationEdit">
 		
 		<s:Label text="Add New Litter" styleName="formPartHeaderLabel" />
 		
 		<s:HGroup gap="10" verticalAlign="middle">
 			<s:Label text="identifier" width="60" textAlign="left"/>
-			<s:Label id="new_litter_id" text="{_proposedLitterIdentifier}" />
-			<!-- <s:TextInput id="new_litter_id" text="{_proposedLitterIdentifier}" /> -->
+			<s:TextInput id="new_litter_ti" text="{_proposedLitterIdentifier}" />
 		</s:HGroup>	
 		
 		<s:HGroup gap="10" verticalAlign="middle">
@@ -269,7 +280,7 @@
 								click="addNewLitter()"
 								iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/add.png')" 
 								height="22"
-								enabled="{(new_litter_age.text != '') &amp;&amp; (new_litter_id.text != '') }"
+								enabled="{(new_litter_age.text != '') &amp;&amp; (new_litter_ti.text != '') }"
 								left="70"/>	
 		</s:Group>
 	</s:VGroup>
@@ -277,8 +288,10 @@
 	
 	
 	<!-- existing litter -->
-	<mx:Spacer height="5" />
-	<s:VGroup gap="10">
+	<mx:Spacer height="5" 
+			   includeIn="boxAdd,boxEdit,otherLocationAdd,otherLocationEdit"/>
+	<s:VGroup gap="10"
+			  includeIn="boxAdd,boxEdit,otherLocationAdd,otherLocationEdit">
 		<s:Label text="Add Existing Litter" styleName="formPartHeaderLabel" />
 		
 		<s:HGroup gap="10" verticalAlign="middle">
@@ -289,7 +302,7 @@
 									 filterFunction="existingLitterFilterFunction"
 									 requireSelection="true"
 									 showGrid="false"
-									 listData="{entities}" 
+									 listData="{_existingLittersData}" 
 									 field="identifier"
 									 widthInPixels="150"
 									 left="70"/>	
@@ -310,18 +323,19 @@
 			  includeInLayout="{repository.entities.length > 0}"
 			  visible="{repository.entities.length > 0}">
 		
-		<s:Label text="Added Litters" styleName="formPartHeaderLabel"/>
+		<s:Label text="Added Litters" styleName="formPartHeaderLabel"
+				 includeIn="boxAdd,boxEdit,otherLocationAdd,otherLocationEdit"/>
 		
-		<grids:AutoResizeDataGrid id="litters" dataSource="{_nestcheck.litterChecks}"
+		<grids:AutoResizeDataGrid id="litters" dataSource="{_locationCheck.litterChecks}"
 					 wordWrap="true"
 					 sortableColumns="false"
 					 editable="false" width="300">
 			
 			<grids:columns>
-				<mx:DataGridColumn headerText="identifier" labelFunction="{LitterUtils.litterCheckIdentifierLabelFunction}"/>
+				<mx:DataGridColumn headerText="identifier" labelFunction="{LitterUtils.litterCheckIdentifierLabelFunction}" />
 				<mx:DataGridColumn headerText="age (in days)" labelFunction="{LitterUtils.calculateLitterAgeLabelFunction}" />
 				<mx:DataGridColumn headerText="remark" dataField="remark" />
-				<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.datagrid.DeleteItemWithoutConfirmRenderer" width="30" />
+				<mx:DataGridColumn itemRenderer="ch.tofuse.micemeta.views.renderers.datagrid.DeleteItemWithoutConfirmRenderer" width="30" includeIn="boxAdd,boxEdit,otherLocationAdd,otherLocationEdit"/>
 			</grids:columns>
 		</grids:AutoResizeDataGrid>							
 	</s:VGroup>	

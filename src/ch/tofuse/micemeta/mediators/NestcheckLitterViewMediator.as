@@ -41,7 +41,6 @@ package ch.tofuse.micemeta.mediators
 			addViewListener( EntityManagerEvent.ROLLBACK, rollbackHandler );
 			
 			litterEntitiesLoadedHandler();
-			//_view.proposeLitterIdentifier();
 			
 			eventMap.mapListener( model.eventDispatcher, EntityModelEvent.LITTER_ENTITIES_LOADED, litterEntitiesLoadedHandler, EntityModelEvent );
 			model.loadAll( new EntityModelEvent( EntityModelEvent.LITTER_ENTITIES_LOADED, LitterModel(model) ) );
@@ -50,6 +49,7 @@ package ch.tofuse.micemeta.mediators
 			
 		protected function litterEntitiesLoadedHandler( e:EntityModelEvent = null ):void
 		{
+			_view.existingLittersData = model.repository.entities;
 			_view.proposeLitterIdentifier();
 		}
 	}

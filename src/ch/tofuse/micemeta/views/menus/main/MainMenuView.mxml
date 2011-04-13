@@ -28,10 +28,10 @@
 			
 			import spark.components.HGroup;
 			
-			[SkinPart(required="false", type="ch.tofuse.micemeta.views.components.buttons.ModuleButton")]
+			[SkinPart(type="ch.tofuse.micemeta.views.components.buttons.ModuleButton", required="false")]
 			public var moduleButton:IFactory;
 			
-			[SkinPart(required="false", type="ch.tofuse.micemeta.views.components.buttons.ComponentButton")]
+			[SkinPart(type="ch.tofuse.micemeta.views.components.buttons.ComponentButton", required="false")]
 			public var componentButton:IFactory;
 			
 			[SkinPart(required="true")]

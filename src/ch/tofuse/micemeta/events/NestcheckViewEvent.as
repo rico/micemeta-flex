@@ -9,6 +9,7 @@ package ch.tofuse.micemeta.events
 		public static const ADD_LOCATION_CHECK:String = "addLocationCheck";
 		public static const CLOSE_LOCATION_CHECK:String = "closeLocationCheck";
 		public static const EDIT_LOCATION_CHECK:String = "editLocationCheck";
+		public static const SHOW_LOCATION_CHECK:String = "showLocationCheck";
 		
 		private var _locationCheck:ILocationCheck;
 		

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:AbstractComponentView xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" 
+						  xmlns:components="ch.tofuse.micemeta.views.components.*"
+						  xmlns:inputs="ch.tofuse.micemeta.views.inputs.*"
+						  xmlns:buttons="ch.tofuse.micemeta.views.buttons.*"
+						  xmlns:text="ch.tofuse.micemeta.views.text.*"
+						  xmlns:grids="ch.tofuse.micemeta.views.grids.*"
+						  width="100%"
+						  height="100%"
+						  backgroundColor="#FFFFFF">
+	
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	
+	<components:states>
+		<s:State name="view" />
+		<s:State name="edit" />
+	</components:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.entities.LitterEntity;
+			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
+			import ch.tofuse.micemeta.events.EntityManagerEvent;
+			import ch.tofuse.micemeta.utils.DataUtils;
+			
+			[Bindable] private var _formItemLabelLeft:Number = 15;
+			[Bindable] private var _formItemValueLeft:Number = 75;
+			
+			private var _number_valid:Boolean = false;
+			private var _xcoord_valid:Boolean = true;
+			private var _ycoord_valid:Boolean = true;
+			
+			
+		]]>
+	</fx:Script>
+	
+	<components:layout>
+		<s:VerticalLayout gap="2"
+						  paddingTop="10"
+						  paddingBottom="10"
+						  paddingRight="10"/>
+	</components:layout>
+	
+	<s:Label id="header" text="Litters" styleName="headerLabel" />
+	
+	<mx:Spacer height="15" />
+	
+	<s:HGroup id="main" left="20" layoutDirection="ltr"
+			  paddingLeft="{_formItemLabelLeft}"
+			  gap="50">
+			<components:VScrollerBase gap="10">
+				<s:Label text="Current Boxes" styleName="sectionLabel" />
+				<grids:AutoResizeDataGrid id="entitiesGrid" dataSource="{entities}">
+					<grids:columns>
+						<mx:DataGridColumn headerText="identifier" dataField="identifier" width="80"/>
+						<mx:DataGridColumn headerText="first found date" dataField="first_found_date" width="100"/>
+						<mx:DataGridColumn headerText="first found age" dataField="first_found_age" width="100"/>
+					</grids:columns>
+				</grids:AutoResizeDataGrid>	
+			</components:VScrollerBase>
+	</s:HGroup>
+	
+</components:AbstractComponentView>

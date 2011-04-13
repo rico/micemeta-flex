@@ -3,6 +3,7 @@ package ch.tofuse.micemeta.models
 	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.views.components.mouse.MiceMainContainer;
 	import ch.tofuse.micemeta.views.modules.genetic.GeneticsModuleView;
+	import ch.tofuse.micemeta.views.modules.litter.LitterModuleView;
 	import ch.tofuse.micemeta.views.modules.location.LocationModuleView;
 	import ch.tofuse.micemeta.views.modules.nestcheck.NestcheckModuleView;
 	
@@ -29,7 +30,7 @@ package ch.tofuse.micemeta.models
 		{
 			if( _components == null ) {
 				_components = new Vector.<IContent>();
-				_components.push( new MiceMainContainer(), new LocationModuleView() );
+				_components.push( new MiceMainContainer(), new LocationModuleView(), new LitterModuleView() );
 			}
 			
 			return _components;

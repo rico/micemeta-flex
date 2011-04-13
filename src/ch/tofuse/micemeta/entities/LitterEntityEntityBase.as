@@ -14,8 +14,6 @@ package ch.tofuse.micemeta.entities {
 		
 		public var isInitialized__:Boolean = true;
 		
-		flextrine var savedState:Dictionary;
-		
 		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
@@ -35,18 +33,12 @@ package ch.tofuse.micemeta.entities {
 		public function set first_found_age(value:int):void { _first_found_age = value; }
 		private var _first_found_age:int;
 		
-		[Association(side="owning", oppositeAttribute="litters", oppositeCardinality="*")]
-		public function get locationChecks():PersistentCollection { checkIsInitialized("locationChecks"); return _locationChecks; }
-		public function set locationChecks(value:PersistentCollection):void { _locationChecks = value; }
-		private var _locationChecks:PersistentCollection;
-		
 		[Association(side="inverse", oppositeAttribute="litter", oppositeCardinality="1")]
 		public function get litterChecks():PersistentCollection { checkIsInitialized("litterChecks"); return _litterChecks; }
 		public function set litterChecks(value:PersistentCollection):void { _litterChecks = value; }
 		private var _litterChecks:PersistentCollection;
 		
 		public function LitterEntityEntityBase() {
-			if (!_locationChecks) _locationChecks = new PersistentCollection(null, true, "locationChecks", this);
 			if (!_litterChecks) _litterChecks = new PersistentCollection(null, true, "litterChecks", this);
 		}
 		
@@ -94,26 +86,27 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["identifier"] = identifier;
-				flextrine::savedState["first_found_date"] = first_found_date;
-				flextrine::savedState["first_found_age"] = first_found_age;
-				locationChecks.flextrine::saveState();
-				litterChecks.flextrine::saveState();
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["identifier"] = identifier;
+				memento["first_found_date"] = first_found_date;
+				memento["first_found_age"] = first_found_age;
+				memento["litterChecks"] = litterChecks.flextrine::saveState();
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				identifier = flextrine::savedState["identifier"];
-				first_found_date = flextrine::savedState["first_found_date"];
-				first_found_age = flextrine::savedState["first_found_age"];
-				locationChecks.flextrine::restoreState();
-				litterChecks.flextrine::restoreState();
+				id = memento["id"];
+				identifier = memento["identifier"];
+				first_found_date = memento["first_found_date"];
+				first_found_age = memento["first_found_age"];
+				litterChecks.flextrine::restoreState(memento["litterChecks"]);
 			}
 		}
 		

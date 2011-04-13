@@ -1,6 +1,6 @@
 package ch.tofuse.micemeta.entities {
 	import ch.tofuse.micemeta.entities.ILocationCheck;
-	[RemoteClass(alias="ch.tofuse.micemeta.entities.BoxCheckEntityEntity")]
+	[RemoteClass(alias="ch.tofuse.micemeta.entities.BoxCheckEntity")]
 	[Entity]
 	public class BoxCheckEntity extends BoxCheckEntityEntityBase implements ILocationCheck {
 		
@@ -24,7 +24,6 @@ package ch.tofuse.micemeta.entities {
 			this.remark = '';
 			
 		}
-		
 	}
 
 }

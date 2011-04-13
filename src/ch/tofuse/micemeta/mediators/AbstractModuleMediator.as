@@ -1,10 +1,10 @@
 package ch.tofuse.micemeta.mediators
 {
-	import ch.tofuse.micemeta.events.EntityManagerEvent;
 	import ch.tofuse.micemeta.events.EntityMediatorEvent;
 	import ch.tofuse.micemeta.interfaces.IEntityModelInterface;
-	import ch.tofuse.micemeta.views.components.AbstractComponentView;
 	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
+	
+	import mx.events.CollectionEvent;
 	
 	import org.robotlegs.mvcs.Mediator;
 	
@@ -43,7 +43,24 @@ package ch.tofuse.micemeta.mediators
 		{
 			_view.repository = _model.repository;
 			_view.entities = _model.repository.entities;
+			_model.repository.entities.addEventListener(CollectionEvent.COLLECTION_CHANGE, collectionChangeHandler );
 			
+			addViewListener( EntityMediatorEvent.ENTITY_REMOVE, removeEntityHandler, EntityMediatorEvent );
+			
+		}
+
+		private function collectionChangeHandler(e:CollectionEvent):void
+		{
+			trace("change => " + e.kind);
+		}
+		
+		protected function removeEntityHandler( e:EntityMediatorEvent ):void
+		{
+			model.remove( e.entity );
+			
+			if( e.flush ) {
+				_model.flush();
+			}
 		}
 		
 	}

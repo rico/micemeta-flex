@@ -1,6 +1,7 @@
 package ch.tofuse.micemeta.entities {
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
-     
+     	import ch.tofuse.micemeta.entities.NestCheckEntity;
+   
 	public interface ILocationCheckInterfaceBase {
 	
 		[Bindable(event="propertyChange")]
@@ -68,8 +69,12 @@ package ch.tofuse.micemeta.entities {
 		function set mice(value:PersistentCollection):void;
 		
 		[Bindable(event="propertyChange")]
-		function get litters():PersistentCollection;
-		function set litters(value:PersistentCollection):void;
+		function get litterChecks():PersistentCollection;
+		function set litterChecks(value:PersistentCollection):void;
+		
+		[Bindable(event="propertyChange")]
+		function get nestcheck():NestCheckEntity;
+		function set nestcheck(value:NestCheckEntity):void;
 		
 	}
 

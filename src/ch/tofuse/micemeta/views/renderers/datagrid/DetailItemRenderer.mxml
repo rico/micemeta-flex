@@ -11,7 +11,12 @@
 						  width="100%"
 						  height="100%"
 						  toolTip="show details"
-						  click="{dispatchEvent( new Event('detailsItem',true) )}">
+						  click="{dispatchEvent( new DataGridItemRendererEvent( DataGridItemRendererEvent.SHOW_ITEM) )}">
+	<fx:Script>
+		<![CDATA[
+			import ch.tofuse.micemeta.events.DataGridItemRendererEvent;
+		]]>
+	</fx:Script>
 	
 	<s:HGroup verticalAlign="middle" horizontalAlign="center"
 			  width="100%" height="100%">

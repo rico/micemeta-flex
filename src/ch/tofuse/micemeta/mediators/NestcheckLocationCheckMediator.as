@@ -1,5 +1,6 @@
 package ch.tofuse.micemeta.mediators
 {
+	import ch.tofuse.micemeta.events.EntityModelEvent;
 	import ch.tofuse.micemeta.events.MouseModelEvent;
 	import ch.tofuse.micemeta.interfaces.IEntityModelInterface;
 	import ch.tofuse.micemeta.models.MouseModel;
@@ -31,19 +32,16 @@ package ch.tofuse.micemeta.mediators
 		}
 		
 		override public function onRegister():void
-		{
-			//_view.entities = _model.repository.entities;
-			//_view.repository = _model.repository;
-			
-			/*addViewListener( EntityMediatorEvent.ENTITY_PERSIST, handlePersist );
-			addViewListener( EntityMediatorEvent.ENTITY_REMOVE, handleRemove );
-			
-			addViewListener( EntityManagerEvent.FLUSH, handleFlush );
-			addViewListener( EntityManagerEvent.ROLLBACK, rollbackHandler );*/
-			
+		{			
 			// rfid data
-			eventMap.mapListener( _model.eventDispatcher, MouseModelEvent.ACTIVE_MICE_LOADED, activeMiceLoadedHandler, MouseModelEvent );
+			//eventMap.mapListener( _model.eventDispatcher, MouseModelEvent.ACTIVE_MICE_LOADED, activeMiceLoadedHandler, MouseModelEvent );
+			eventMap.mapListener( _model.eventDispatcher, EntityModelEvent.MOUSE_ENTITIES_LOADED, mouseEntitiesLoadedHandler, EntityModelEvent );
 			_view.activeMice = _model.activeMice;
+		}
+
+		private function mouseEntitiesLoadedHandler( e:EntityModelEvent ):void
+		{
+			_view.activeMice = _model.repository.entities;
 		}
 		
 		private function activeMiceLoadedHandler( e:MouseModelEvent ):void

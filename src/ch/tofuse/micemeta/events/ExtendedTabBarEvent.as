@@ -4,6 +4,8 @@ package ch.tofuse.micemeta.events {
 	
 	public class ExtendedTabBarEvent extends Event {
 		public static const CLOSE_TAB:String = 'closeTab';
+		public static const DISABLE_BUTTONS:String = "disableButtons";
+		public static const ENABLE_BUTTONS:String = "enableButtons";
 		
 		private var _index:int = -1;
 		

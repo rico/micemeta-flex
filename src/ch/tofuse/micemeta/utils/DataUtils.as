@@ -6,6 +6,8 @@ package ch.tofuse.micemeta.utils
 	
 	import mx.collections.ArrayCollection;
 	import mx.utils.ObjectUtil;
+	
+	import org.davekeen.flextrine.orm.EntityProxy;
 
 	public class DataUtils
 	{
@@ -44,5 +46,19 @@ package ch.tofuse.micemeta.utils
 			return newArr;
 			
 		}
+		
+		public static function copyEntitiesOverArray( arr:Array ):Array
+		{
+			var newArr:Array = [];
+			var i:int;
+			
+			for ( i; i < arr.length; i++ ) {
+				newArr.push( copyOverObject( EntityProxy(arr[i])._item, true ) );
+			}
+			
+			return newArr;
+			
+		}
+		
 	}
 }

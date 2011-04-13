@@ -52,7 +52,9 @@
 			
 			public function set listData( value:ArrayCollection ):void
 			{
-				_listData = new ArrayCollection( DataUtils.copyOverArray( value.source ) );
+				if( value ) {
+					_listData = value;
+				}
 			}
 			
 			[Bindable]

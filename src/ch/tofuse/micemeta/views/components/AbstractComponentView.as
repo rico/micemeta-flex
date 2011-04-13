@@ -37,6 +37,7 @@ package ch.tofuse.micemeta.views.components
 		protected var persistEntityEvent:EntityMediatorEvent;
 		protected var removeEntityEvent:EntityMediatorEvent;
 		protected var flushEvent:EntityManagerEvent;
+		protected var rollbackEvent:EntityManagerEvent;
 		
 		public function AbstractComponentView()
 		{
@@ -49,6 +50,7 @@ package ch.tofuse.micemeta.views.components
 			persistEntityEvent = new EntityMediatorEvent( EntityMediatorEvent.ENTITY_PERSIST, {} );
 			
 			flushEvent = new EntityManagerEvent( EntityManagerEvent.FLUSH );
+			rollbackEvent = new EntityManagerEvent( EntityManagerEvent.ROLLBACK );
 		}
 			
 		
@@ -90,6 +92,12 @@ package ch.tofuse.micemeta.views.components
 				
 		protected function onLoadFault(fault:Object, token:Object):void {
 			throw new Error("An error occurred during load: " + fault);
+		}
+		
+		protected function rollback():void
+		{
+			dispatchEvent( rollbackEvent ); 
+			dispatchEvent( new PendingChangesEvent( PendingChangesEvent.PENDING_CHANGES, false) );
 		}
 		
 		protected function save():void

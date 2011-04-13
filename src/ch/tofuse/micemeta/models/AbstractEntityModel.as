@@ -172,11 +172,11 @@ package ch.tofuse.micemeta.models
 		protected function onLoadFault( result:Object, token:Object ):void
 		{
 			_entitiesLoading = false;
-			throw new Error("[EntityManagerBase] load failed => " + token.toString() ); 			
+			throw new Error( "[EntityManagerBase] load failed => " + token.toString() ); 			
 		}
 		
 		protected function onDqlSelectFault( fault:Object, token:Object ):void {
-			throw new Error("[EntityManagerBase] DQL select error => " + fault);
+			throw new Error( "[EntityManagerBase] DQL select error => " + fault );
 		}
 
 	}

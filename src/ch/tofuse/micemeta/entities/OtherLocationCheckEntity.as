@@ -23,6 +23,7 @@ package ch.tofuse.micemeta.entities {
 			this.remark = '';
 			
 		}
+		
 	}
 
 }

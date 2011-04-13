@@ -24,6 +24,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import ch.tofuse.micemeta.events.EntityMediatorEvent;
+			import org.davekeen.flextrine.orm.events.EntityEvent;
 			import ch.tofuse.micemeta.entities.NestCheckEntity;
 			import ch.tofuse.micemeta.entities.ILocationCheck;
 			import ch.tofuse.micemeta.events.NestcheckViewEvent;
@@ -36,35 +38,58 @@
 			public function set nestcheck( nc:NestCheckEntity ):void
 			{
 				_nestcheck = nc;
+				dispatchEvent( new Event("nestcheckChanged") );
 			}
 			
+			[Bindable(Event="nestcheckChanged")]
 			public function get nestcheck():NestCheckEntity
 			{
 				return _nestcheck;
+			}
+			
+			[Inspectable(category="General",type="String", defaultValue="view",enumeration="view, edit, add, new")]
+			override public function set mode(value:String):void
+			{
+				
+				if( value == 'new' ) {
+					_nestcheck = new NestCheckEntity();
+					value = 'add';
+				}
+				
+				if( currentState != 'locationCheck' ) {
+					currentState = value;	
+				}
+				
+				_mode = value;
+				dispatchEvent( new Event("modeChanged") );
+				
+			}
+			
+			[Bindable(Event="modeChanged")]
+			override public function get mode():String
+			{
+				return _mode;
 			}
 			
 			private function viewStateEntered():void
 			{
 				_mode = 'view';
 				header.text = "Add Nestcheck";
+				overview.nestcheck = _nestcheck;
 			}
 			
 			private function editStateEntered():void
 			{
-				_mode = 'edit';
 				header.text = "Edit Nestcheck";
+				_mode = 'edit';
+				overview.nestcheck = _nestcheck;
 			}
 			
 			private function addStateEntered():void
 			{
 				_mode = 'add';
-				
-				if( !_nestcheck) {
-					_nestcheck = new NestCheckEntity();
-					dispatchPersistEntity( _nestcheck );
-				}
-				
 				header.text = "Add Nestcheck";
+				overview.nestcheck = _nestcheck;
 			}
 			
 			private function locationCheckEntered():void
@@ -85,17 +110,11 @@
 				
 			}
 			
-			private function done():void
-			{
-				save();
-				dispatchEvent( new ComponentEvent(ComponentEvent.CLOSE_VIEW) );
-				
-			}
-			
 			private function addLocationCheck( e:NestcheckViewEvent ):void
 			{
 				currentState = 'locationCheck';
 				_locationCheck = e.locationCheck;
+				locationCheck.nestcheck = nestcheck;
 				
 			}
 
@@ -103,12 +122,28 @@
 			{
 				currentState = 'locationCheck';
 				_locationCheck = e.locationCheck;
+				locationCheck.nestcheck = nestcheck;
+			}
+			
+			private function showLocationCheckEvent(e:NestcheckViewEvent):void
+			{
+				currentState = 'locationCheck';
+				_locationCheck = e.locationCheck;
+				locationCheck.nestcheck = nestcheck;
+			}
+			
+			private function done():void
+			{
+				save();
+				dispatchEvent( new ComponentEvent(ComponentEvent.CLOSE_VIEW) );
+				
 			}
 			
 			private function close():void
 			{
 				dispatchEvent( new ComponentEvent(ComponentEvent.CLOSE_VIEW) );
 			}
+
 			
 		]]>
 	</fx:Script>
@@ -128,11 +163,12 @@
 		<!-- overview -->
 		<nestcheck:NestcheckOverview id="overview" 
 									 width="100%"
-									 nestcheck="{_nestcheck}"
 									 includeIn="add,view,edit" 
 									 mode="{_mode}"
+									 nestcheck="{_nestcheck}"
 									 addLocationCheck="addLocationCheck( event )"
-									 editLocationCheck="editLocationCheck( event )"/>
+									 editLocationCheck="editLocationCheck( event )"
+									 showLocationCheck="showLocationCheckEvent( event )"/>
 			
 		<!-- location check -->
 		<nestcheck:NestcheckLocationCheckView id="locationCheck"
@@ -146,11 +182,12 @@
 	</s:VGroup>
 	
 	<mx:Spacer height="20" />
-	<buttons:IconButton id="doneButton" label="done" click="done()"
+	
+	<buttons:IconButton id="doneButton" label="save" click="{done()}"
 						includeIn="add,edit"
 						iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
 	
-	<buttons:IconButton id="closeButton" label="close" click="done()"
+	<buttons:IconButton id="closeButton" label="close" click="{close()}"
 						includeIn="view"
 						iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
 	

@@ -6,8 +6,8 @@ package ch.tofuse.micemeta.entities {
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
 	import org.davekeen.flextrine.orm.events.EntityEvent;
 	import org.davekeen.flextrine.flextrine;
-	import ch.tofuse.micemeta.entities.OtherLocationEntity;
 	import ch.tofuse.micemeta.entities.NestCheckEntity;
+	import ch.tofuse.micemeta.entities.OtherLocationEntity;
 
 	[Bindable]
 	public class OtherLocationCheckEntityEntityBase extends EventDispatcher {
@@ -15,8 +15,6 @@ package ch.tofuse.micemeta.entities {
 		public var isUnserialized__:Boolean;
 		
 		public var isInitialized__:Boolean = true;
-		
-		flextrine var savedState:Dictionary;
 		
 		flextrine var itemPendingError:ItemPendingError;
 		
@@ -86,24 +84,24 @@ package ch.tofuse.micemeta.entities {
 		public function set mice(value:PersistentCollection):void { _mice = value; }
 		private var _mice:PersistentCollection;
 		
+		[Association(side="inverse", oppositeAttribute="locationCheck", oppositeCardinality="1")]
+		public function get litterChecks():PersistentCollection { checkIsInitialized("litterChecks"); return _litterChecks; }
+		public function set litterChecks(value:PersistentCollection):void { _litterChecks = value; }
+		private var _litterChecks:PersistentCollection;
+		
 		[Association(side="owning", oppositeAttribute="locationChecks", oppositeCardinality="*")]
-		public function get litters():PersistentCollection { checkIsInitialized("litters"); return _litters; }
-		public function set litters(value:PersistentCollection):void { _litters = value; }
-		private var _litters:PersistentCollection;
+		public function get nestcheck():NestCheckEntity { checkIsInitialized("nestcheck"); return _nestcheck; }
+		public function set nestcheck(value:NestCheckEntity):void { (value) ? value.flextrine::addValue('locationChecks', this) : ((_nestcheck) ? _nestcheck.flextrine::removeValue('locationChecks', this) : null); _nestcheck = value; }
+		private var _nestcheck:NestCheckEntity;
 		
 		[Association(side="owning")]
 		public function get otherLocation():OtherLocationEntity { checkIsInitialized("otherLocation"); return _otherLocation; }
 		public function set otherLocation(value:OtherLocationEntity):void { _otherLocation = value; }
 		private var _otherLocation:OtherLocationEntity;
 		
-		[Association(side="owning", oppositeAttribute="other_location_checks", oppositeCardinality="*")]
-		public function get nestcheck():NestCheckEntity { checkIsInitialized("nestcheck"); return _nestcheck; }
-		public function set nestcheck(value:NestCheckEntity):void { (value) ? value.flextrine::addValue('other_location_checks', this) : ((_nestcheck) ? _nestcheck.flextrine::removeValue('other_location_checks', this) : null); _nestcheck = value; }
-		private var _nestcheck:NestCheckEntity;
-		
 		public function OtherLocationCheckEntityEntityBase() {
 			if (!_mice) _mice = new PersistentCollection(null, true, "mice", this);
-			if (!_litters) _litters = new PersistentCollection(null, true, "litters", this);
+			if (!_litterChecks) _litterChecks = new PersistentCollection(null, true, "litterChecks", this);
 		}
 		
 		override public function toString():String {
@@ -150,52 +148,55 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["rank"] = rank;
-				flextrine::savedState["non_transpondered"] = non_transpondered;
-				flextrine::savedState["sub_adults"] = sub_adults;
-				flextrine::savedState["pups"] = pups;
-				flextrine::savedState["pups_age"] = pups_age;
-				flextrine::savedState["pups_male_alive"] = pups_male_alive;
-				flextrine::savedState["pups_male_dead"] = pups_male_dead;
-				flextrine::savedState["pups_female_alive"] = pups_female_alive;
-				flextrine::savedState["pups_female_dead"] = pups_female_dead;
-				flextrine::savedState["pups_unknown_alive"] = pups_unknown_alive;
-				flextrine::savedState["pups_unknown_dead"] = pups_unknown_dead;
-				flextrine::savedState["new_litter"] = new_litter;
-				flextrine::savedState["communal"] = communal;
-				flextrine::savedState["remark"] = remark;
-				mice.flextrine::saveState();
-				litters.flextrine::saveState();
-				flextrine::savedState["otherLocation"] = otherLocation;
-				flextrine::savedState["nestcheck"] = nestcheck;
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["rank"] = rank;
+				memento["non_transpondered"] = non_transpondered;
+				memento["sub_adults"] = sub_adults;
+				memento["pups"] = pups;
+				memento["pups_age"] = pups_age;
+				memento["pups_male_alive"] = pups_male_alive;
+				memento["pups_male_dead"] = pups_male_dead;
+				memento["pups_female_alive"] = pups_female_alive;
+				memento["pups_female_dead"] = pups_female_dead;
+				memento["pups_unknown_alive"] = pups_unknown_alive;
+				memento["pups_unknown_dead"] = pups_unknown_dead;
+				memento["new_litter"] = new_litter;
+				memento["communal"] = communal;
+				memento["remark"] = remark;
+				memento["mice"] = mice.flextrine::saveState();
+				memento["litterChecks"] = litterChecks.flextrine::saveState();
+				memento["nestcheck"] = nestcheck;
+				memento["otherLocation"] = otherLocation;
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				rank = flextrine::savedState["rank"];
-				non_transpondered = flextrine::savedState["non_transpondered"];
-				sub_adults = flextrine::savedState["sub_adults"];
-				pups = flextrine::savedState["pups"];
-				pups_age = flextrine::savedState["pups_age"];
-				pups_male_alive = flextrine::savedState["pups_male_alive"];
-				pups_male_dead = flextrine::savedState["pups_male_dead"];
-				pups_female_alive = flextrine::savedState["pups_female_alive"];
-				pups_female_dead = flextrine::savedState["pups_female_dead"];
-				pups_unknown_alive = flextrine::savedState["pups_unknown_alive"];
-				pups_unknown_dead = flextrine::savedState["pups_unknown_dead"];
-				new_litter = (flextrine::savedState["new_litter"] == true);
-				communal = (flextrine::savedState["communal"] == true);
-				remark = flextrine::savedState["remark"];
-				mice.flextrine::restoreState();
-				litters.flextrine::restoreState();
-				otherLocation = flextrine::savedState["otherLocation"];
-				nestcheck = flextrine::savedState["nestcheck"];
+				id = memento["id"];
+				rank = memento["rank"];
+				non_transpondered = memento["non_transpondered"];
+				sub_adults = memento["sub_adults"];
+				pups = memento["pups"];
+				pups_age = memento["pups_age"];
+				pups_male_alive = memento["pups_male_alive"];
+				pups_male_dead = memento["pups_male_dead"];
+				pups_female_alive = memento["pups_female_alive"];
+				pups_female_dead = memento["pups_female_dead"];
+				pups_unknown_alive = memento["pups_unknown_alive"];
+				pups_unknown_dead = memento["pups_unknown_dead"];
+				new_litter = (memento["new_litter"] == true);
+				communal = (memento["communal"] == true);
+				remark = memento["remark"];
+				mice.flextrine::restoreState(memento["mice"]);
+				litterChecks.flextrine::restoreState(memento["litterChecks"]);
+				nestcheck = memento["nestcheck"];
+				otherLocation = memento["otherLocation"];
 			}
 		}
 		

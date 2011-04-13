@@ -20,29 +20,12 @@ package ch.tofuse.micemeta.views.navigation {
 		
 		public function ExtendedTabBar() {
 			super();
-			//setStyle("skinClass", ExtendedTabBarSkin);
 			setStyle("skinClass", ExtendedButtonBarSkin);
 			requireSelection = true;
+			/*addEventListener( ExtendedTabBarEvent.DISABLE_BUTTONS, disableButtonsHandler );
+			addEventListener( ExtendedTabBarEvent.ENABLE_BUTTONS, enableButtonsHandler );*/
 		}
-		
-		public function setCloseableTab(index:int, value:Boolean):void {
-			if (index > 0 && index < dataGroup.numElements) {
-				var btn:ExtendedTabBarButton = dataGroup.getElementAt(index) as ExtendedTabBarButton;
-				btn.closeable = value;
-				dispatchEvent( new Event("setClosableTabChanged") );
-			}
-		}
-		
-		[Bindable(Event="setClosableTabChanged")]
-		public function getCloseableTab(index:int):Boolean {
-			if (index > 0 && index < dataGroup.numElements) {
-				var btn:ExtendedTabBarButton = dataGroup.getElementAt(index) as ExtendedTabBarButton;
-				return btn.closeable;
-			}
-			
-			return false;
-		}
-		
+				
 		private function closeHandler(e:ExtendedTabBarEvent):void {
 			closeTab(e.index, selectedIndex);
 		}
@@ -51,11 +34,9 @@ package ch.tofuse.micemeta.views.navigation {
 			if (dataProvider.length == 0) return;
 			
 			if (dataProvider is IList) {
-				//dataProvider.removeItemAt(closedTab);
 				dispatchEvent( new ContentEvent( ContentEvent.REMOVE_CONTENT, IContent( dataProvider.getItemAt(closedTab) ) ) );
 			} else if (dataProvider is ViewStack){
 				dispatchEvent( new ContentEvent( ContentEvent.REMOVE_CONTENT, IContent( (dataProvider as ViewStack).getChildAt(closedTab) ) ) );
-				//(dataProvider as ViewStack).removeChildAt(closedTab);
 			}
 			
 			//adjust selectedIndex appropriately

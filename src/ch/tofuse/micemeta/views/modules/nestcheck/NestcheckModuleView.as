@@ -2,11 +2,13 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 {
 	import ch.tofuse.micemeta.entities.NestCheckEntity;
 	import ch.tofuse.micemeta.events.ComponentEvent;
+	import ch.tofuse.micemeta.events.EntityMediatorEvent;
 	import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
 	import ch.tofuse.micemeta.views.components.nestcheck.NestcheckView;
 	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	import ch.tofuse.micemeta.vo.MenuOptionVO;
 	
+	import mx.events.CloseEvent;
 	import mx.events.FlexEvent;
 	import mx.events.ItemClickEvent;
 	
@@ -19,10 +21,9 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 		private var _options:Array; 
 		private var _generalDateFormatter:GeneralDateFormatter;
 		
-		private var _nestcheck:NestCheckEntity;
-		
 		private var _addOption:MenuOptionVO;
 		private var _editOption:MenuOptionVO;
+		private var _deleteOption:MenuOptionVO;
 		
 		
 		public function NestcheckModuleView()
@@ -35,6 +36,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 			
 			_addOption = new MenuOptionVO( 'Add', add );
 			_editOption = new MenuOptionVO( 'Edit', edit )
+			_deleteOption = new MenuOptionVO( 'Delete', remove );	
 			
 			menuOptionsData = [ _addOption ];
 				
@@ -54,7 +56,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 			_view.currentState = "view";
 			_view.nestcheck = NestCheckEntity( event.item );
 			
-			menuOptionsData = [ _editOption ];
+			menuOptionsData = [ _editOption, _deleteOption ];
 			
 		}
 		
@@ -69,7 +71,7 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 		
 		override protected function closeView( e:ComponentEvent = null ):void
 		{
-			switch ( _view.currentState ) {
+			switch ( _view.mode ) {
 				
 				case "view":
 				case "add":
@@ -78,8 +80,8 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 				break;
 				
 				case "edit":
-					_view.currentState = "view";
-					menuOptionsData = [ _editOption ];
+					_view.mode = "view";
+					menuOptionsData = [ _editOption, _deleteOption ];
 				break;
 				
 			}
@@ -100,15 +102,22 @@ package ch.tofuse.micemeta.views.modules.nestcheck
 		
 		private function add():void
 		{
-			_view.currentState = "add";
+			_view.mode = "new";
 			disableControls();
 			
 		}
 		
 		private function edit():void
 		{
-			_view.currentState = "edit";
+			_view.mode = "edit";
 			disableControls();
+		}
+		
+		private function remove():void
+		{
+			dispatchEvent( new EntityMediatorEvent( EntityMediatorEvent.ENTITY_REMOVE, _view.nestcheck, true ) );
+			closeView();
+			
 		}
 		
 		public function nestcheckLabelFunction( nc:NestCheckEntity ):String

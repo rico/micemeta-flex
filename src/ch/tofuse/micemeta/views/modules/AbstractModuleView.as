@@ -24,6 +24,7 @@ package ch.tofuse.micemeta.views.modules
 	import mx.core.ClassFactory;
 	import mx.core.IVisualElement;
 	import mx.events.CloseEvent;
+	import mx.events.CollectionEvent;
 	import mx.events.FlexEvent;
 	import mx.events.ItemClickEvent;
 	
@@ -41,6 +42,8 @@ package ch.tofuse.micemeta.views.modules
 		[Bindable] public var showFilter:Boolean = true;
 		[Bindable] public var showList:Boolean = true;
 		[Bindable] public var showOptions:Boolean = true;
+		
+		private var _showMenu:Boolean;
 		
 		private var _repository:IEntityRepository;
 		private var _entities:EntityCollection;
@@ -70,9 +73,12 @@ package ch.tofuse.micemeta.views.modules
 		protected var _addInstanceOnStart:Boolean;
 		
 		
-		public function AbstractModuleView()
+		public function AbstractModuleView( showMenu:Boolean = true)
 		{
 			super();
+			
+			_showMenu = showMenu;
+			
 			addEventListener( FlexEvent.CREATION_COMPLETE, build );
 			addEventListener( PendingChangesEvent.PENDING_CHANGES, pendingChangesHandler );
 			
@@ -88,68 +94,73 @@ package ch.tofuse.micemeta.views.modules
 			addElement( _main );
 			
 			/* MENU */
-			_menu = new ModuleMenuContainer();
-			_menu.width = 200;
-			_menu.minWidth = 150;
-			_menu.maxWidth = 250;
-			_menu.percentHeight = 100;
-			
-			_main.addElement( _menu );
-			
-			/* filter label */
-			_menuEntriesFilterLabel = new ModuleMenuLabel();
-			_menuEntriesFilterLabel.label = "FILTER";
-			
-			_menu.addElement( _menuEntriesFilterLabel);
-			
-			/* filter */
-			_menuEntriesFilterContainer = new ModuleMenuEntryContainer();
-			_menuEntriesFilterContainer.insetLeft = 15;
-			
-			_menuEntriesFilter = new SearchTextInput();
-			_menuEntriesFilter.percentWidth = 100;
-			_menuEntriesFilter.height = 22;
-			_menuEntriesFilter.addEventListener( TextOperationEvent.CHANGE, filterMenuEntriesList );
-			
-			
-			_menuEntriesFilterContainer.addElement( _menuEntriesFilter );
-			
-			_menu.addElement( _menuEntriesFilterContainer );
-			
-			/* spacer */
-			var vspacer:Spacer = new Spacer();
-			vspacer.height = 10;
-			_menu.addElement( vspacer );
-			
-			/* entries list */ 
-			_menuEntriesListLabel = new ModuleMenuLabel();
-			_menuEntriesListLabel.label = "LIST";
-			
-			_menu.addElement( _menuEntriesListLabel );
-			
-			_menuEntriesList = new ModuleMenuList();
-			_menuEntriesList.itemRenderer = new ClassFactory( ModuleMenuEntriesItemRenderer );
-			_menuEntriesList.addEventListener( ItemClickEvent.ITEM_CLICK, entriesListChangeHandler );
-			_menuEntriesList.percentWidth = 100;
-			_menuEntriesList.percentHeight = 100;
-			//_menuList.dataProvider = new ArrayCollection();
-			
-			_menu.addElement( _menuEntriesList );
-			
-			/* options list */
-			_menuOptionsLabel = new ModuleMenuLabel();
-			_menuOptionsLabel.label = "OPTIONS";
-			
-			_menu.addElement( _menuOptionsLabel );
-			
-			_menuOptionsList = new ModuleMenuList();
-			_menuOptionsList.dataProvider = new ArrayCollection();
-			_menuOptionsList.itemRenderer = new ClassFactory( ModuleMenuOptionsItemRenderer );
-			_menuOptionsList.addEventListener( ItemClickEvent.ITEM_CLICK, optionsListChangeHandler );
-			_menuOptionsList.percentWidth = 100;
-			
-			_menu.addElement( _menuOptionsList );
-			
+			if( _showMenu ) {
+				
+				_menu = new ModuleMenuContainer();
+				_menu.width = 200;
+				_menu.minWidth = 150;
+				_menu.maxWidth = 250;
+				_menu.percentHeight = 100;
+				
+				if( showMenu ) {
+					_main.addElement( _menu );
+				}
+				
+				/* filter label */
+				_menuEntriesFilterLabel = new ModuleMenuLabel();
+				_menuEntriesFilterLabel.label = "FILTER";
+				
+				_menu.addElement( _menuEntriesFilterLabel);
+				
+				/* filter */
+				_menuEntriesFilterContainer = new ModuleMenuEntryContainer();
+				_menuEntriesFilterContainer.insetLeft = 15;
+				
+				_menuEntriesFilter = new SearchTextInput();
+				_menuEntriesFilter.percentWidth = 100;
+				_menuEntriesFilter.height = 22;
+				_menuEntriesFilter.addEventListener( TextOperationEvent.CHANGE, filterMenuEntriesList );
+				
+				
+				_menuEntriesFilterContainer.addElement( _menuEntriesFilter );
+				
+				_menu.addElement( _menuEntriesFilterContainer );
+				
+				/* spacer */
+				var vspacer:Spacer = new Spacer();
+				vspacer.height = 10;
+				_menu.addElement( vspacer );
+				
+				/* entries list */ 
+				_menuEntriesListLabel = new ModuleMenuLabel();
+				_menuEntriesListLabel.label = "LIST";
+				
+				_menu.addElement( _menuEntriesListLabel );
+				
+				_menuEntriesList = new ModuleMenuList();
+				_menuEntriesList.itemRenderer = new ClassFactory( ModuleMenuEntriesItemRenderer );
+				_menuEntriesList.addEventListener( ItemClickEvent.ITEM_CLICK, entriesListChangeHandler );
+				_menuEntriesList.percentWidth = 100;
+				_menuEntriesList.percentHeight = 100;
+				//_menuList.dataProvider = new ArrayCollection();
+				
+				_menu.addElement( _menuEntriesList );
+				
+				/* options list */
+				_menuOptionsLabel = new ModuleMenuLabel();
+				_menuOptionsLabel.label = "OPTIONS";
+				
+				_menu.addElement( _menuOptionsLabel );
+				
+				_menuOptionsList = new ModuleMenuList();
+				_menuOptionsList.dataProvider = new ArrayCollection();
+				_menuOptionsList.itemRenderer = new ClassFactory( ModuleMenuOptionsItemRenderer );
+				_menuOptionsList.addEventListener( ItemClickEvent.ITEM_CLICK, optionsListChangeHandler );
+				_menuOptionsList.percentWidth = 100;
+				
+				_menu.addElement( _menuOptionsList );
+			}
+				
 			/* CONTENT */
 			_content = new ModuleContainerContent();
 			_content.layout = new BasicLayout();
@@ -180,25 +191,27 @@ package ch.tofuse.micemeta.views.modules
 		{
 			setLabel();
 			
-			_menuEntriesFilterLabel.includeInLayout = showFilter;
-			_menuEntriesFilterLabel.visible = showFilter;
-			_menuEntriesFilterContainer.includeInLayout = showFilter;
-			_menuEntriesFilterContainer.visible = showFilter;
-			
-			_menuOptionsLabel.includeInLayout = menuOptionsData.length != 0;
-			_menuOptionsLabel.visible = menuOptionsData.length != 0;
-			_menuOptionsList.includeInLayout = menuOptionsData.length != 0;
-			_menuOptionsList.visible = menuOptionsData.length != 0;
-			
-			_menuEntriesListLabel.includeInLayout = showList;
-			_menuEntriesListLabel.visible = showList;
-			_menuEntriesList.includeInLayout = showList;
-			_menuEntriesList.visible = showList;
-			
-			_menuOptionsLabel.includeInLayout = showOptions;
-			_menuOptionsLabel.visible = showOptions;
-			_menuOptionsList.includeInLayout = showOptions;
-			_menuOptionsList.visible = showOptions;
+			if( _showMenu ) {
+				_menuEntriesFilterLabel.includeInLayout = showFilter;
+				_menuEntriesFilterLabel.visible = showFilter;
+				_menuEntriesFilterContainer.includeInLayout = showFilter;
+				_menuEntriesFilterContainer.visible = showFilter;
+				
+				_menuOptionsLabel.includeInLayout = menuOptionsData.length != 0;
+				_menuOptionsLabel.visible = menuOptionsData.length != 0;
+				_menuOptionsList.includeInLayout = menuOptionsData.length != 0;
+				_menuOptionsList.visible = menuOptionsData.length != 0;
+				
+				_menuEntriesListLabel.includeInLayout = showList;
+				_menuEntriesListLabel.visible = showList;
+				_menuEntriesList.includeInLayout = showList;
+				_menuEntriesList.visible = showList;
+				
+				_menuOptionsLabel.includeInLayout = showOptions;
+				_menuOptionsLabel.visible = showOptions;
+				_menuOptionsList.includeInLayout = showOptions;
+				_menuOptionsList.visible = showOptions;	
+			}
 			
 		}
 		
@@ -225,7 +238,10 @@ package ch.tofuse.micemeta.views.modules
 		
 		protected function setLabel():void
 		{
-			_menuEntriesListLabel.label = label.toUpperCase();
+			if( _menuEntriesListLabel ) {
+				_menuEntriesListLabel.label = label.toUpperCase();	
+			}
+			
 		}
 		
 		public function get menuEntriesList():ModuleMenuList
@@ -338,7 +354,7 @@ package ch.tofuse.micemeta.views.modules
 				e.stopImmediatePropagation();
 			}
 			
-			removeChild( _menu );
+			removeElement( _menu );
 		}
 		
 		protected function showMenu( e:ModuleMenuEvent = null ):void
@@ -470,8 +486,11 @@ package ch.tofuse.micemeta.views.modules
 
 		public function set entities(value:EntityCollection):void
 		{
-			_entities = value;
-			dispatchEvent( new Event("entitiesChanged") );
+			if( value ) {
+				_entities = value;
+				dispatchEvent( new Event("entitiesChanged") );	
+			}
+			
 		}
 
 		[Bindable(Event="pendingChangesChanged")]

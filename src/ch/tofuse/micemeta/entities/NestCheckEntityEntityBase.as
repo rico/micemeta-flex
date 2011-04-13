@@ -15,8 +15,6 @@ package ch.tofuse.micemeta.entities {
 		
 		public var isInitialized__:Boolean = true;
 		
-		flextrine var savedState:Dictionary;
-		
 		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
@@ -34,24 +32,12 @@ package ch.tofuse.micemeta.entities {
 		private var _user:UserEntity;
 		
 		[Association(side="inverse", oppositeAttribute="nestcheck", oppositeCardinality="1")]
-		public function get box_checks():PersistentCollection { checkIsInitialized("box_checks"); return _box_checks; }
-		public function set box_checks(value:PersistentCollection):void { _box_checks = value; }
-		private var _box_checks:PersistentCollection;
-		
-		[Association(side="inverse", oppositeAttribute="nestcheck", oppositeCardinality="1")]
-		public function get litterChecks():PersistentCollection { checkIsInitialized("litterChecks"); return _litterChecks; }
-		public function set litterChecks(value:PersistentCollection):void { _litterChecks = value; }
-		private var _litterChecks:PersistentCollection;
-		
-		[Association(side="inverse", oppositeAttribute="nestcheck", oppositeCardinality="1")]
-		public function get other_location_checks():PersistentCollection { checkIsInitialized("other_location_checks"); return _other_location_checks; }
-		public function set other_location_checks(value:PersistentCollection):void { _other_location_checks = value; }
-		private var _other_location_checks:PersistentCollection;
+		public function get locationChecks():PersistentCollection { checkIsInitialized("locationChecks"); return _locationChecks; }
+		public function set locationChecks(value:PersistentCollection):void { _locationChecks = value; }
+		private var _locationChecks:PersistentCollection;
 		
 		public function NestCheckEntityEntityBase() {
-			if (!_box_checks) _box_checks = new PersistentCollection(null, true, "box_checks", this);
-			if (!_litterChecks) _litterChecks = new PersistentCollection(null, true, "litterChecks", this);
-			if (!_other_location_checks) _other_location_checks = new PersistentCollection(null, true, "other_location_checks", this);
+			if (!_locationChecks) _locationChecks = new PersistentCollection(null, true, "locationChecks", this);
 		}
 		
 		override public function toString():String {
@@ -98,26 +84,25 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["checkdate"] = checkdate;
-				flextrine::savedState["user"] = user;
-				box_checks.flextrine::saveState();
-				litterChecks.flextrine::saveState();
-				other_location_checks.flextrine::saveState();
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["checkdate"] = checkdate;
+				memento["user"] = user;
+				memento["locationChecks"] = locationChecks.flextrine::saveState();
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				checkdate = flextrine::savedState["checkdate"];
-				user = flextrine::savedState["user"];
-				box_checks.flextrine::restoreState();
-				litterChecks.flextrine::restoreState();
-				other_location_checks.flextrine::restoreState();
+				id = memento["id"];
+				checkdate = memento["checkdate"];
+				user = memento["user"];
+				locationChecks.flextrine::restoreState(memento["locationChecks"]);
 			}
 		}
 		

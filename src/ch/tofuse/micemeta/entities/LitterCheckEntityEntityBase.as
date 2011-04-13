@@ -6,10 +6,8 @@ package ch.tofuse.micemeta.entities {
 	import org.davekeen.flextrine.orm.collections.PersistentCollection;
 	import org.davekeen.flextrine.orm.events.EntityEvent;
 	import org.davekeen.flextrine.flextrine;
-	import ch.tofuse.micemeta.entities.NestCheckEntity;
+	import ch.tofuse.micemeta.entities.ILocationCheck;
 	import ch.tofuse.micemeta.entities.LitterEntity;
-	import ch.tofuse.micemeta.entities.OtherLocationEntity;
-	import ch.tofuse.micemeta.entities.BoxEntity;
 
 	[Bindable]
 	public class LitterCheckEntityEntityBase extends EventDispatcher {
@@ -17,8 +15,6 @@ package ch.tofuse.micemeta.entities {
 		public var isUnserialized__:Boolean;
 		
 		public var isInitialized__:Boolean = true;
-		
-		flextrine var savedState:Dictionary;
 		
 		flextrine var itemPendingError:ItemPendingError;
 		
@@ -32,24 +28,14 @@ package ch.tofuse.micemeta.entities {
 		private var _remark:String;
 		
 		[Association(side="owning", oppositeAttribute="litterChecks", oppositeCardinality="*")]
-		public function get nestcheck():NestCheckEntity { checkIsInitialized("nestcheck"); return _nestcheck; }
-		public function set nestcheck(value:NestCheckEntity):void { (value) ? value.flextrine::addValue('litterChecks', this) : ((_nestcheck) ? _nestcheck.flextrine::removeValue('litterChecks', this) : null); _nestcheck = value; }
-		private var _nestcheck:NestCheckEntity;
+		public function get locationCheck():ILocationCheck { checkIsInitialized("locationCheck"); return _locationCheck; }
+		public function set locationCheck(value:ILocationCheck):void { (value) ? value.flextrine::addValue('litterChecks', this) : ((_locationCheck) ? _locationCheck.flextrine::removeValue('litterChecks', this) : null); _locationCheck = value; }
+		private var _locationCheck:ILocationCheck;
 		
 		[Association(side="owning", oppositeAttribute="litterChecks", oppositeCardinality="*")]
 		public function get litter():LitterEntity { checkIsInitialized("litter"); return _litter; }
 		public function set litter(value:LitterEntity):void { (value) ? value.flextrine::addValue('litterChecks', this) : ((_litter) ? _litter.flextrine::removeValue('litterChecks', this) : null); _litter = value; }
 		private var _litter:LitterEntity;
-		
-		[Association(side="owning")]
-		public function get otherLocation():OtherLocationEntity { checkIsInitialized("otherLocation"); return _otherLocation; }
-		public function set otherLocation(value:OtherLocationEntity):void { _otherLocation = value; }
-		private var _otherLocation:OtherLocationEntity;
-		
-		[Association(side="owning")]
-		public function get box():BoxEntity { checkIsInitialized("box"); return _box; }
-		public function set box(value:BoxEntity):void { _box = value; }
-		private var _box:BoxEntity;
 		
 		public function LitterCheckEntityEntityBase() {
 		}
@@ -98,26 +84,25 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["remark"] = remark;
-				flextrine::savedState["nestcheck"] = nestcheck;
-				flextrine::savedState["litter"] = litter;
-				flextrine::savedState["otherLocation"] = otherLocation;
-				flextrine::savedState["box"] = box;
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["remark"] = remark;
+				memento["locationCheck"] = locationCheck;
+				memento["litter"] = litter;
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				remark = flextrine::savedState["remark"];
-				nestcheck = flextrine::savedState["nestcheck"];
-				litter = flextrine::savedState["litter"];
-				otherLocation = flextrine::savedState["otherLocation"];
-				box = flextrine::savedState["box"];
+				id = memento["id"];
+				remark = memento["remark"];
+				locationCheck = memento["locationCheck"];
+				litter = memento["litter"];
 			}
 		}
 		

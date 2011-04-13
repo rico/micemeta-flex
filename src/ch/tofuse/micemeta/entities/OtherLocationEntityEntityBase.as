@@ -14,8 +14,6 @@ package ch.tofuse.micemeta.entities {
 		
 		public var isInitialized__:Boolean = true;
 		
-		flextrine var savedState:Dictionary;
-		
 		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
@@ -82,22 +80,25 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["description"] = description;
-				flextrine::savedState["code"] = code;
-				flextrine::savedState["segment"] = segment;
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["description"] = description;
+				memento["code"] = code;
+				memento["segment"] = segment;
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				description = flextrine::savedState["description"];
-				code = flextrine::savedState["code"];
-				segment = flextrine::savedState["segment"];
+				id = memento["id"];
+				description = memento["description"];
+				code = memento["code"];
+				segment = memento["segment"];
 			}
 		}
 		

@@ -14,8 +14,6 @@ package ch.tofuse.micemeta.entities {
 		
 		public var isInitialized__:Boolean = true;
 		
-		flextrine var savedState:Dictionary;
-		
 		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
@@ -104,32 +102,35 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["segment"] = segment;
-				flextrine::savedState["last"] = last;
-				flextrine::savedState["data_count"] = data_count;
-				flextrine::savedState["dir_count"] = dir_count;
-				flextrine::savedState["res_count"] = res_count;
-				flextrine::savedState["xcoord"] = xcoord;
-				flextrine::savedState["ycoord"] = ycoord;
-				box_checks.flextrine::saveState();
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["segment"] = segment;
+				memento["last"] = last;
+				memento["data_count"] = data_count;
+				memento["dir_count"] = dir_count;
+				memento["res_count"] = res_count;
+				memento["xcoord"] = xcoord;
+				memento["ycoord"] = ycoord;
+				memento["box_checks"] = box_checks.flextrine::saveState();
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				segment = flextrine::savedState["segment"];
-				last = flextrine::savedState["last"];
-				data_count = flextrine::savedState["data_count"];
-				dir_count = flextrine::savedState["dir_count"];
-				res_count = flextrine::savedState["res_count"];
-				xcoord = flextrine::savedState["xcoord"];
-				ycoord = flextrine::savedState["ycoord"];
-				box_checks.flextrine::restoreState();
+				id = memento["id"];
+				segment = memento["segment"];
+				last = memento["last"];
+				data_count = memento["data_count"];
+				dir_count = memento["dir_count"];
+				res_count = memento["res_count"];
+				xcoord = memento["xcoord"];
+				ycoord = memento["ycoord"];
+				box_checks.flextrine::restoreState(memento["box_checks"]);
 			}
 		}
 		

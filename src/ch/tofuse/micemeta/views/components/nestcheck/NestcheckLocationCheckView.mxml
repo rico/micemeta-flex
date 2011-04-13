@@ -26,6 +26,7 @@
 			import ch.tofuse.micemeta.config.LayoutConfig;
 			import ch.tofuse.micemeta.entities.BoxCheckEntity;
 			import ch.tofuse.micemeta.entities.ILocationCheck;
+			import ch.tofuse.micemeta.entities.LitterCheckEntity;
 			import ch.tofuse.micemeta.entities.LitterEntity;
 			import ch.tofuse.micemeta.entities.MouseEntity;
 			import ch.tofuse.micemeta.entities.NestCheckEntity;
@@ -33,6 +34,7 @@
 			import ch.tofuse.micemeta.events.AutoCompleteListEvent;
 			import ch.tofuse.micemeta.events.NestcheckViewEvent;
 			import ch.tofuse.micemeta.skins.input.DisabledTextInputSkin;
+			import ch.tofuse.micemeta.utils.DataUtils;
 			import ch.tofuse.micemeta.utils.MouseUtils;
 			
 			import mx.collections.ArrayCollection;
@@ -70,7 +72,9 @@
 			
 			public function set activeMice( data:ArrayCollection ):void
 			{
-				_activeMice = data;
+				if( data && !_activeMice ) {
+					_activeMice = new ArrayCollection( DataUtils.copyEntitiesOverArray( data.source ) )	
+				}
 			}
 			
 			[Bindable(Event="modeChanged")]
@@ -100,11 +104,11 @@
 					
 					case "edit":
 						boxCheck != null  ? currentState == 'boxEdit' : currentState == 'otherLocationEdit';
-						break;
+					break;
 					
 					case "add":
 						boxCheck != null  ? currentState == 'boxAdd' : currentState == 'otherLocationAdd';
-						break;
+					break;
 				}
 				
 				dispatchEvent( new Event("modeChanged") );
@@ -169,12 +173,11 @@
 				_locationCheck.pups_unknown_alive = pups_unknown_alive.numericValue;
 				_locationCheck.pups_unknown_dead = pups_unknown_dead.numericValue;
 				_locationCheck.new_litter = false;
-				for each ( var litter:LitterEntity in _locationCheck.litters ) {
-					if( litter.first_found_date.getTime() == nestcheck.checkdate.getTime() ) {
+				for each ( var litterCheck:LitterCheckEntity in _locationCheck.litterChecks ) {
+					if( litterCheck.litter.first_found_date.getTime() == nestcheck.checkdate.getTime() ) {
 						_locationCheck.new_litter = true;
 						break;
 					}
-					
 				}
 				
 				_locationCheck.communal = communal.selected;
@@ -206,7 +209,9 @@
 			
 			private function addTransponder( e:AutoCompleteListEvent ):void
 			{
-				_locationCheck.mice.addItem( MouseEntity( e.item ) );
+				var mouse:MouseEntity = MouseEntity( e.item );
+				//dispatchPersistEntity( mouse );
+				_locationCheck.mice.addItem( mouse );
 				
 			}
 			
@@ -249,15 +254,18 @@
 									 listData="{_activeMice}" 
 									 itemRemoved="{removeTransponder( event )}"
 									 itemAdded="{addTransponder( event )}"
-									 field="id"/>
+									 field="rfid"
+									 enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 		<mx:FormItem label="non transpondered" >
-			<inputs:NumericTextInput id="non_transpondered"/>	
+			<inputs:NumericTextInput id="non_transpondered"
+									 enabled="{_mode != 'view'}"/>	
 		</mx:FormItem>
 		
 		<mx:FormItem label="Subadults" >
-			<inputs:NumericTextInput id="sub_adults"/>	
+			<inputs:NumericTextInput id="sub_adults"
+									 enabled="{_mode != 'view'}"/>	
 		</mx:FormItem>
 		
 	</mx:Form>
@@ -271,7 +279,8 @@
 		
 		<mx:FormItem label="pups age">
 			<s:HGroup verticalAlign="middle" gap="10">
-				<inputs:NumericTextInput id="pups_age" maxChars="3" widthInChars="3" />
+				<inputs:NumericTextInput id="pups_age" maxChars="2" widthInChars="3" 
+										 enabled="{_mode != 'view'}"/>
 				<s:Label text="(in days)" styleName="inputInfoLabel" />
 			</s:HGroup>
 			
@@ -283,27 +292,33 @@
 		</mx:FormItem>
 		
 		<mx:FormItem label="pups male alive">
-			<inputs:NumericTextInput id="pups_male_alive" />
+			<inputs:NumericTextInput id="pups_male_alive" 
+									 enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 		<mx:FormItem label="pups male dead">
-			<inputs:NumericTextInput id="pups_male_dead" />
+			<inputs:NumericTextInput id="pups_male_dead" 
+									 enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 		<mx:FormItem label="pups female alive">
-			<inputs:NumericTextInput id="pups_female_alive" />
+			<inputs:NumericTextInput id="pups_female_alive" 
+									 enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 		<mx:FormItem label="pups female dead">
-			<inputs:NumericTextInput id="pups_female_dead" />
+			<inputs:NumericTextInput id="pups_female_dead" 
+									 enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 		<mx:FormItem label="pups unknown gender alive">
-			<inputs:NumericTextInput id="pups_unknown_alive" />
+			<inputs:NumericTextInput id="pups_unknown_alive" 
+									 enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 		<mx:FormItem label="pups unknown gender dead">
-			<inputs:NumericTextInput id="pups_unknown_dead" />
+			<inputs:NumericTextInput id="pups_unknown_dead" 
+									 enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 	</mx:Form>
@@ -315,7 +330,7 @@
 				 verticalAlign="top"/>
 		<mx:Spacer height="5" />
 		<mx:FormItem>
-			<nestcheck:NestcheckLitterView id="litters" nestcheck="{nestcheck}" mode="{_mode}" locationCheck="{_locationCheck}"/>
+			<nestcheck:NestcheckLitterView id="litters" mode="{_mode}" locationCheck="{_locationCheck}"/>
 		</mx:FormItem>
 	</mx:Form>
 	
@@ -327,21 +342,23 @@
 		<mx:Spacer height="5" />
 		<mx:FormItem label="Nest open"
 					 includeIn="box">
-			<s:CheckBox id="nest_open" />	
+			<s:CheckBox id="nest_open" 
+						enabled="{_mode != 'view'}"/>	
 		</mx:FormItem>
 		
 		<mx:FormItem label="communal">
-			<s:CheckBox id="communal" />
+			<s:CheckBox id="communal" 
+						enabled="{_mode != 'view'}"/>
 		</mx:FormItem>
 		
 		<mx:FormItem label="remark">
-			<s:TextArea id="remark" widthInChars="30" heightInLines="5" top="10"/>	
+			<s:TextArea id="remark" widthInChars="30" heightInLines="5" top="10"
+						enabled="{_mode != 'view'}"/>	
 		</mx:FormItem>
 		
 	</mx:Form>	
 	
-	<buttons:IconButton id="doneButton" label="done" click="close()"
+	<buttons:IconButton id="doneButton" label="{_mode == 'view' ? 'close' : 'done'}" click="close()"
 						iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
-	
 	
 </components:AbstractComponentView>

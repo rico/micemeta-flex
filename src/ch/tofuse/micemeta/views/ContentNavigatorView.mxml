@@ -7,12 +7,17 @@
 	<s:layout>
 		<s:VerticalLayout gap="0" />
 	</s:layout>
+	<s:states>
+		<s:State name="view"/>
+		<s:State name="edit" />			
+	</s:states>
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
 			import ch.tofuse.micemeta.events.ContentEvent;
+			import ch.tofuse.micemeta.events.ExtendedTabBarEvent;
 			import ch.tofuse.micemeta.interfaces.IContent;
 			
 			import mx.collections.ArrayCollection;
@@ -22,6 +27,18 @@
 			private function build():void
 			{
 				modulesStackTabBar.addEventListener( ContentEvent.REMOVE_CONTENT, removeContentHandler );
+				modulesStackTabBar.addEventListener( ExtendedTabBarEvent.DISABLE_BUTTONS, hideNavigaton );
+				modulesStackTabBar.addEventListener( ExtendedTabBarEvent.ENABLE_BUTTONS, showNavigaton );
+			}
+
+			private function showNavigaton(e:ExtendedTabBarEvent):void
+			{
+				currentState = 'view';
+			}
+
+			private function hideNavigaton(e:ExtendedTabBarEvent):void
+			{
+				currentState = 'edit';
 			}
 			
 			public function addContent( content:IContent ):void
@@ -68,6 +85,7 @@
 		]]>
 	</fx:Script>
 	<navigation:ModulesStackTabBar id="modulesStackTabBar" 
+								   includeIn="view"
 								   dataProvider="{modulesStack}" 
 								   height="25" width="100%" />
 	

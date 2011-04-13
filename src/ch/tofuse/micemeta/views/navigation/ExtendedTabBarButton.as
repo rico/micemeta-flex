@@ -2,10 +2,13 @@ package ch.tofuse.micemeta.views.navigation {
 	
 	
 	import ch.tofuse.micemeta.events.ExtendedTabBarEvent;
+	import ch.tofuse.micemeta.interfaces.IContent;
 	import ch.tofuse.micemeta.skins.button.ExtendedTabBarButtonSkin;
 	
+	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	import mx.binding.utils.ChangeWatcher;
 	import mx.states.OverrideBase;
 	
 	import spark.components.Button;
@@ -16,7 +19,7 @@ package ch.tofuse.micemeta.views.navigation {
 	public class ExtendedTabBarButton extends ButtonBarButton 
 	{
 		
-		[SkinPart("false")]
+		[SkinPart(required="false")]
 		public var closeButton:Button;
 		
 		private var _closeable:Boolean = true;
@@ -29,19 +32,9 @@ package ch.tofuse.micemeta.views.navigation {
 			//NOTE: this enables the button's children (aka the close button) to receive mouse events
 			this.mouseChildren = true;
 			
+			
 		}
 		
-		[Bindable]
-		public function get closeable():Boolean {
-			return _closeable;
-		}
-		public function set closeable(val:Boolean):void {
-			if (_closeable != val) {
-				_closeable = val;
-				closeButton.visible = val;
-				//labelDisplay.right = (val ? 30 : 14);
-			}
-		}
 		
 		private function closeHandler(e:MouseEvent):void {
 			dispatchEvent(new ExtendedTabBarEvent(ExtendedTabBarEvent.CLOSE_TAB, itemIndex, true));
@@ -52,7 +45,6 @@ package ch.tofuse.micemeta.views.navigation {
 			
 			if (instance == closeButton) {
 				closeButton.addEventListener(MouseEvent.CLICK, closeHandler);
-				closeButton.visible = closeable;
 			} 
 		}
 		

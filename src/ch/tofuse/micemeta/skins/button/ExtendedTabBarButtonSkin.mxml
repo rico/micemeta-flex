@@ -11,6 +11,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import ch.tofuse.micemeta.events.ExtendedTabBarEvent;
 			import ch.tofuse.micemeta.interfaces.IContent;
 			
 			import mx.binding.utils.ChangeWatcher;
@@ -25,7 +26,15 @@
 			
 			// Event listener when binding occurs. 
 			public function watcherListener(event:Event):void {
-				closeButton.pendingChanges = IContent( hostComponent.data).pendingChanges;
+				if( hostComponent.data ) {
+					closeButton.pendingChanges = IContent( hostComponent.data).pendingChanges;
+					
+					if( closeButton.pendingChanges ) {
+						dispatchEvent( new ExtendedTabBarEvent( ExtendedTabBarEvent.DISABLE_BUTTONS, hostComponent.itemIndex, true ) )
+					} else {
+						dispatchEvent( new ExtendedTabBarEvent( ExtendedTabBarEvent.ENABLE_BUTTONS, hostComponent.itemIndex, true ) )
+					}
+				}
 			}
 			
 			

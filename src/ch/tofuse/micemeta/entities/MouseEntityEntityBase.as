@@ -14,14 +14,16 @@ package ch.tofuse.micemeta.entities {
 		
 		public var isInitialized__:Boolean = true;
 		
-		flextrine var savedState:Dictionary;
-		
 		flextrine var itemPendingError:ItemPendingError;
 		
 		[Id]
 		public function get id():String { return _id; }
 		public function set id(value:String):void { _id = value; }
 		private var _id:String;
+		
+		public function get rfid():String { checkIsInitialized("rfid"); return _rfid; }
+		public function set rfid(value:String):void { _rfid = value; }
+		private var _rfid:String;
 		
 		public function get birth_date():Date { checkIsInitialized("birth_date"); return (_birth_date && _birth_date.getTime() > 0) ? _birth_date : null; }
 		public function set birth_date(value:*):void { _birth_date = (value is Date) ? value : new Date(value); }
@@ -75,17 +77,17 @@ package ch.tofuse.micemeta.entities {
 		public function set weight(value:Number):void { _weight = value; }
 		private var _weight:Number = 0;
 		
-		[Association(side="owning", oppositeAttribute="mice", oppositeCardinality="*")]
+		[Association(side="inverse", oppositeAttribute="mice", oppositeCardinality="*")]
 		public function get boxChecks():PersistentCollection { checkIsInitialized("boxChecks"); return _boxChecks; }
 		public function set boxChecks(value:PersistentCollection):void { _boxChecks = value; }
 		private var _boxChecks:PersistentCollection;
 		
-		[Association(side="owning", oppositeAttribute="mice", oppositeCardinality="*")]
+		[Association(side="inverse", oppositeAttribute="mice", oppositeCardinality="*")]
 		public function get otherLocationChecks():PersistentCollection { checkIsInitialized("otherLocationChecks"); return _otherLocationChecks; }
 		public function set otherLocationChecks(value:PersistentCollection):void { _otherLocationChecks = value; }
 		private var _otherLocationChecks:PersistentCollection;
 		
-		[Association(side="owning", oppositeAttribute="mice", oppositeCardinality="*")]
+		[Association(side="inverse", oppositeAttribute="mice", oppositeCardinality="*")]
 		public function get locationChecks():PersistentCollection { checkIsInitialized("locationChecks"); return _locationChecks; }
 		public function set locationChecks(value:PersistentCollection):void { _locationChecks = value; }
 		private var _locationChecks:PersistentCollection;
@@ -140,48 +142,53 @@ package ch.tofuse.micemeta.entities {
 			}
 		}
 		
-		flextrine function saveState():void {
+		flextrine function saveState():Dictionary {
 			if (isInitialized__) {
-				flextrine::savedState = new Dictionary(true);
-				flextrine::savedState["id"] = id;
-				flextrine::savedState["birth_date"] = birth_date;
-				flextrine::savedState["death_date"] = death_date;
-				flextrine::savedState["import_date"] = import_date;
-				flextrine::savedState["dir"] = dir;
-				flextrine::savedState["res"] = res;
-				flextrine::savedState["i"] = i;
-				flextrine::savedState["data_count"] = data_count;
-				flextrine::savedState["dir_count"] = dir_count;
-				flextrine::savedState["res_count"] = res_count;
-				flextrine::savedState["sex"] = sex;
-				flextrine::savedState["last"] = last;
-				flextrine::savedState["implant_date"] = implant_date;
-				flextrine::savedState["weight"] = weight;
-				boxChecks.flextrine::saveState();
-				otherLocationChecks.flextrine::saveState();
-				locationChecks.flextrine::saveState();
+				var memento:Dictionary = new Dictionary(true);
+				memento["id"] = id;
+				memento["rfid"] = rfid;
+				memento["birth_date"] = birth_date;
+				memento["death_date"] = death_date;
+				memento["import_date"] = import_date;
+				memento["dir"] = dir;
+				memento["res"] = res;
+				memento["i"] = i;
+				memento["data_count"] = data_count;
+				memento["dir_count"] = dir_count;
+				memento["res_count"] = res_count;
+				memento["sex"] = sex;
+				memento["last"] = last;
+				memento["implant_date"] = implant_date;
+				memento["weight"] = weight;
+				memento["boxChecks"] = boxChecks.flextrine::saveState();
+				memento["otherLocationChecks"] = otherLocationChecks.flextrine::saveState();
+				memento["locationChecks"] = locationChecks.flextrine::saveState();
+				return memento;
 			}
+			
+			return null;
 		}
 		
-		flextrine function restoreState():void {
+		flextrine function restoreState(memento:Dictionary):void {
 			if (isInitialized__) {
-				id = flextrine::savedState["id"];
-				birth_date = flextrine::savedState["birth_date"];
-				death_date = flextrine::savedState["death_date"];
-				import_date = flextrine::savedState["import_date"];
-				dir = flextrine::savedState["dir"];
-				res = flextrine::savedState["res"];
-				i = flextrine::savedState["i"];
-				data_count = flextrine::savedState["data_count"];
-				dir_count = flextrine::savedState["dir_count"];
-				res_count = flextrine::savedState["res_count"];
-				sex = flextrine::savedState["sex"];
-				last = flextrine::savedState["last"];
-				implant_date = flextrine::savedState["implant_date"];
-				weight = flextrine::savedState["weight"];
-				boxChecks.flextrine::restoreState();
-				otherLocationChecks.flextrine::restoreState();
-				locationChecks.flextrine::restoreState();
+				id = memento["id"];
+				rfid = memento["rfid"];
+				birth_date = memento["birth_date"];
+				death_date = memento["death_date"];
+				import_date = memento["import_date"];
+				dir = memento["dir"];
+				res = memento["res"];
+				i = memento["i"];
+				data_count = memento["data_count"];
+				dir_count = memento["dir_count"];
+				res_count = memento["res_count"];
+				sex = memento["sex"];
+				last = memento["last"];
+				implant_date = memento["implant_date"];
+				weight = memento["weight"];
+				boxChecks.flextrine::restoreState(memento["boxChecks"]);
+				otherLocationChecks.flextrine::restoreState(memento["otherLocationChecks"]);
+				locationChecks.flextrine::restoreState(memento["locationChecks"]);
 			}
 		}
 		
