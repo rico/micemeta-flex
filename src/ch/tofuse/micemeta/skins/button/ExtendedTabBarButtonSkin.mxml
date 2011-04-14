@@ -22,7 +22,7 @@
 	
 	<s:transitions>
 		<s:Transition>
-			<s:Fade target="{closeButton}" duration="500" effectStart="{trace('start')}" effectEnd="{trace('end')}"/>
+			<s:Fade target="{closeButton}" duration="500" />
 		</s:Transition>
 	</s:transitions>
 	

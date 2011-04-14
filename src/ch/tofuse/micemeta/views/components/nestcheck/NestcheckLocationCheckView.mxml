@@ -72,8 +72,8 @@
 			
 			public function set activeMice( data:ArrayCollection ):void
 			{
-				if( data && !_activeMice ) {
-					_activeMice = new ArrayCollection( DataUtils.copyEntitiesOverArray( data.source ) )	
+				if( data ) {
+					_activeMice = new ArrayCollection( DataUtils.copyOverArray( data.source ) )	
 				}
 			}
 			
@@ -183,11 +183,11 @@
 				_locationCheck.communal = communal.selected;
 				_locationCheck.remark = remark.text;
 				
+				close();
 			}
 			
 			private function close():void
 			{
-				saveCheck();
 				dispatchEvent( new NestcheckViewEvent( NestcheckViewEvent.CLOSE_LOCATION_CHECK, _locationCheck) );
 			}
 			
@@ -358,7 +358,7 @@
 		
 	</mx:Form>	
 	
-	<buttons:IconButton id="doneButton" label="{_mode == 'view' ? 'close' : 'done'}" click="close()"
+	<buttons:IconButton id="doneButton" label="{_mode == 'view' ? 'close' : 'save'}" click="{_mode == 'view' ? close() : saveCheck()}"
 						iconUp="@Embed(source='ch/tofuse/micemeta/assets/img/done.png')"/>
 	
 </components:AbstractComponentView>

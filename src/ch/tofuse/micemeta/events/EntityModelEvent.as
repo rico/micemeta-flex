@@ -11,6 +11,7 @@ package ch.tofuse.micemeta.events
 		public static const OTHER_LOCATION_ENTITIES_LOADED:String = "otherLocationEntitiesLoaded";
 		public static const BOX_ENTITIES_LOADED:String = "boxEntitiesLoaded";
 		public static const MOUSE_ENTITIES_LOADED:String = "mouseEntitiesLoaded";
+		public static const ACTIVE_MOUSE_ENTITIES_LOADED:String = "activeMouseEntitiesLoaded";
 		
 		private var _model:IEntityModelInterface;
 		

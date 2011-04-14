@@ -3,6 +3,7 @@ package ch.tofuse.micemeta.models
 	import ch.tofuse.micemeta.entities.MouseEntity;
 	import ch.tofuse.micemeta.events.EntityModelEvent;
 	import ch.tofuse.micemeta.events.MouseModelEvent;
+	import ch.tofuse.micemeta.utils.DateUtils;
 	
 	import flash.events.Event;
 	
@@ -40,13 +41,14 @@ package ch.tofuse.micemeta.models
 			if( !_activeMice ) {
 				
 				_activeMice = new ArrayCollection();
-				/*loadAll( new EntityModelEvent( EntityModelEvent.MOUSE_ENTITIES_LOADED, this ) );
+				//loadAll( new EntityModelEvent( EntityModelEvent.ACTIVE_MOUSE_ENTITIES_LOADED, this ) );
 				
 				entityManager.select( 
-					new Query("SELECT m FROM " + QueryUtil.getDQLClass( cls ) + " m WHERE m.data_count > :data_count AND m.last > DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)",{data_count: 100}) 
+					new Query("SELECT m FROM " + QueryUtil.getDQLClass( cls ) + " m WHERE m.data_count > :data_count AND m.last > " + DateUtils.halfYearAhedMysql()  + ")",{data_count: 100}) 
+					//new Query("SELECT m FROM " + QueryUtil.getDQLClass( cls ) + " m WHERE m.data_count > :data_count",{data_count: 10000})
 				).addResponder( 
 					new AsyncResponder(onGetRfidDataResult, onFault) 
-				);*/
+				);
 			}
 			
 			return _activeMice;

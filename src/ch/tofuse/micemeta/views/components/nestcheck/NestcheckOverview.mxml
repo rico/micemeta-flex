@@ -44,6 +44,8 @@
 			import ch.tofuse.micemeta.utils.LocationUtils;
 			
 			import mx.collections.ArrayCollection;
+			import mx.collections.AsyncListView;
+			import mx.events.CollectionEvent;
 			
 			import org.davekeen.flextrine.orm.EntityRepository;
 			import org.davekeen.flextrine.util.EntityUtil;
@@ -71,9 +73,15 @@
 				if( value ) {
 					_nestcheck = value;
 					nestcheckDate.selectedDate = _nestcheck.checkdate;
+					//_nestcheck.locationChecks.addEventListener(CollectionEvent.COLLECTION_CHANGE, locationsChangeHandler);
 					ILocationChecksGrid.dataSource = _nestcheck.locationChecks;
 					dispatchEvent( new Event("nestcheckChanged") );
 				}
+			}
+
+			private function locationsChangeHandler(e:CollectionEvent):void
+			{
+				trace("locations change => " + e.kind);
 			}
 			
 			public function set disabledNestcheckDates( value:Array ):void
@@ -88,19 +96,23 @@
 				
 				if( l is OtherLocationEntity ) {
 					var olc:OtherLocationCheckEntity = new OtherLocationCheckEntity();
+					dispatchPersistEntity( olc );
+					
 					lc = olc;
 					olc.otherLocation = OtherLocationEntity(l);
+					olc.nestcheck = _nestcheck;
 					
-					dispatchPersistEntity( olc );
 					_nestcheck.locationChecks.addItem( olc );
 					ILocationChecksGrid.selectedItem = olc;
 					
 				} else if ( l is BoxEntity ) {
 					var bc:BoxCheckEntity = new BoxCheckEntity();
+					dispatchPersistEntity( bc );
+					
 					lc = bc;
 					bc.box = BoxEntity(l);
+					bc.nestcheck = _nestcheck;
 					
-					dispatchPersistEntity( bc );
 					_nestcheck.locationChecks.addItem( bc );
 					ILocationChecksGrid.selectedItem = bc;e
 				}
@@ -151,21 +163,34 @@
 			
 			private function locationsFilterFunction( item:Object ):Boolean 
 			{
-			
-				if( _nestcheck.locationChecks.getItemIndex( item ) == -1) {
-					return true;
+				for each( var lc:ILocationCheck in _nestcheck.locationChecks ) {
+					if( lc is BoxCheckEntity && item is BoxEntity ) {
+						
+						if( BoxCheckEntity( lc ).box == BoxEntity( item) ) {
+							return false;
+						}
+						
+					} else if ( lc is OtherLocationCheckEntity && item is OtherLocationEntity ) {
+						
+						if( OtherLocationCheckEntity( lc ).otherLocation == OtherLocationEntity( item) ) {
+							return false;
+						}		
+						
+					}
 				}
 				
-				return false;
+				return true;
 			}
 
 			private function updateNestcheckDate():void
 			{
-				_nestcheck.checkdate = nestcheckDate.selectedDate;
 				
 				if ( repository.getEntityState( _nestcheck ) == EntityRepository.STATE_NEW ) {
 					dispatchPersistEntity( _nestcheck );
 				}
+				
+				_nestcheck.checkdate = nestcheckDate.selectedDate;
+				
 			}
 			
 			

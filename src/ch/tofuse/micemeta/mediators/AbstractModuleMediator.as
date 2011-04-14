@@ -43,7 +43,7 @@ package ch.tofuse.micemeta.mediators
 		{
 			_view.repository = _model.repository;
 			_view.entities = _model.repository.entities;
-			_model.repository.entities.addEventListener(CollectionEvent.COLLECTION_CHANGE, collectionChangeHandler );
+			//_model.repository.entities.addEventListener(CollectionEvent.COLLECTION_CHANGE, collectionChangeHandler );
 			
 			addViewListener( EntityMediatorEvent.ENTITY_REMOVE, removeEntityHandler, EntityMediatorEvent );
 			

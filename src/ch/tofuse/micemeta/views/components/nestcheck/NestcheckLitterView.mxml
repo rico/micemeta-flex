@@ -140,14 +140,14 @@
 				}
 			}
 			
-			protected function addNewLitter( ):void
+			private function addNewLitter( ):void
 			{
 				_litter = new LitterEntity();
+				dispatchPersistEntity( _litter );
+				
 				_litter.identifier = new_litter_ti.text;
 				_litter.first_found_age = int( new_litter_age.text );
 				_litter.first_found_date = new Date();
-				
-				dispatchPersistEntity( _litter );
 				
 				_newLitter = true;
 				addLitterCheck();
@@ -164,25 +164,24 @@
 			
 			private function addLitterCheck( ):void
 			{
-				var lc:LitterCheckEntity = new LitterCheckEntity();
+				var litterCheck:LitterCheckEntity = new LitterCheckEntity();
+				dispatchPersistEntity( litterCheck );
 				
 				if( _newLitter ) {
-					lc.remark = new_litter_remark.text;	
+					litterCheck.remark = new_litter_remark.text;	
 				} else {
-					lc.remark = existing_litter_remark.text;
+					litterCheck.remark = existing_litter_remark.text;
 				}
-				
-				lc.litter = _litter;
 				
 				if( _locationCheck is OtherLocationCheckEntity ) {
-					lc.locationCheck = otherLocationCheck;
+					litterCheck.locationCheck = otherLocationCheck;
 				} else if( _locationCheck is BoxCheckEntity ) {
-					lc.locationCheck = boxCheck;
+					litterCheck.locationCheck = boxCheck;
 				}
 				
-				dispatchPersistEntity( lc );
-				_litter.litterChecks.addItem( lc );
-				_locationCheck.litterChecks.addItem( lc );
+				litterCheck.litter = _litter;
+				_litter.litterChecks.addItem( litterCheck );
+				_locationCheck.litterChecks.addItem( litterCheck );
 				
 				new_litter_remark.text = '';
 				existing_litter_remark.text = '';
@@ -270,7 +269,7 @@
 			<s:Label text="(in days)" styleName="inputInfoLabel"/>
 		</s:HGroup>	
 		
-		<s:HGroup gap="10" verticalAlign="middle">
+		<s:HGroup gap="10" verticalAlign="top">
 			<s:Label text="remark" width="60" textAlign="left"/>
 			<s:TextArea id="new_litter_remark" widthInChars="30" heightInLines="5"/>
 		</s:HGroup>	

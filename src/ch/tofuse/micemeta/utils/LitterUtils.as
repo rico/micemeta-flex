@@ -10,12 +10,22 @@ package ch.tofuse.micemeta.utils
 		
 		public static function calculateLitterAgeLabelFunction( litterCheck:LitterCheckEntity, column:DataGridColumn = null ):String
 		{
-			return (DateUtils.dateDiffInDays( new Date(), litterCheck.litter.first_found_date ) + litterCheck.litter.first_found_age).toString();
+			if( litterCheck.litter ) {
+				return (DateUtils.dateDiffInDays( new Date(), litterCheck.litter.first_found_date ) + litterCheck.litter.first_found_age).toString();
+			}
+			
+			return "";
+			
 		}
 		
 		public static function litterCheckIdentifierLabelFunction( litterCheck:LitterCheckEntity, column:DataGridColumn ):String
 		{
-			return litterCheck.litter.identifier;
+			if( litterCheck.litter ) {
+				return litterCheck.litter.identifier;
+			}
+			
+			return "";
+			
 		}
 		
 		public static function litterLabelFunction( litter:LitterEntity ):String

@@ -5,8 +5,7 @@ package ch.tofuse.micemeta.config
 	public class FlextrineConfig extends Configuration
 	{
 		
-		//public static const GATEWAY:String = "http://micemeta/flextrine/php/web/gateway.php?app=micemeta";
-		public static const GATEWAY:String = "http://micemeta/flextrine-clone/php/web/gateway.php?app=micemeta";
+		public static const GATEWAY:String = "http://micemeta/flextrine/php/web/gateway.php?app=micemeta";
 		public static const ENTITY_TIME_TO_LIVE:Number = -1;
 		
 		public function FlextrineConfig():void
