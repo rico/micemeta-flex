@@ -43,12 +43,12 @@ package ch.tofuse.micemeta.models
 				_activeMice = new ArrayCollection();
 				//loadAll( new EntityModelEvent( EntityModelEvent.ACTIVE_MOUSE_ENTITIES_LOADED, this ) );
 				
-				entityManager.select( 
-					new Query("SELECT m FROM " + QueryUtil.getDQLClass( cls ) + " m WHERE m.data_count > :data_count AND m.last > " + DateUtils.halfYearAhedMysql()  + ")",{data_count: 100}) 
+				/*entityManager.select( 
+					new Query("SELECT m FROM " + QueryUtil.getDQLClass( cls ) + " m WHERE m.data_count > :data_count AND m.last > '" + DateUtils.activeMouseThreshold()  + "'",{data_count: 100}) 
 					//new Query("SELECT m FROM " + QueryUtil.getDQLClass( cls ) + " m WHERE m.data_count > :data_count",{data_count: 10000})
 				).addResponder( 
 					new AsyncResponder(onGetRfidDataResult, onFault) 
-				);
+				);*/
 			}
 			
 			return _activeMice;

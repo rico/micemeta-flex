@@ -18,7 +18,6 @@ package ch.tofuse.micemeta.mediators
 			super();
 		}
 		
-		[Inject]
 		public function set view( v:AbstractModuleView ):void
 		{
 			_view = v;	

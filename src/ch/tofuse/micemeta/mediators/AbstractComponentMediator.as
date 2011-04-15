@@ -20,7 +20,6 @@ package ch.tofuse.micemeta.mediators
 			super();
 		}
 		
-		[Inject]
 		public function set view( v:AbstractComponentView ):void
 		{
 			_view = v;	

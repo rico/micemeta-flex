@@ -14,18 +14,17 @@ package ch.tofuse.micemeta.mediators
 	{
 		
 		private var _view:NestcheckLitterView;
-		private var _model:IEntityModelInterface;
 		
 		[Inject]
 		override public function set view( v:AbstractComponentView ):void
 		{
+			super.view = v;
 			_view = NestcheckLitterView(v);	
 		}
 		
 		[Inject(name="LitterModel")]
-		override public function set model( m:IEntityModelInterface ):void
+		override public function set model(m:IEntityModelInterface):void
 		{
-			//_model = m;
 			super.model = m;
 		}
 		

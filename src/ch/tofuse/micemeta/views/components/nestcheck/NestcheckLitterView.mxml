@@ -37,7 +37,6 @@
 			import org.davekeen.flextrine.orm.EntityProxy;
 
 			
-			private var _litter:LitterEntity;
 			private var _currentLocation:Object;
 			private var _boxCheck:BoxCheckEntity;
 			private var _otherLocationCheck:OtherLocationCheckEntity;
@@ -101,11 +100,6 @@
 				dispatchEvent( new Event("modeChanged") );
 			}
 
-			public function get litter():LitterEntity
-			{
-				return _litter;
-			}
-			
 			public function get otherLocationCheck():OtherLocationCheckEntity
 			{
 				return _otherLocationCheck;
@@ -142,27 +136,26 @@
 			
 			private function addNewLitter( ):void
 			{
-				_litter = new LitterEntity();
-				dispatchPersistEntity( _litter );
+				var litter:LitterEntity = new LitterEntity();
+				dispatchPersistEntity( litter );
 				
-				_litter.identifier = new_litter_ti.text;
-				_litter.first_found_age = int( new_litter_age.text );
-				_litter.first_found_date = new Date();
+				litter.identifier = new_litter_ti.text;
+				litter.first_found_age = int( new_litter_age.text );
+				litter.first_found_date = new Date();
 				
 				_newLitter = true;
-				addLitterCheck();
+				addLitterCheckToLitter( litter );
 				proposeLitterIdentifier();
 			}
 			
 			private function addExistingLitter( e:AutoCompleteListEvent ):void
 			{
-				_litter = LitterEntity( e.item );
-				
+				var litter:LitterEntity = LitterEntity( e.item );
 				_newLitter = false;
-				addLitterCheck();
+				addLitterCheckToLitter( litter );
 			}
 			
-			private function addLitterCheck( ):void
+			private function addLitterCheckToLitter( litter:LitterEntity ):void
 			{
 				var litterCheck:LitterCheckEntity = new LitterCheckEntity();
 				dispatchPersistEntity( litterCheck );
@@ -179,8 +172,8 @@
 					litterCheck.locationCheck = boxCheck;
 				}
 				
-				litterCheck.litter = _litter;
-				_litter.litterChecks.addItem( litterCheck );
+				litterCheck.litter = litter;
+				litter.litterChecks.addItem( litterCheck );
 				_locationCheck.litterChecks.addItem( litterCheck );
 				
 				new_litter_remark.text = '';

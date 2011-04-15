@@ -32,21 +32,15 @@ package ch.tofuse.micemeta.context
 	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	import ch.tofuse.micemeta.views.modules.nestcheck.NestcheckModuleView;
 	
-	import flash.display.DisplayObjectContainer;
-	
 	import org.robotlegs.mvcs.Context;
 	
 	public class ApplicationContext extends Context
 	{
-		public function ApplicationContext(contextView:DisplayObjectContainer=null, autoStartup:Boolean=true)
-		{
-			super(contextView, autoStartup);
-		}
 		
 		override public function startup():void
 		{
 			// MODELS
-			injector.mapSingleton( ContentModel );
+			injector.mapSingleton( ContentModel, "ContentModel" );
 			injector.mapSingletonOf( IEntityModelInterface, OtherLocationModel,'OtherLocationModel' );
 			injector.mapSingletonOf( IEntityModelInterface, BoxModel, 'BoxModel' );
 			injector.mapSingletonOf( IEntityModelInterface, NestcheckModel, 'NestcheckModel' );

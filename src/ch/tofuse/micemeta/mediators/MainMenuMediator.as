@@ -18,7 +18,7 @@ package ch.tofuse.micemeta.mediators
 		[Inject]
 		public var view:MainMenuView;
 		
-		[Inject]
+		[Inject(name="ContentModel")]
 		public var model:ContentModel;
 		
 		override public function onRegister():void

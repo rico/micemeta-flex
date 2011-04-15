@@ -22,7 +22,7 @@ package ch.tofuse.micemeta.mediators
 		[Inject]
 		public var view:ContentNavigatorView;
 		
-		[Inject]
+		[Inject(name="ContentModel")]
 		public var model:ContentModel;
 		
 		

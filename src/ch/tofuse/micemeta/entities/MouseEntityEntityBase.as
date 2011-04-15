@@ -78,23 +78,11 @@ package ch.tofuse.micemeta.entities {
 		private var _weight:Number = 0;
 		
 		[Association(side="inverse", oppositeAttribute="mice", oppositeCardinality="*")]
-		public function get boxChecks():PersistentCollection { checkIsInitialized("boxChecks"); return _boxChecks; }
-		public function set boxChecks(value:PersistentCollection):void { _boxChecks = value; }
-		private var _boxChecks:PersistentCollection;
-		
-		[Association(side="inverse", oppositeAttribute="mice", oppositeCardinality="*")]
-		public function get otherLocationChecks():PersistentCollection { checkIsInitialized("otherLocationChecks"); return _otherLocationChecks; }
-		public function set otherLocationChecks(value:PersistentCollection):void { _otherLocationChecks = value; }
-		private var _otherLocationChecks:PersistentCollection;
-		
-		[Association(side="inverse", oppositeAttribute="mice", oppositeCardinality="*")]
 		public function get locationChecks():PersistentCollection { checkIsInitialized("locationChecks"); return _locationChecks; }
 		public function set locationChecks(value:PersistentCollection):void { _locationChecks = value; }
 		private var _locationChecks:PersistentCollection;
 		
 		public function MouseEntityEntityBase() {
-			if (!_boxChecks) _boxChecks = new PersistentCollection(null, true, "boxChecks", this);
-			if (!_otherLocationChecks) _otherLocationChecks = new PersistentCollection(null, true, "otherLocationChecks", this);
 			if (!_locationChecks) _locationChecks = new PersistentCollection(null, true, "locationChecks", this);
 		}
 		
@@ -160,8 +148,6 @@ package ch.tofuse.micemeta.entities {
 				memento["last"] = last;
 				memento["implant_date"] = implant_date;
 				memento["weight"] = weight;
-				memento["boxChecks"] = boxChecks.flextrine::saveState();
-				memento["otherLocationChecks"] = otherLocationChecks.flextrine::saveState();
 				memento["locationChecks"] = locationChecks.flextrine::saveState();
 				return memento;
 			}
@@ -186,8 +172,6 @@ package ch.tofuse.micemeta.entities {
 				last = memento["last"];
 				implant_date = memento["implant_date"];
 				weight = memento["weight"];
-				boxChecks.flextrine::restoreState(memento["boxChecks"]);
-				otherLocationChecks.flextrine::restoreState(memento["otherLocationChecks"]);
 				locationChecks.flextrine::restoreState(memento["locationChecks"]);
 			}
 		}

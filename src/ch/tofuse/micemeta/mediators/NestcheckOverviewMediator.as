@@ -23,6 +23,20 @@ package ch.tofuse.micemeta.mediators
 		private var _view:NestcheckOverview;
 		private var _nestcheckModel:NestcheckModel;
 		
+		[Inject]
+		override public function set view( v:AbstractComponentView ):void
+		{
+			_view = NestcheckOverview( v );	
+			super.view = _view;
+		}
+		
+		[Inject(name="NestcheckModel")]
+		override public function set model(m:IEntityModelInterface):void
+		{
+			_nestcheckModel = NestcheckModel( m );
+			super.model = m;
+		}
+		
 		override public function onRegister():void
 		{
 			super.onRegister();
@@ -50,20 +64,6 @@ package ch.tofuse.micemeta.mediators
 		private function locationEntitiesLoadedHandler( e:NestcheckModelEvent ):void
 		{
 			_view.locationsData = _nestcheckModel.locations;
-		}
-		
-		[Inject(name="NestcheckModel")]
-		override public function set model(m:IEntityModelInterface):void
-		{
-			_nestcheckModel = NestcheckModel( m );
-			super.model = m;
-		}
-		
-		[Inject]
-		override public function set view( v:AbstractComponentView ):void
-		{
-			_view = NestcheckOverview( v );	
-			super.view = _view;
 		}
 		
 		override public function get view():AbstractComponentView

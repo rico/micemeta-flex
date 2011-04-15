@@ -4,11 +4,18 @@ package ch.tofuse.micemeta.mediators
 	import ch.tofuse.micemeta.entities.NestCheckEntity;
 	import ch.tofuse.micemeta.events.EntityMediatorEvent;
 	import ch.tofuse.micemeta.interfaces.IEntityModelInterface;
+	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	
 	import mx.events.ModuleEvent;
 	
 	public class NestcheckModuleMediator extends AbstractModuleMediator
 	{
+		
+		[Inject]
+		override public function set view( v:AbstractModuleView ):void
+		{
+			super.view = v;
+		}
 		
 		[Inject(name="NestcheckModel")]
 		override public function set model(m:IEntityModelInterface):void

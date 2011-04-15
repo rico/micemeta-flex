@@ -49,7 +49,6 @@ package ch.tofuse.micemeta.models
 			_idField = EntityUtil.getAttributesWithTag( new _class(), MetaTags.ID ); 
 		}
 		
-		[Bindable(Event="entityManagerInstanceChange")]
 		public function get entityManager():EntityManager
 		{
 			if( !_em ) {

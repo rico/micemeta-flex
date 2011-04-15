@@ -10,6 +10,13 @@ package ch.tofuse.micemeta.mediators
 	
 	public class OtherLocationMediator extends AbstractComponentMediator
 	{
+		
+		[Inject]
+		override public function set view( v:AbstractComponentView ):void
+		{
+			super.view = v;
+		}
+		
 		[Inject(name="OtherLocationModel")]
 		override public function set model(m:IEntityModelInterface):void
 		{

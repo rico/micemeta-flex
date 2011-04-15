@@ -12,6 +12,13 @@ package ch.tofuse.micemeta.mediators
 		
 		private var _view:NestcheckView;
 		
+		[Inject]
+		override public function set view( v:AbstractComponentView ):void
+		{
+			_view = NestcheckView( v );	
+			super.view = _view;
+		}
+		
 		[Inject(name="NestcheckModel")]
 		override public function set model(m:IEntityModelInterface):void
 		{
