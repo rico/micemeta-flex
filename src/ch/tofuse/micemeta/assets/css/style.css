@@ -139,7 +139,8 @@ mx|DateField, mx|Button, mx|DataGrid, mx|FormItem, mx|FormItemLabel, mx|Label, m
 /* INPUTS */
 
 mx|DateField {
-	
+	/*color: #000000;
+	disabled-color: #000000;*/
 }
 
 /* BUTTONS */

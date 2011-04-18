@@ -7,7 +7,7 @@ package ch.tofuse.micemeta.views.inputs
 	import spark.components.TextInput;
 	import spark.events.TextOperationEvent;
 	
-	public class NumericTextInput extends TextInput
+	public class NumericTextInput extends BaseTextInput
 	{
 		public function NumericTextInput()
 		{

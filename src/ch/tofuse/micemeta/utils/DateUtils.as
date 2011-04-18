@@ -1,5 +1,7 @@
 package ch.tofuse.micemeta.utils
 {
+	import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
+	
 	import mx.formatters.DateFormatter;
 
 	public class DateUtils
@@ -20,6 +22,14 @@ package ch.tofuse.micemeta.utils
 			dateFormatter.formatString = MYSQL_DATE_FORMAT;
 			
 			return dateFormatter.format( new Date(new Date().getTime() - 200 * MILLISECONDS_PER_DAY) );
+		}
+		
+		public static function toGeneralDateFormat( nestcheckDate:Date ):String
+		{
+			
+			var dateFormatter:GeneralDateFormatter = new GeneralDateFormatter();
+			
+			return dateFormatter.format( nestcheckDate );
 		}
 	}
 }

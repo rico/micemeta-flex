@@ -11,6 +11,7 @@
 						  width="100%"
 						  height="100%"
 						  toolTip="edit item"
+						  autoDrawBackground="false"
 						  click="{dispatchEvent( new DataGridItemRendererEvent( DataGridItemRendererEvent.EDIT_ITEM ) )}">
 	<fx:Script>
 		<![CDATA[

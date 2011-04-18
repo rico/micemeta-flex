@@ -11,7 +11,8 @@
 						  width="100%"
 						  height="100%"
 						  toolTip="delete item"
-						  click="showConfirm(event)">
+						  click="showConfirm(event)"
+						  autoDrawBackground="false">
 	
 	<fx:Script>
 		<![CDATA[

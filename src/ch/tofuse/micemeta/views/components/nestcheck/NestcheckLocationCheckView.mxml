@@ -27,13 +27,11 @@
 			import ch.tofuse.micemeta.entities.BoxCheckEntity;
 			import ch.tofuse.micemeta.entities.ILocationCheck;
 			import ch.tofuse.micemeta.entities.LitterCheckEntity;
-			import ch.tofuse.micemeta.entities.LitterEntity;
 			import ch.tofuse.micemeta.entities.MouseEntity;
 			import ch.tofuse.micemeta.entities.NestCheckEntity;
 			import ch.tofuse.micemeta.entities.OtherLocationCheckEntity;
 			import ch.tofuse.micemeta.events.AutoCompleteListEvent;
 			import ch.tofuse.micemeta.events.NestcheckViewEvent;
-			import ch.tofuse.micemeta.skins.input.DisabledTextInputSkin;
 			import ch.tofuse.micemeta.utils.DataUtils;
 			import ch.tofuse.micemeta.utils.MouseUtils;
 			
@@ -287,7 +285,7 @@
 		</mx:FormItem>
 		
 		<mx:FormItem label="number of pups">
-			<inputs:NumericTextInput id="pups" enabled="false" skinClass="ch.tofuse.micemeta.skins.input.DisabledTextInputSkin"
+			<inputs:NumericTextInput id="pups" enabled="false"
 									 numericValue="{ pups_male_alive.numericValue + pups_male_dead.numericValue + pups_female_alive.numericValue + pups_female_dead.numericValue + pups_unknown_alive.numericValue + pups_unknown_dead.numericValue }"/>
 		</mx:FormItem>
 		

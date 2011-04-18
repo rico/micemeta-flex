@@ -6,6 +6,8 @@ package ch.tofuse.micemeta.mediators
 	import ch.tofuse.micemeta.interfaces.IEntityModelInterface;
 	import ch.tofuse.micemeta.views.modules.AbstractModuleView;
 	
+	import mx.events.CollectionEvent;
+	import mx.events.CollectionEventKind;
 	import mx.events.ModuleEvent;
 	
 	public class NestcheckModuleMediator extends AbstractModuleMediator
@@ -27,9 +29,8 @@ package ch.tofuse.micemeta.mediators
 		{
 			super.onRegister();
 			view.menuEntriesData = model.repository.entities;
-			
 		}
-		
+
 		override protected function removeEntityHandler( e:EntityMediatorEvent ):void
 		{
 			var nc:NestCheckEntity = e.entity;

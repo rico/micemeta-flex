@@ -41,6 +41,7 @@
 			import ch.tofuse.micemeta.events.EntityEvent;
 			import ch.tofuse.micemeta.events.NestcheckViewEvent;
 			import ch.tofuse.micemeta.formatters.GeneralDateFormatter;
+			import ch.tofuse.micemeta.utils.DateUtils;
 			import ch.tofuse.micemeta.utils.LocationUtils;
 			
 			import mx.collections.ArrayCollection;
@@ -72,7 +73,6 @@
 			{
 				if( value ) {
 					_nestcheck = value;
-					nestcheckDate.selectedDate = _nestcheck.checkdate;
 					//_nestcheck.locationChecks.addEventListener(CollectionEvent.COLLECTION_CHANGE, locationsChangeHandler);
 					ILocationChecksGrid.dataSource = _nestcheck.locationChecks;
 					dispatchEvent( new Event("nestcheckChanged") );
@@ -189,7 +189,7 @@
 					dispatchPersistEntity( _nestcheck );
 				}
 				
-				_nestcheck.checkdate = nestcheckDate.selectedDate;
+				_nestcheck.checkdate = nestcheckDateSelector.selectedDate;
 				
 			}
 			
@@ -204,14 +204,20 @@
 				 verticalCenter="0"/>
 		<s:HGroup gap="10" verticalAlign="middle"
 				  paddingTop="2" paddingRight="2" paddingLeft="2" paddingBottom="2">
-			<mx:DateField id="nestcheckDate"
+			<mx:DateField id="nestcheckDateSelector"
+						  selectedDate="{_nestcheck.checkdate}"
 						  formatString="{GeneralDateFormatter.DATE_FORMAT}" 
 						  disabledRanges="{_disabledNestcheckDates}"
 						  change="updateNestcheckDate()"
 						  left="{LayoutConfig.FORM_ITEM_VALUE_LEFT}"
 						  verticalCenter="0"
-						  enabled="{currentState != 'view'}"
+						  includeIn="add,edit"
 						  showToday="false"/>	
+			<inputs:BaseTextInput id="nestcheckDateIndicator" enabled="false"
+								  includeIn="view"
+								  width="65"
+								  text="{DateUtils.toGeneralDateFormat(_nestcheck.checkdate)}"/>
+			
 			<text:InfoText text="Select the date the nestcheck took place."
 						   visible="{_nestcheck.checkdate == null}"
 						   includeInLayout="{_nestcheck.checkdate == null}" />
@@ -222,8 +228,8 @@
 	<!-- checks -->
 	<s:VGroup id="checks"
 			  gap="10"
-			  includeInLayout="{nestcheckDate.selectedDate != null}"
-			  visible="{nestcheckDate.selectedDate != null}">
+			  includeInLayout="{nestcheckDateSelector.selectedDate != null}"
+			  visible="{nestcheckDateSelector.selectedDate != null}">
 		
 		<s:Label text="Locations" 
 				 styleName="formItemlabel" 
