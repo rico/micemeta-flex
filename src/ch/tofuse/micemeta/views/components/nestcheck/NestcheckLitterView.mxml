@@ -253,7 +253,7 @@
 		
 		<s:HGroup gap="10" verticalAlign="middle">
 			<s:Label text="identifier" width="60" textAlign="left"/>
-			<s:TextInput id="new_litter_ti" text="{_proposedLitterIdentifier}" />
+			<inputs:BaseTextInput id="new_litter_ti" text="{_proposedLitterIdentifier}" />
 		</s:HGroup>	
 		
 		<s:HGroup gap="10" verticalAlign="middle">

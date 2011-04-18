@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="micemeta" default="clean">
+    
+	<property name="base.dir" value="/Library/WebServer/micemeta/"/>
+
+    <property name="flex.src" value="${base.dir}flex/src/"/>
+     	
+	<property name="flextrine.bin.dir" value="${base.dir}/flextrine/php/bin/"/>
+	<property name="flextrine.bin" value="flextrine"/>
+	
+ 	<property name="sql.driver" value="org.gjt.mm.mysql.Driver"/>
+	<property name="sql.url" value="jdbc:mysql://localhost"/>
+	<property name="sql.user" value="root"/>
+	<property name="sql.pass" value="wasser"/>
+	<property name="sql.database" value="micemeta"/>
+	
+	<property name="mysql.bin" value="/usr/local/mysql/bin/mysql"/>
+	<property name="mysql.data" value="${base.dir}flex/sql/insert_rfid_box_values.sql"/>
+		
+	<property name="classpath" value="lib"/>
+		
+    <target name="clean" depends="insertData" />
+
+	<target name="dropDatabase">
+		<echo>drop database</echo>
+		<sql driver="${sql.driver}" url="${sql.url}" userid="${sql.user}" password="${sql.pass}" >
+			DROP DATABASE IF EXISTS ${sql.database}; 
+		</sql>
+	</target>
+
+	<target name="createDatabase" depends="dropDatabase">
+		<echo>create databse</echo>
+		<sql driver="${sql.driver}" url="${sql.url}" userid="${sql.user}" password="${sql.pass}" >
+			CREATE DATABASE ${sql.database}; 
+		</sql>
+	</target>
+
+	<target name="ormCreateSchema" depends="createDatabase" description="description">
+		<echo>create schema</echo>
+		<exec dir="${flextrine.bin.dir}" executable="/usr/bin/php" failonerror="true">
+			<arg value="${flextrine.bin}" />
+			<arg value="orm:schema-tool:create" />
+		</exec> 
+    </target>
+
+	<target name="insertData" depends="ormCreateSchema">
+		<echo>insert data</echo>
+		<sql driver="${sql.driver}" url="${sql.url}/${sql.database}" userid="${sql.user}" password="${sql.pass}" >
+			<transaction src="${mysql.data}"/> 
+		</sql>
+	</target>
+
+	<target name="ormCreateEntities" depends="insertData" >
+		<echo>create entities</echo>
+        <exec executable="${flextrine.bin}" failonerror="true">
+			<arg value="as3:generate-entities" />
+			<arg value="${flex.src}" />
+		</exec> 
+    </target>
+
+
+</project>

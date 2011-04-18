@@ -53,6 +53,6 @@
 	<s:Button id="clearButton"
 			  verticalCenter="0"
 			  right="5"
-			  skinClass="ch.tofuse.micemeta.skins.SearchTextInputClearButtonSkin"/>
+			  skinClass="ch.tofuse.micemeta.skins.button.SearchTextInputClearButtonSkin"/>
 
 </s:SparkSkin>
